@@ -2,10 +2,14 @@
 
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { effectiveBg } from "./checks";
 import { MODULES } from "./modules";
 import { setAt, getAt, uid } from "./path";
-import { exampleDentalWater, makeModule, pageFromRecipe } from "./recipes";
-import type { ModuleInstance, ModuleType, PageDoc, Viewport } from "./types";
+import { EXAMPLES, exampleDentalWater, exampleST108, makeModule, pageFromRecipe } from "./recipes";
+import type { ModuleInstance, ModuleStyle, ModuleType, PageDoc, Viewport } from "./types";
+
+/** Bump when a new worked example ships, so browsers that already have pages get it too. */
+const SEED_VERSION = 2;
 
 type Snapshot = { pageId: string; modules: ModuleInstance[] };
 
@@ -20,9 +24,12 @@ interface BuilderState {
   past: Snapshot[];
   future: Snapshot[];
   toast: { msg: string; undo?: boolean } | null;
+  seeded: number;
+  savedAt: number;
 
   // pages
   seedIfEmpty: () => void;
+  addExample: (id: string) => void;
   createPage: (name: string, recipeId: string) => string;
   addPage: (page: PageDoc) => string;
   duplicatePage: (id: string) => void;
@@ -41,6 +48,12 @@ interface BuilderState {
   updateField: (uid: string, path: string, value: unknown) => void;
   addItem: (uid: string, group: string) => void;
   removeItem: (uid: string, group: string, index: number) => void;
+  setElement: (uid: string, elementId: string, on: boolean) => void;
+  setStyle: (uid: string, patch: ModuleStyle) => void;
+  setAnchor: (uid: string, anchor: string) => void;
+  setNote: (uid: string, note: string) => void;
+  selectAdjacent: (dir: -1 | 1) => void;
+  tidyBackgrounds: () => number;
 
   // ui
   setViewport: (v: Viewport) => void;
@@ -71,6 +84,7 @@ export const useBuilder = create<BuilderState>()(
         if (next === page.modules) return;
         set({
           pages: s.pages.map((p) => (p.id === page.id ? { ...p, modules: next, updatedAt: Date.now() } : p)),
+          savedAt: Date.now(),
           ...(record
             ? { past: [...s.past, { pageId: page.id, modules: page.modules }].slice(-HISTORY), future: [] }
             : {}),
@@ -82,21 +96,35 @@ export const useBuilder = create<BuilderState>()(
         activeId: null,
         selectedUid: null,
         viewport: "desktop",
-        showSpecs: true,
+        showSpecs: false,
         preview: false,
         focus: null,
         past: [],
         future: [],
         toast: null,
+        seeded: 0,
+        savedAt: 0,
 
         seedIfEmpty: () => {
-          if (get().pages.length) {
-            if (!get().activeId || !activePage(get())) set({ activeId: get().pages[0].id });
+          const s = get();
+          if (!s.pages.length) {
+            const master = pageFromRecipe("master", "Master template");
+            set({ pages: [master, exampleDentalWater(), exampleST108()], activeId: master.id, seeded: SEED_VERSION });
             return;
           }
-          const master = pageFromRecipe("master", "Master template");
-          const example = exampleDentalWater();
-          set({ pages: [master, example], activeId: master.id });
+          if (s.seeded < SEED_VERSION) {
+            // Existing browsers: add the examples that shipped since their last visit, leave their pages alone
+            const add = s.pages.some((p) => p.name.startsWith("Example — ST108")) ? [] : [exampleST108()];
+            set({ pages: [...s.pages, ...add], seeded: SEED_VERSION });
+          }
+          if (!get().activeId || !activePage(get())) set({ activeId: get().pages[0].id });
+        },
+
+        addExample: (id) => {
+          const ex = EXAMPLES.find((e) => e.id === id);
+          if (!ex) return;
+          const page = ex.make();
+          set((s) => ({ pages: [...s.pages, page], activeId: page.id, selectedUid: null, past: [], future: [], preview: false }));
         },
 
         createPage: (name, recipeId) => {
@@ -142,6 +170,7 @@ export const useBuilder = create<BuilderState>()(
         updatePage: (patch) =>
           set((s) => ({
             pages: s.pages.map((p) => (p.id === s.activeId ? { ...p, ...patch, updatedAt: Date.now() } : p)),
+            savedAt: Date.now(),
           })),
 
         select: (u) => set({ selectedUid: u }),
@@ -242,6 +271,77 @@ export const useBuilder = create<BuilderState>()(
             }),
           ),
 
+        setElement: (u, elementId, on) => {
+          const page = activePage(get());
+          const mod = page?.modules.find((m) => m.uid === u);
+          if (!mod) return;
+          const spec = MODULES[mod.type].elements.find((e) => e.id === elementId);
+          if (!spec) return;
+          commit((mods) =>
+            mods.map((m) => {
+              if (m.uid !== u) return m;
+              const hidden = new Set(m.hidden ?? []);
+              if (on) hidden.delete(elementId);
+              else hidden.add(elementId);
+              return { ...m, hidden: [...hidden] };
+            }),
+          );
+          if (!on) get().showToast(`${spec.label} hidden. Bring it back from Show / hide.`, true);
+        },
+
+        setStyle: (u, patch) =>
+          commit((mods) => mods.map((m) => (m.uid === u ? { ...m, style: { ...m.style, ...patch } } : m))),
+
+        setAnchor: (u, anchor) =>
+          commit(
+            (mods) => mods.map((m) => (m.uid === u ? { ...m, anchor: anchor || undefined } : m)),
+            false,
+          ),
+
+        setNote: (u, note) =>
+          commit(
+            (mods) => mods.map((m) => (m.uid === u ? { ...m, note: note || undefined } : m)),
+            false,
+          ),
+
+        tidyBackgrounds: () => {
+          // Give neighbouring sections different backgrounds, using only the colors each block allows
+          let changed = 0;
+          commit((mods) => {
+            const out = mods.map((m) => ({ ...m }));
+            for (let i = 1; i < out.length; i++) {
+              const prev = effectiveBg(out[i - 1]);
+              const cur = effectiveBg(out[i]);
+              const next = out[i + 1] ? effectiveBg(out[i + 1]) : null;
+              const allowed = MODULES[out[i].type].backgrounds;
+              const clash = cur === prev && (cur !== "white" || (out[i - 1].type !== "hero" && allowed.includes("silver")));
+              if (!allowed.length || !clash) continue;
+              const pick = (["white", "silver", "cyan"] as const).find((b) => allowed.includes(b) && b !== prev && b !== next) ??
+                allowed.find((b) => b !== prev);
+              if (pick && pick !== cur) {
+                out[i] = { ...out[i], style: { ...out[i].style, bg: pick } };
+                changed++;
+              }
+            }
+            return changed ? out : mods;
+          });
+          get().showToast(changed ? `Changed ${changed} background${changed > 1 ? "s" : ""} so sections stand apart` : "Backgrounds already alternate", !!changed);
+          return changed;
+        },
+
+        selectAdjacent: (dir) => {
+          const s = get();
+          const page = activePage(s);
+          if (!page?.modules.length) return;
+          const i = page.modules.findIndex((m) => m.uid === s.selectedUid);
+          const j = i < 0 ? (dir > 0 ? 0 : page.modules.length - 1) : Math.min(page.modules.length - 1, Math.max(0, i + dir));
+          const next = page.modules[j];
+          set({ selectedUid: next.uid });
+          requestAnimationFrame(() =>
+            document.getElementById(`mod-${next.uid}`)?.scrollIntoView({ behavior: "smooth", block: "nearest" }),
+          );
+        },
+
         setViewport: (v) => set({ viewport: v }),
         toggleSpecs: () => set((s) => ({ showSpecs: !s.showSpecs })),
         setPreview: (on) => set({ preview: on, selectedUid: on ? null : get().selectedUid }),
@@ -277,9 +377,36 @@ export const useBuilder = create<BuilderState>()(
     },
     {
       name: "agenics-page-builder:v1",
+      version: 2,
       storage: createJSONStorage(() => localStorage),
       skipHydration: true,
-      partialize: (s) => ({ pages: s.pages, activeId: s.activeId, viewport: s.viewport, showSpecs: s.showSpecs }),
+      partialize: (s) => ({
+        pages: s.pages,
+        activeId: s.activeId,
+        viewport: s.viewport,
+        showSpecs: s.showSpecs,
+        seeded: s.seeded,
+      }),
+      migrate: (persisted, version) => {
+        const state = persisted as { pages?: PageDoc[]; seeded?: number };
+        if (version < 2) {
+          // New optional slots (hero supporting paragraph, CTA reassurance line) start switched off on old pages
+          state.pages = (state.pages ?? []).map((p) => ({
+            ...p,
+            modules: p.modules.map((mod) => {
+              const meta = MODULES[mod.type];
+              const missing = (meta.hiddenByDefault ?? []).filter((k) => !(k in mod.data));
+              if (!missing.length) return mod;
+              const defaults = meta.defaults();
+              const data = { ...mod.data };
+              missing.forEach((k) => (data[k] = defaults[k]));
+              return { ...mod, data, hidden: [...new Set([...(mod.hidden ?? []), ...missing])] };
+            }),
+          }));
+          state.seeded = state.seeded ?? 1;
+        }
+        return state as unknown as BuilderState;
+      },
     },
   ),
 );

@@ -4,7 +4,7 @@ import { Fragment } from "react";
 import { getAt } from "@/lib/path";
 import { useBuilder } from "@/lib/store";
 import type { ModuleType } from "@/lib/types";
-import { Btn, Img, ItemAdd, ItemRemove, Note, T, useMod } from "./edit";
+import { Btn, IconSlot, Img, ItemAdd, ItemRemove, Note, Paras, Section, T, useMod, useShown } from "./edit";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -34,40 +34,34 @@ function ArrowIcon() {
 /* M01 ---------------------------------------------------------------- */
 function Hero() {
   const { variant } = useMod();
+  const body = (
+    <div className="agx-hero__body">
+      <T path="eyebrow" as="p" className="agx-eyebrow agx-eyebrow--cyan" />
+      <T path="h1" as="h1" className="agx-h1" />
+      <T path="sub" as="p" className="agx-hero__sub" />
+      <T path="body" as="p" className="agx-hero__more" />
+      <div className="agx-btns">
+        <Btn path="cta1" variant="cyan" />
+        <Btn path="cta2" variant="outline-light" />
+      </div>
+    </div>
+  );
   if (variant === "split") {
     return (
-      <section className="agx-hero agx-hero--split" aria-label="Hero">
+      <Section base="agx-hero agx-hero--split" label="Hero">
         <div className="agx-hero__split">
-          <div className="agx-hero__body">
-            <T path="eyebrow" as="p" className="agx-eyebrow agx-eyebrow--cyan" />
-            <T path="h1" as="h1" className="agx-h1" />
-            <T path="sub" as="p" className="agx-hero__sub" />
-            <div className="agx-btns">
-              <Btn path="cta1" variant="cyan" />
-              <Btn path="cta2" variant="outline-light" />
-            </div>
-          </div>
+          {body}
           <Img path="image" className="agx-hero__splitimg" />
         </div>
-      </section>
+      </Section>
     );
   }
   return (
-    <section className="agx-hero" aria-label="Hero">
-      <Img path="image" className="agx-hero__media" position="75% 50%" controls="chip" />
+    <Section base="agx-hero" label="Hero">
+      <Img path="image" className="agx-hero__media" position="72% 50%" controls="chip" />
       <div className="agx-hero__shade" aria-hidden="true" />
-      <div className="agx-wrap agx-hero__inner">
-        <div className="agx-hero__body">
-          <T path="eyebrow" as="p" className="agx-eyebrow agx-eyebrow--cyan" />
-          <T path="h1" as="h1" className="agx-h1" />
-          <T path="sub" as="p" className="agx-hero__sub" />
-          <div className="agx-btns">
-            <Btn path="cta1" variant="cyan" />
-            <Btn path="cta2" variant="outline-light" />
-          </div>
-        </div>
-      </div>
-    </section>
+      <div className="agx-wrap agx-hero__inner">{body}</div>
+    </Section>
   );
 }
 
@@ -75,7 +69,7 @@ function Hero() {
 function Trust() {
   const { data } = useMod();
   return (
-    <section className="agx-trust" aria-label="Proof points">
+    <Section base="agx-trust" label="Proof points">
       <div className="agx-wrap">
         <div className="agx-trust__grid">
           {list(data, "items").map((_, i) => (
@@ -91,7 +85,7 @@ function Trust() {
         </div>
         <ItemAdd group="items" />
       </div>
-    </section>
+    </Section>
   );
 }
 
@@ -99,7 +93,7 @@ function Trust() {
 function Intro() {
   const { data, variant } = useMod();
   return (
-    <section className="agx-sec" aria-label="Introduction">
+    <Section label="Introduction">
       <div className="agx-wrap agx-center">
         <div className="agx-intro">
           <T path="h2" as="h2" className="agx-h2" />
@@ -124,15 +118,16 @@ function Intro() {
           </>
         ) : null}
       </div>
-    </section>
+    </Section>
   );
 }
 
 /* M04 ---------------------------------------------------------------- */
 function Feature() {
   const { data, variant } = useMod();
+  const benefits = useShown("benefits");
   return (
-    <section className="agx-sec agx-sec--tint" aria-label="Feature">
+    <Section label="Feature">
       <div className={`agx-wrap agx-feature ${variant === "image-right" ? "agx-feature--right" : ""}`}>
         <div className="agx-feature__media">
           <Img path="image" className="agx-ratio-4x5 agx-rounded" />
@@ -140,40 +135,44 @@ function Feature() {
         <div className="agx-feature__body">
           <T path="eyebrow" as="p" className="agx-eyebrow" />
           <T path="h2" as="h2" className="agx-h2" />
-          <div className="agx-benefits">
-            {list(data, "benefits").map((_, i) => (
-              <div className="agx-benefit agx-item" key={i}>
-                <span className="agx-benefit__mark" aria-hidden="true" />
-                <div className="agx-col">
-                  <T path={`benefits.${i}.title`} as="h3" className="agx-h3" note={i === 0} />
-                  <T path={`benefits.${i}.body`} as="p" note={i === 0} />
+          {benefits ? (
+            <div className="agx-benefits">
+              {list(data, "benefits").map((_, i) => (
+                <div className="agx-benefit agx-item" key={i}>
+                  <span className="agx-benefit__mark" aria-hidden="true" />
+                  <div className="agx-col">
+                    <T path={`benefits.${i}.title`} as="h3" className="agx-h3" note={i === 0} />
+                    <T path={`benefits.${i}.body`} as="p" note={i === 0} />
+                  </div>
+                  <ItemRemove group="benefits" index={i} />
                 </div>
-                <ItemRemove group="benefits" index={i} />
-              </div>
-            ))}
-            <ItemAdd group="benefits" />
-          </div>
+              ))}
+              <ItemAdd group="benefits" />
+            </div>
+          ) : null}
           <div className="agx-btns">
             <Btn path="cta" variant="outline" />
           </div>
         </div>
       </div>
-    </section>
+    </Section>
   );
 }
 
 /* M05 ---------------------------------------------------------------- */
 function Products() {
   const { data } = useMod();
+  const bullets = useShown("cards.0.bullets.0");
+  const cards = list(data, "cards");
   return (
-    <section className="agx-sec" aria-label="Products">
+    <Section label="Products">
       <div className="agx-wrap">
         <div className="agx-head agx-center">
           <T path="h2" as="h2" className="agx-h2" />
           <T path="intro" as="p" className="agx-lead" />
         </div>
-        <div className="agx-cards">
-          {list(data, "cards").map((card, i) => (
+        <div className={`agx-cards agx-cards--${cards.length}`}>
+          {cards.map((card, i) => (
             <article className="agx-card agx-item" key={i}>
               <div className="agx-card__tile">
                 <Img path={`cards.${i}.image`} className="agx-ratio-1x1" fit="contain" />
@@ -182,15 +181,17 @@ function Products() {
                 <T path={`cards.${i}.type`} as="p" className="agx-kicker" note={i === 0} />
                 <T path={`cards.${i}.name`} as="h3" className="agx-h3 agx-card__name" note={i === 0} />
                 <T path={`cards.${i}.tagline`} as="p" note={i === 0} />
-                <ul className="agx-bullets">
-                  {(card.bullets as string[]).map((_, b) => (
-                    <Fragment key={b}>
-                      <li>
-                        <T path={`cards.${i}.bullets.${b}`} note={i === 0 && b === 0} />
-                      </li>
-                    </Fragment>
-                  ))}
-                </ul>
+                {bullets ? (
+                  <ul className="agx-bullets">
+                    {(card.bullets as string[]).map((_, b) => (
+                      <Fragment key={b}>
+                        <li>
+                          <T path={`cards.${i}.bullets.${b}`} note={i === 0 && b === 0} />
+                        </li>
+                      </Fragment>
+                    ))}
+                  </ul>
+                ) : null}
                 <T path={`cards.${i}.price`} as="p" className="agx-price" note={i === 0} />
                 <div className="agx-btns agx-card__actions">
                   <Btn path={`cards.${i}.cta`} variant="primary" note={i === 0} />
@@ -203,7 +204,7 @@ function Products() {
         </div>
         <ItemAdd group="cards" />
       </div>
-    </section>
+    </Section>
   );
 }
 
@@ -211,7 +212,7 @@ function Products() {
 function Steps() {
   const { data } = useMod();
   return (
-    <section className="agx-sec agx-sec--tint" aria-label="How it works">
+    <Section label="How it works">
       <div className="agx-wrap">
         <div className="agx-head">
           <T path="h2" as="h2" className="agx-h2" />
@@ -228,19 +229,22 @@ function Steps() {
         </ol>
         <ItemAdd group="steps" />
       </div>
-    </section>
+    </Section>
   );
 }
 
 /* M07 ---------------------------------------------------------------- */
 function Proof() {
   const { data, variant } = useMod();
+  const photo = useShown("image");
   return (
-    <section className="agx-sec agx-sec--navy" aria-label="Customer proof">
-      <div className="agx-wrap agx-proof">
-        <div className="agx-proof__photo">
-          <Img path="image" className="agx-ratio-1x1 agx-circle" />
-        </div>
+    <Section className="agx-sec--navy" label="Customer proof">
+      <div className={`agx-wrap agx-proof ${photo ? "" : "agx-proof--solo"}`}>
+        {photo ? (
+          <div className="agx-proof__photo">
+            <Img path="image" className="agx-ratio-1x1 agx-circle" />
+          </div>
+        ) : null}
         <div className="agx-proof__body">
           <blockquote className="agx-quote">
             <p>
@@ -268,7 +272,7 @@ function Proof() {
           </div>
         </div>
       </div>
-    </section>
+    </Section>
   );
 }
 
@@ -277,7 +281,7 @@ function Compare() {
   const { data } = useMod();
   const columns = list(data, "columns");
   return (
-    <section className="agx-sec" aria-label="Comparison">
+    <Section label="Comparison">
       <div className="agx-wrap">
         <div className="agx-head">
           <T path="h2" as="h2" className="agx-h2" />
@@ -316,7 +320,7 @@ function Compare() {
         </div>
         <ItemAdd group="rows" />
       </div>
-    </section>
+    </Section>
   );
 }
 
@@ -324,7 +328,7 @@ function Compare() {
 function Resources() {
   const { data } = useMod();
   return (
-    <section className="agx-sec agx-sec--tint" aria-label="Resources">
+    <Section label="Resources">
       <div className="agx-wrap">
         <div className="agx-head agx-head--row">
           <T path="h2" as="h2" className="agx-h2" />
@@ -346,7 +350,7 @@ function Resources() {
         </div>
         <ItemAdd group="cards" />
       </div>
-    </section>
+    </Section>
   );
 }
 
@@ -378,14 +382,17 @@ function DocLinkEdit({ index, href }: { index: number; href: string }) {
 /* M10 ---------------------------------------------------------------- */
 function Faq() {
   const { data, editing } = useMod();
+  const support = useShown("help");
   return (
-    <section className="agx-sec" aria-label="Questions">
+    <Section label="Questions">
       <div className="agx-wrap agx-faq">
         <div className="agx-faq__side">
           <T path="h2" as="h2" className="agx-h2" />
-          <p className="agx-small">
-            <T path="help" /> <Btn path="helpLink" variant="link" note={false} />
-          </p>
+          {support ? (
+            <p className="agx-small">
+              <T path="help" /> <Btn path="helpLink" variant="link" note={false} />
+            </p>
+          ) : null}
         </div>
         <div className="agx-faq__list">
           {list(data, "items").map((_, i) =>
@@ -405,7 +412,7 @@ function Faq() {
           <ItemAdd group="items" />
         </div>
       </div>
-    </section>
+    </Section>
   );
 }
 
@@ -414,7 +421,7 @@ function CtaBand() {
   const { variant, data, editing } = useMod();
   const phone = String(data.phone ?? "");
   return (
-    <section className="agx-ctaband" aria-label="Next step">
+    <Section base="agx-ctaband" label="Next step">
       <svg className="agx-wave" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true">
         <path d="M0 0 H1440 V22 C1180 62 980 4 720 24 C460 44 260 60 0 30 Z" fill="currentColor" />
       </svg>
@@ -435,8 +442,188 @@ function CtaBand() {
             ) : null
           ) : null}
         </div>
+        <T path="assure" as="p" className="agx-ctaband__assure" />
       </div>
-    </section>
+    </Section>
+  );
+}
+
+/* M12 ---------------------------------------------------------------- */
+function Explainer() {
+  const { data, variant } = useMod();
+  const items = list(data, "items");
+  const Tag = variant === "numbered" ? "ol" : "ul";
+  return (
+    <Section label="Explainer">
+      <div className={`agx-wrap agx-explainer ${variant === "stacked" ? "agx-explainer--stacked" : ""}`}>
+        <div className="agx-explainer__text">
+          <T path="eyebrow" as="p" className="agx-eyebrow" />
+          <T path="h2" as="h2" className="agx-h2" />
+          <Paras className="agx-prose" />
+          <div className="agx-btns">
+            <Btn path="cta" variant="outline" />
+          </div>
+        </div>
+        <div className="agx-listcard">
+          <T path="listTitle" as="h3" className="agx-listcard__title" />
+          <Tag className={`agx-checklist ${variant === "numbered" ? "agx-checklist--num" : ""}`}>
+            {items.map((_, i) => (
+              <li className="agx-item" key={i}>
+                <span className="agx-checklist__mark" aria-hidden="true">
+                  {variant === "numbered" ? (
+                    i + 1
+                  ) : (
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="m5 12.5 4.5 4.5L19 7.5" />
+                    </svg>
+                  )}
+                </span>
+                <T path={`items.${i}`} note={i === 0} />
+                <ItemRemove group="items" index={i} />
+              </li>
+            ))}
+          </Tag>
+          <ItemAdd group="items" />
+        </div>
+      </div>
+    </Section>
+  );
+}
+
+/* M13 ---------------------------------------------------------------- */
+function Grid() {
+  const { data, variant } = useMod();
+  const items = list(data, "items");
+  const head = (
+    <div className={`agx-grid__head ${variant === "split" ? "" : "agx-center"}`}>
+      <T path="eyebrow" as="p" className="agx-eyebrow" />
+      <T path="h2" as="h2" className="agx-h2" />
+      <T path="intro" as="p" className="agx-lead" />
+    </div>
+  );
+  const cells = (
+    <div className={`agx-grid__items agx-grid__items--${variant}`}>
+      {items.map((_, i) => (
+        <div className="agx-gridcard agx-item" key={i}>
+          <IconSlot path={`items.${i}.icon`} />
+          <T path={`items.${i}.title`} as="h3" className="agx-h3" note={i === 0} />
+          <T path={`items.${i}.body`} as="p" note={i === 0} />
+          <ItemRemove group="items" index={i} />
+        </div>
+      ))}
+    </div>
+  );
+  const button = (
+    <div className={`agx-btns ${variant === "split" ? "" : "agx-btns--center"}`}>
+      <Btn path="cta" variant="primary" />
+    </div>
+  );
+  return (
+    <Section label="Key points">
+      <div className={`agx-wrap agx-grid agx-grid--${variant}`}>
+        {variant === "split" ? (
+          <>
+            <div className="agx-grid__side">
+              {head}
+              {button}
+            </div>
+            <div>
+              {cells}
+              <ItemAdd group="items" />
+            </div>
+          </>
+        ) : (
+          <>
+            {head}
+            {cells}
+            <ItemAdd group="items" />
+            {button}
+          </>
+        )}
+      </div>
+    </Section>
+  );
+}
+
+/* M14 ---------------------------------------------------------------- */
+function Audience() {
+  const { data, variant } = useMod();
+  const items = list(data, "items");
+  return (
+    <Section label="Who it is for">
+      <div className={`agx-wrap agx-aud agx-aud--${variant}`}>
+        <div className="agx-aud__intro">
+          {variant === "image" ? <Img path="image" className="agx-ratio-3x2 agx-rounded agx-aud__img" /> : null}
+          <T path="eyebrow" as="p" className="agx-eyebrow" />
+          <T path="h2" as="h2" className="agx-h2" />
+          <T path="sub" as="p" className="agx-subhead" />
+          <T path="body" as="p" />
+          <div className="agx-btns">
+            <Btn path="cta" variant="outline" />
+          </div>
+        </div>
+        <div className="agx-aud__list">
+          {items.map((_, i) => (
+            <div className="agx-aud__item agx-item" key={i}>
+              <IconSlot path={`items.${i}.icon`} />
+              <div className="agx-col">
+                <T path={`items.${i}.title`} as="h3" className="agx-h3" note={i === 0} />
+                <T path={`items.${i}.body`} as="p" className="agx-aud__examples" note={i === 0} />
+              </div>
+              <ItemRemove group="items" index={i} />
+            </div>
+          ))}
+          <ItemAdd group="items" />
+        </div>
+      </div>
+    </Section>
+  );
+}
+
+/* M15 ---------------------------------------------------------------- */
+function Statement() {
+  const { variant } = useMod();
+  return (
+    <Section label="Statement">
+      <div className={`agx-wrap agx-stmt agx-stmt--${variant}`}>
+        <div className="agx-stmt__head">
+          <T path="eyebrow" as="p" className="agx-eyebrow" />
+          <T path="h2" as="h2" className="agx-h2" />
+        </div>
+        <div className="agx-stmt__body">
+          <Paras className="agx-prose" />
+          <T path="statement" as="p" className="agx-stmt__line" />
+          <div className={`agx-btns ${variant === "center" ? "agx-btns--center" : ""}`}>
+            <Btn path="cta" variant="primary" />
+          </div>
+        </div>
+      </div>
+    </Section>
+  );
+}
+
+/* M16 ---------------------------------------------------------------- */
+function Story() {
+  const { variant } = useMod();
+  const image = useShown("image");
+  return (
+    <Section label="Story">
+      <div className={`agx-wrap agx-story ${variant === "image-left" ? "agx-story--left" : ""} ${image ? "" : "agx-story--solo"}`}>
+        <div className="agx-story__body">
+          <T path="eyebrow" as="p" className="agx-eyebrow" />
+          <T path="h2" as="h2" className="agx-h2" />
+          <Paras className="agx-prose" />
+          <div className="agx-btns">
+            <Btn path="cta" variant="outline" />
+          </div>
+        </div>
+        {image ? (
+          <div className="agx-story__media">
+            <Img path="image" className="agx-ratio-3x2 agx-rounded" />
+          </div>
+        ) : null}
+      </div>
+    </Section>
   );
 }
 
@@ -452,4 +639,9 @@ export const RENDERERS: Record<ModuleType, () => React.ReactElement> = {
   resources: Resources,
   faq: Faq,
   cta: CtaBand,
+  explainer: Explainer,
+  grid: Grid,
+  audience: Audience,
+  statement: Statement,
+  story: Story,
 };

@@ -1,250 +1,347 @@
 "use client";
 
-import { useMemo, useRef } from "react";
-import { checkPage, measure } from "@/lib/checks";
+import { useRef, useState } from "react";
 import { saveImage, useImageUrl } from "@/lib/images";
-import { IMAGE_KINDS, MODULES, imageSpecLabel, limitLabel, moduleFields } from "@/lib/modules";
-import { getAt, itemNumber, slugify } from "@/lib/path";
+import { BACKGROUNDS, IMAGE_KINDS, MODULES, bgOf, moduleFields } from "@/lib/modules";
+import { anchorFor, getAt, itemNumber, slugify } from "@/lib/path";
 import { RECIPES } from "@/lib/recipes";
 import { activePage, useBuilder } from "@/lib/store";
-import type { CtaVal, ImageVal, ModuleInstance } from "@/lib/types";
+import type { CtaVal, ImageKind, ImageVal, ModuleInstance, Space } from "@/lib/types";
+import { ModuleThumb } from "./thumbs";
+import { BG_SWATCH, Icon } from "./ui";
 
 function numbered(label: string, path: string) {
   const n = itemNumber(path);
   return n ? `${label} ${n}` : label;
 }
 
-function ImageRow({ mod, path, label, kind }: { mod: ModuleInstance; path: string; label: string; kind: keyof typeof IMAGE_KINDS }) {
+const plural = (s: string) => (s.endsWith("s") ? s : `${s}s`);
+const cap = (s: string) => s[0].toUpperCase() + s.slice(1);
+
+/* ------------------------------------------------------------------ */
+/* Pieces                                                              */
+/* ------------------------------------------------------------------ */
+
+function ImageRow({ mod, path, label, kind }: { mod: ModuleInstance; path: string; label: string; kind: ImageKind }) {
   const update = useBuilder((s) => s.updateField);
   const im = (getAt(mod.data, path) ?? { id: null, alt: "" }) as ImageVal;
-  const url = useImageUrl(im.id);
+  const stored = useImageUrl(im.id);
+  const url = stored ?? (im.id ? null : im.src ?? null);
   const input = useRef<HTMLInputElement>(null);
   const k = IMAGE_KINDS[kind];
-  const small = im.id && im.w && im.h && (im.w < k.w * 0.75 || im.h < k.h * 0.75);
-  const offRatio = im.id && im.w && im.h && Math.abs(im.w / im.h - k.r) / k.r > 0.08;
+  const has = !!(im.id || im.src);
+  const small = has && im.w && im.h && (im.w < k.w * 0.75 || im.h < k.h * 0.75);
   return (
     <div className="pb-imgrow">
-      {url ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img className="pb-thumb" src={url} alt="" />
-      ) : (
-        <span className="pb-thumb">{k.ratio}</span>
-      )}
-      <div style={{ display: "flex", flexDirection: "column", gap: 6, minWidth: 0 }}>
-        <b style={{ fontSize: 13 }}>{label}</b>
-        <span style={{ fontSize: 12, color: "var(--ag-gray)" }}>{imageSpecLabel(kind)}</span>
-        {im.id ? (
-          <span style={{ fontSize: 12, color: "var(--ag-gray)" }}>
-            Uploaded: {im.w}×{im.h}
-            {im.name ? ` · ${im.name}` : ""}
-          </span>
-        ) : null}
-        {small ? <span className="pb-warn">Smaller than spec; it may look soft.</span> : null}
-        {offRatio ? <span className="pb-warn">Not {k.ratio}; it will be cropped.</span> : null}
-        <label className="pb-field">
-          Alt text{kind === "doc" ? " (optional for covers)" : ""}
-          <input
-            value={im.alt}
-            placeholder="Describe the photo in one sentence"
-            onChange={(e) => update(mod.uid, `${path}.alt`, e.target.value)}
-          />
-        </label>
-        {im.id && !im.alt && kind !== "doc" ? <span className="pb-err">Alt text missing</span> : null}
-        <div className="pb-actions">
-          <button type="button" className="pb-btn pb-btn--sm" onClick={() => input.current?.click()}>
-            {im.id ? "Replace" : "Upload"}
-          </button>
-          {im.id ? (
-            <button type="button" className="pb-btn pb-btn--sm" onClick={() => update(mod.uid, path, { id: null, alt: im.alt })}>
-              Remove
-            </button>
-          ) : null}
-        </div>
+      <button type="button" className="pb-thumb" onClick={() => input.current?.click()} title={has ? "Replace image" : "Add image"}>
+        {url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={url} alt="" />
+        ) : (
+          <span>{k.ratio}</span>
+        )}
+      </button>
+      <div className="pb-imgrow__body">
+        <b>{label}</b>
+        <small>
+          {k.ratio} · {k.w}×{k.h}
+          {kind === "product" ? " · transparent PNG" : ""}
+        </small>
         <input
-          ref={input}
-          type="file"
-          accept="image/*"
-          hidden
-          onChange={async (e) => {
-            const f = e.target.files?.[0];
-            e.target.value = "";
-            if (!f) return;
-            const saved = await saveImage(f);
-            update(mod.uid, path, { ...saved, alt: im.alt });
-          }}
+          className={has && !im.alt && kind !== "doc" ? "is-missing" : ""}
+          value={im.alt}
+          aria-label={`${label} alt text`}
+          placeholder="Describe the image (alt text)"
+          onChange={(e) => update(mod.uid, `${path}.alt`, e.target.value)}
         />
+        {small ? <span className="pb-warn">A bit small; it may look soft.</span> : null}
       </div>
+      <input
+        ref={input}
+        type="file"
+        accept="image/*"
+        hidden
+        onChange={async (e) => {
+          const f = e.target.files?.[0];
+          e.target.value = "";
+          if (!f) return;
+          const saved = await saveImage(f);
+          update(mod.uid, path, { ...saved, alt: im.alt });
+        }}
+      />
     </div>
   );
 }
 
-function ModuleInspector({ mod, index, total }: { mod: ModuleInstance; index: number; total: number }) {
+function Switch({ on, onChange, label }: { on: boolean; onChange: (v: boolean) => void; label: string }) {
+  return (
+    <button type="button" role="switch" aria-checked={on} aria-label={label} className={`pb-switch ${on ? "is-on" : ""}`} onClick={() => onChange(!on)}>
+      <i />
+    </button>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Block inspector                                                     */
+/* ------------------------------------------------------------------ */
+
+type ITab = "content" | "style" | "elements";
+
+function ModuleInspector({ mod }: { mod: ModuleInstance }) {
   const meta = MODULES[mod.type];
+  const page = useBuilder((s) => activePage(s));
   const setVariant = useBuilder((s) => s.setVariant);
   const addItem = useBuilder((s) => s.addItem);
   const removeItem = useBuilder((s) => s.removeItem);
   const update = useBuilder((s) => s.updateField);
-  const move = useBuilder((s) => s.moveModule);
+  const setElement = useBuilder((s) => s.setElement);
+  const setStyle = useBuilder((s) => s.setStyle);
+  const setAnchor = useBuilder((s) => s.setAnchor);
+  const setNote = useBuilder((s) => s.setNote);
   const dup = useBuilder((s) => s.duplicateModule);
   const remove = useBuilder((s) => s.removeModule);
+  const [tab, setTab] = useState<ITab>("content");
 
-  const fields = moduleFields(mod.type, mod.variant, mod.data);
+  const fields = moduleFields(mod.type, mod.variant, mod.data, mod.hidden);
   const ctas = fields.filter((f) => f.spec.kind === "cta" || f.spec.kind === "href");
   const images = fields.filter((f) => f.spec.kind === "image");
-  const texts = fields.filter((f) => f.spec.kind === "text" && f.spec.limit);
+  const hiddenCount = meta.elements.filter((e) => mod.hidden?.includes(e.id)).length;
+  const bg = bgOf(mod);
+  const anchors = (page?.modules ?? []).filter((m) => m.anchor && m.uid !== mod.uid).map((m) => `#${m.anchor}`);
+  const heading = String(mod.data.h1 ?? mod.data.h2 ?? meta.name);
 
   return (
     <div className="pb-insp">
       <div className="pb-insp__head">
-        <div className="pb-insp__title">
-          <span className={`pb-code ${meta.status === "required" ? "pb-code--req" : ""}`}>{meta.code}</span>
+        <ModuleThumb type={mod.type} variant={mod.variant} className="pb-insp__thumb" />
+        <div>
           <h2>{meta.name}</h2>
-          <span className="pb-status">{meta.status}</span>
+          <p>{meta.summary}</p>
         </div>
-        <p>{meta.summary}</p>
-        <p>
-          <b style={{ color: "var(--ag-charcoal)" }}>Squarespace:</b> {meta.squarespace}
-        </p>
-        <p>
-          <b style={{ color: "var(--ag-charcoal)" }}>Replaces:</b> {meta.replaces}
-        </p>
       </div>
 
-      {meta.variants.length ? (
-        <section>
-          <h3>Layout</h3>
-          <div className="pb-seg" role="group" aria-label="Layout">
-            {meta.variants.map((v) => (
-              <button key={v.id} type="button" aria-pressed={mod.variant === v.id} onClick={() => setVariant(mod.uid, v.id)}>
-                {v.label}
+      <div className="pb-itabs" role="tablist">
+        {(
+          [
+            ["content", "Content"],
+            ["style", "Style"],
+            ["elements", hiddenCount ? `Show / hide · ${hiddenCount}` : "Show / hide"],
+          ] as [ITab, string][]
+        ).map(([id, label]) => (
+          <button key={id} type="button" role="tab" aria-selected={tab === id} onClick={() => setTab(id)}>
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {tab === "content" ? (
+        <>
+          {meta.variants.length > 1 ? (
+            <section>
+              <h3>Layout</h3>
+              <div className="pb-variants">
+                {meta.variants.map((v) => (
+                  <button key={v.id} type="button" aria-pressed={mod.variant === v.id} onClick={() => setVariant(mod.uid, v.id)}>
+                    <ModuleThumb type={mod.type} variant={v.id} />
+                    <span>{v.label}</span>
+                  </button>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          {meta.groups.length ? (
+            <section>
+              <h3>How many</h3>
+              {meta.groups.map((g) => {
+                const n = ((getAt(mod.data, g.key) as unknown[]) ?? []).length;
+                const rec = g.recMin === g.recMax ? `${g.recMin}` : `${g.recMin}–${g.recMax}`;
+                return (
+                  <div key={g.key} className="pb-counter" title={`${rec} works best`}>
+                    <span>{cap(plural(g.label))}</span>
+                    <span className="pb-counter__ctl">
+                      <button type="button" className="pb-btn pb-icon" aria-label={`Remove last ${g.label}`} disabled={n <= g.min} onClick={() => removeItem(mod.uid, g.key, n - 1)}>
+                        −
+                      </button>
+                      <span>{n}</span>
+                      <button type="button" className="pb-btn pb-icon" aria-label={`Add ${g.label}`} disabled={n >= g.max} onClick={() => addItem(mod.uid, g.key)}>
+                        +
+                      </button>
+                    </span>
+                  </div>
+                );
+              })}
+            </section>
+          ) : null}
+
+          {ctas.length ? (
+            <section>
+              <h3>Links</h3>
+              <datalist id={`anchors-${mod.uid}`}>
+                {anchors.map((a) => (
+                  <option key={a} value={a} />
+                ))}
+              </datalist>
+              {ctas.map(({ path, spec }) => {
+                const isCta = spec.kind === "cta";
+                const c = isCta ? ((getAt(mod.data, path) ?? { label: "", href: "" }) as CtaVal) : null;
+                const href = isCta ? c!.href : String(getAt(mod.data, path) ?? "");
+                return (
+                  <label key={path} className="pb-field">
+                    <span className="pb-field__label">
+                      {c?.label ? `“${c.label}”` : numbered(spec.label, path)}
+                    </span>
+                    <input
+                      className={!href ? "is-missing" : ""}
+                      value={href}
+                      list={`anchors-${mod.uid}`}
+                      placeholder="/shop/p/… or #section"
+                      onChange={(e) => update(mod.uid, isCta ? `${path}.href` : path, e.target.value.trim())}
+                    />
+                  </label>
+                );
+              })}
+            </section>
+          ) : null}
+
+          {images.length ? (
+            <section>
+              <h3>Images</h3>
+              {images.map(({ path, spec }) => (
+                <ImageRow key={path} mod={mod} path={path} label={numbered(spec.label, path)} kind={spec.image ?? "feature"} />
+              ))}
+            </section>
+          ) : null}
+
+          {!meta.variants.length && !meta.groups.length && !ctas.length && !images.length ? (
+            <section>
+              <p>Click any text on the page to edit it.</p>
+            </section>
+          ) : null}
+        </>
+      ) : null}
+
+      {tab === "style" ? (
+        <>
+          <section>
+            <h3>Background</h3>
+            {meta.backgrounds.length ? (
+              <>
+                <div className="pb-swatches" role="radiogroup" aria-label="Background">
+                  {meta.backgrounds.map((b) => (
+                    <button
+                      key={b}
+                      type="button"
+                      role="radio"
+                      aria-checked={bg === b}
+                      title={BACKGROUNDS[b].note}
+                      onClick={() => setStyle(mod.uid, { bg: b })}
+                    >
+                      <i style={{ background: BG_SWATCH[b] }} />
+                      <span>{BACKGROUNDS[b].label.replace(" 18%", "").replace(" 12%", " tint")}</span>
+                    </button>
+                  ))}
+                </div>
+                <p>Alternate backgrounds so each section stands apart. Only brand-approved colors are offered.</p>
+              </>
+            ) : (
+              <p>This block always uses navy, as the brand guide sets for it.</p>
+            )}
+          </section>
+          {mod.type !== "hero" && mod.type !== "cta" ? (
+            <section>
+              <h3>Spacing</h3>
+              <div className="pb-seg" role="group" aria-label="Spacing">
+                {(["compact", "regular", "roomy"] as Space[]).map((sp) => (
+                  <button key={sp} type="button" aria-pressed={(mod.style?.space ?? "regular") === sp} onClick={() => setStyle(mod.uid, { space: sp })}>
+                    {cap(sp)}
+                  </button>
+                ))}
+              </div>
+            </section>
+          ) : null}
+          <section>
+            <h3>Section link</h3>
+            <label className="pb-field">
+              <span className="pb-field__label">Buttons can jump here with #{mod.anchor || "…"}</span>
+              <span className="pb-hash">
+                <b>#</b>
+                <input value={mod.anchor ?? ""} placeholder={anchorFor(heading)} onChange={(e) => setAnchor(mod.uid, e.target.value.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""))} />
+              </span>
+            </label>
+            {!mod.anchor ? (
+              <button type="button" className="pb-btn pb-btn--sm" onClick={() => setAnchor(mod.uid, anchorFor(heading))}>
+                Use #{anchorFor(heading)}
               </button>
-            ))}
-          </div>
-        </section>
+            ) : null}
+          </section>
+          <section>
+            <h3>Note for the team</h3>
+            <label className="pb-field">
+              <textarea value={mod.note ?? ""} placeholder="e.g. Waiting on final prices" onChange={(e) => setNote(mod.uid, e.target.value)} />
+              <span className="pb-field__help">Shows on the page while editing and in the brief. Never published.</span>
+            </label>
+          </section>
+          <details className="pb-about">
+            <summary>For the developer</summary>
+            <p>
+              <b>Squarespace:</b> {meta.squarespace}
+            </p>
+            <p>
+              <b>Replaces:</b> {meta.replaces}
+            </p>
+            <p>
+              <b>Block code:</b> {meta.code}
+            </p>
+          </details>
+        </>
       ) : null}
 
-      {meta.groups.length ? (
+      {tab === "elements" ? (
         <section>
-          <h3>Content blocks</h3>
-          {meta.groups.map((g) => {
-            const n = ((getAt(mod.data, g.key) as unknown[]) ?? []).length;
-            const rec = g.recMin === g.recMax ? `${g.recMin}` : `${g.recMin}–${g.recMax}`;
-            return (
-              <div key={g.key} className="pb-counter">
-                <span>
-                  {g.label[0].toUpperCase() + g.label.slice(1)}s <small style={{ color: "var(--ag-gray)" }}>· {rec} recommended</small>
-                </span>
-                <span className="pb-counter__ctl">
-                  <button
-                    type="button"
-                    className="pb-btn pb-btn--sm pb-icon"
-                    aria-label={`Remove last ${g.label}`}
-                    disabled={n <= g.min}
-                    onClick={() => removeItem(mod.uid, g.key, n - 1)}
-                  >
-                    −
-                  </button>
-                  <span>
-                    {n}/{g.max}
-                  </span>
-                  <button
-                    type="button"
-                    className="pb-btn pb-btn--sm pb-icon"
-                    aria-label={`Add ${g.label}`}
-                    disabled={n >= g.max}
-                    onClick={() => addItem(mod.uid, g.key)}
-                  >
-                    +
-                  </button>
-                </span>
+          <h3>Show / hide</h3>
+          {meta.elements.length ? (
+            <>
+              <div className="pb-elements">
+                {meta.elements.map((e) => {
+                  const on = !mod.hidden?.includes(e.id);
+                  return (
+                    <div key={e.id} className={`pb-element ${on ? "" : "is-off"}`}>
+                      <span>{e.label}</span>
+                      <Switch on={on} label={`${on ? "Hide" : "Show"} ${e.label}`} onChange={(v) => setElement(mod.uid, e.id, v)} />
+                    </div>
+                  );
+                })}
               </div>
-            );
-          })}
+              <p>Hidden elements keep their text, so you can switch them back on any time.</p>
+            </>
+          ) : (
+            <p>Everything in this block is required.</p>
+          )}
         </section>
       ) : null}
 
-      {ctas.length ? (
-        <section>
-          <h3>Links</h3>
-          {ctas.map(({ path, spec }) => {
-            const isCta = spec.kind === "cta";
-            const c = isCta ? ((getAt(mod.data, path) ?? { label: "", href: "" }) as CtaVal) : null;
-            const href = isCta ? c!.href : String(getAt(mod.data, path) ?? "");
-            return (
-              <label key={path} className="pb-field">
-                {numbered(spec.label, path)}
-                {c?.label ? <span className="pb-help">“{c.label}”</span> : null}
-                <input
-                  value={href}
-                  placeholder="/shop/p/… · /agenics-contact · https://…"
-                  onChange={(e) => update(mod.uid, isCta ? `${path}.href` : path, e.target.value.trim())}
-                  style={!href ? { borderColor: "#e8c46a", background: "#fff9e8" } : undefined}
-                />
-              </label>
-            );
-          })}
-          <p>Point every button at the exact product, form or file — never a category page or the top of another long page.</p>
-        </section>
-      ) : null}
-
-      {images.length ? (
-        <section>
-          <h3>Images</h3>
-          {images.map(({ path, spec }) => (
-            <ImageRow key={path} mod={mod} path={path} label={numbered(spec.label, path)} kind={spec.image!} />
-          ))}
-        </section>
-      ) : null}
-
-      {texts.length ? (
-        <section>
-          <h3>Copy limits</h3>
-          {texts.map(({ path, spec }) => {
-            const r = measure(String(getAt(mod.data, path) ?? ""), spec.limit)!;
-            const pct = Math.min(100, Math.round((r.used / r.max) * 100));
-            return (
-              <div key={path} className={`pb-limit ${r.over ? "is-over" : ""}`} title={spec.guidance}>
-                <span>{numbered(spec.label, path)}</span>
-                <b>
-                  {r.used}/{r.max}
-                </b>
-                <span className="pb-limit__bar">
-                  <i style={{ width: `${pct}%` }} />
-                </span>
-              </div>
-            );
-          })}
-          <p>Limits: {[...new Set(texts.map((t) => limitLabel(t.spec.limit)))].slice(0, 3).join(" · ")}. Cut copy rather than shrinking type.</p>
-        </section>
-      ) : null}
-
-      <section>
-        <h3>Module</h3>
-        <div className="pb-actions">
-          <button type="button" className="pb-btn pb-btn--sm" disabled={index === 0} onClick={() => move(mod.uid, -1)}>
-            Move up
-          </button>
-          <button type="button" className="pb-btn pb-btn--sm" disabled={index === total - 1} onClick={() => move(mod.uid, 1)}>
-            Move down
-          </button>
-          <button type="button" className="pb-btn pb-btn--sm" onClick={() => dup(mod.uid)}>
-            Duplicate
-          </button>
-          <button type="button" className="pb-btn pb-btn--sm pb-btn--danger" onClick={() => remove(mod.uid)}>
-            Remove
-          </button>
-        </div>
-      </section>
+      <div className="pb-insp__foot">
+        <button type="button" className="pb-btn pb-btn--sm" onClick={() => dup(mod.uid)}>
+          <Icon name="copy" size={14} /> Duplicate
+        </button>
+        <button type="button" className="pb-btn pb-btn--sm pb-btn--danger" onClick={() => remove(mod.uid)}>
+          <Icon name="trash" size={14} /> Delete block
+        </button>
+      </div>
     </div>
   );
 }
+
+/* ------------------------------------------------------------------ */
+/* Page settings                                                       */
+/* ------------------------------------------------------------------ */
 
 function Count({ n, min, max }: { n: number; min?: number; max: number }) {
   const bad = n > max || (min !== undefined && n > 0 && n < min);
   return (
     <span className={`pb-count ${bad ? "is-over" : ""}`}>
-      {n}
-      {min ? `/${min}–${max}` : `/${max}`} characters
+      {n}/{max}
     </span>
   );
 }
@@ -252,62 +349,61 @@ function Count({ n, min, max }: { n: number; min?: number; max: number }) {
 function PageInspector() {
   const page = useBuilder((s) => activePage(s));
   const updatePage = useBuilder((s) => s.updatePage);
-  const issues = useMemo(() => (page ? checkPage(page) : []), [page]);
+  const tidy = useBuilder((s) => s.tidyBackgrounds);
   if (!page) return null;
   const recipe = RECIPES.find((r) => r.id === page.recipe);
-  const errors = issues.filter((i) => i.level === "error").length;
   return (
     <div className="pb-insp">
-      <div className="pb-insp__head">
-        <div className="pb-insp__title">
+      <div className="pb-insp__head pb-insp__head--page">
+        <div>
           <h2>Page settings</h2>
+          <p>Click a block on the page to edit it. These settings are for the whole page.</p>
         </div>
-        <p>Select a module on the page to edit its layout, content blocks, links and images.</p>
       </div>
       <section>
         <label className="pb-field">
-          Page name
+          <span className="pb-field__label">Page name</span>
           <input value={page.name} onChange={(e) => updatePage({ name: e.target.value })} />
         </label>
         <label className="pb-field">
-          URL slug
-          <input
-            value={page.slug}
-            placeholder="dental-water"
-            onChange={(e) => updatePage({ slug: e.target.value.toLowerCase().replace(/\s+/g, "-") })}
-          />
-          <span className="pb-help">agenics.com/{page.slug || "…"} · lowercase words joined by hyphens</span>
+          <span className="pb-field__label">Web address</span>
+          <span className="pb-hash pb-hash--url">
+            <b>agenics.com/</b>
+            <input
+              value={page.slug}
+              placeholder={slugify(page.name)}
+              onChange={(e) => updatePage({ slug: e.target.value.toLowerCase().replace(/\s+/g, "-") })}
+            />
+          </span>
         </label>
-        {!page.slug ? (
-          <button type="button" className="pb-btn pb-btn--sm" onClick={() => updatePage({ slug: slugify(page.name) })}>
-            Use “{slugify(page.name)}”
-          </button>
-        ) : null}
+      </section>
+      <section>
+        <h3>How it looks on Google</h3>
+        <div className="pb-serp" aria-label="Google preview">
+          <span className="pb-serp__url">agenics.com › {page.slug || slugify(page.name)}</span>
+          <span className="pb-serp__title">{page.seoTitle || page.name}</span>
+          <span className="pb-serp__desc">{page.metaDescription || "Write a description so Google shows your words, not a guess."}</span>
+        </div>
         <label className="pb-field">
-          SEO title
+          <span className="pb-field__label">
+            Google title <Count n={page.seoTitle.length} max={60} />
+          </span>
           <input value={page.seoTitle} placeholder="Dental Waterline Testing | Agenics Labs" onChange={(e) => updatePage({ seoTitle: e.target.value })} />
-          <Count n={page.seoTitle.length} max={60} />
         </label>
         <label className="pb-field">
-          Meta description
+          <span className="pb-field__label">
+            Google description <Count n={page.metaDescription.length} min={140} max={160} />
+          </span>
           <textarea value={page.metaDescription} onChange={(e) => updatePage({ metaDescription: e.target.value })} />
-          <Count n={page.metaDescription.length} min={140} max={160} />
         </label>
       </section>
       <section>
-        <h3>Recipe</h3>
+        <h3>Look</h3>
+        <button type="button" className="pb-btn pb-btn--block" onClick={tidy}>
+          <Icon name="sparkle" size={16} /> Tidy backgrounds
+        </button>
         <p>
-          <b style={{ color: "var(--ag-charcoal)" }}>{recipe?.name ?? page.recipe}</b>
-          {recipe?.useFor ? ` · ${recipe.useFor}` : ""}
-        </p>
-        <p>{page.modules.length} modules on the page.</p>
-      </section>
-      <section>
-        <h3>Page checks</h3>
-        <p>
-          {issues.length === 0
-            ? "Every check passes."
-            : `${errors} to fix, ${issues.length - errors} to check. See the Checks tab on the left.`}
+          Started from: <b>{recipe?.name ?? page.recipe}</b> · {page.modules.length} blocks
         </p>
       </section>
     </div>
@@ -317,14 +413,10 @@ function PageInspector() {
 export function Inspector() {
   const page = useBuilder((s) => activePage(s));
   const selected = useBuilder((s) => s.selectedUid);
-  const index = page?.modules.findIndex((m) => m.uid === selected) ?? -1;
+  const mod = page?.modules.find((m) => m.uid === selected);
   return (
-    <aside className="pb-right" aria-label="Inspector">
-      {page && index >= 0 ? (
-        <ModuleInspector key={selected} mod={page.modules[index]} index={index} total={page.modules.length} />
-      ) : (
-        <PageInspector />
-      )}
+    <aside className="pb-right" aria-label="Settings">
+      {mod ? <ModuleInspector key={mod.uid} mod={mod} /> : <PageInspector />}
     </aside>
   );
 }

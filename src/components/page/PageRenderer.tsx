@@ -79,7 +79,19 @@ export function GlobalFooter() {
 export function ModuleView({ mod, editing, specs }: { mod: ModuleInstance; editing: boolean; specs: boolean }) {
   const Render = RENDERERS[mod.type];
   return (
-    <ModuleProvider value={{ uid: mod.uid, type: mod.type, variant: mod.variant, data: mod.data, editing, specs }}>
+    <ModuleProvider
+      value={{
+        uid: mod.uid,
+        type: mod.type,
+        variant: mod.variant,
+        data: mod.data,
+        hidden: mod.hidden,
+        style: mod.style,
+        anchor: mod.anchor,
+        editing,
+        specs,
+      }}
+    >
       <Render />
     </ModuleProvider>
   );

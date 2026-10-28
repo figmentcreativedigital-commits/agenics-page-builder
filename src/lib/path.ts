@@ -74,6 +74,18 @@ export function slugify(s: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
+/** A short section anchor from a heading: whole words, at most 32 characters. */
+export function anchorFor(heading: string): string {
+  const words = slugify(heading).split("-").filter(Boolean);
+  let out = "";
+  for (const w of words.slice(0, 5)) {
+    const next = out ? `${out}-${w}` : w;
+    if (next.length > 32) break;
+    out = next;
+  }
+  return out || "section";
+}
+
 export function countWords(s: string): number {
   const t = s.trim();
   return t ? t.split(/\s+/).length : 0;

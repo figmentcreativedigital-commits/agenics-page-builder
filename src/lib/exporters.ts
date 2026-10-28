@@ -3,7 +3,7 @@
 import JSZip from "jszip";
 import { checkPage, isPlaceholder, measure } from "./checks";
 import { blobToDataUrl, dataUrlToBlob, getImageBlob, putImage } from "./images";
-import { IMAGE_KINDS, MODULES, moduleFields } from "./modules";
+import { BACKGROUNDS, IMAGE_KINDS, MODULES, bgOf, isShown, moduleFields } from "./modules";
 import { expand, getAt, itemNumber, slugify, uid } from "./path";
 import type { CtaVal, ImageVal, PageDoc } from "./types";
 
@@ -25,7 +25,7 @@ export function imageSlots(page: PageDoc) {
   page.modules.forEach((m, mi) => {
     const meta = MODULES[m.type];
     for (const [pattern, spec] of Object.entries(meta.fields)) {
-      if (spec.kind !== "image") continue;
+      if (spec.kind !== "image" || !isShown(m, pattern)) continue;
       for (const path of expand(pattern, m.data)) {
         const im = getAt(m.data, path) as ImageVal;
         const k = IMAGE_KINDS[spec.image!];
@@ -48,10 +48,10 @@ export function buildBrief(page: PageDoc): string {
   lines.push(`- **URL slug:** /${page.slug || "[set a slug]"}`);
   lines.push(`- **SEO title:** ${page.seoTitle || "[missing]"} (${page.seoTitle.length}/60)`);
   lines.push(`- **Meta description:** ${page.metaDescription || "[missing]"} (${page.metaDescription.length}/160)`);
-  lines.push(`- **Modules:** ${page.modules.length}`);
+  lines.push(`- **Blocks:** ${page.modules.length}`);
   lines.push(`- **Exported:** ${new Date().toLocaleString("en-US")}`, "");
   lines.push(
-    "Build each module below as one Squarespace section, in this order. Fonts, colors and button styles come from Site Styles. Upload each image under the file name shown.",
+    "Build each block below as one Squarespace section, in this order. Fonts, colors and button styles come from Site Styles. Upload each image under the file name shown.",
     "",
   );
 
@@ -60,7 +60,18 @@ export function buildBrief(page: PageDoc): string {
     const variant = meta.variants.find((v) => v.id === m.variant)?.label;
     lines.push(`## ${mi + 1}. ${meta.code} ${meta.name}${variant ? ` — ${variant}` : ""}`, "");
     lines.push(`_Squarespace: ${meta.squarespace}_`, "");
-    for (const { path, spec } of moduleFields(m.type, m.variant, m.data)) {
+    const bg = bgOf(m);
+    const settings = [
+      bg ? `Background: ${BACKGROUNDS[bg].label} (${BACKGROUNDS[bg].hex})` : "",
+      m.style?.space && m.style.space !== "regular" ? `Spacing: ${m.style.space}` : "",
+      m.anchor ? `Section link: #${m.anchor} (set as the section's anchor ID)` : "",
+    ].filter(Boolean);
+    if (settings.length) lines.push(`- ${settings.join(" · ")}`);
+    const removed = meta.elements.filter((e) => m.hidden?.includes(e.id)).map((e) => e.label);
+    if (removed.length) lines.push(`- Hidden (leave out of the build): ${removed.join(", ")}`);
+    if (m.note) lines.push(`- **Note:** ${m.note}`);
+    if (settings.length || removed.length || m.note) lines.push("");
+    for (const { path, spec } of moduleFields(m.type, m.variant, m.data, m.hidden)) {
       {
         const v = getAt(m.data, path);
         const n = itemNumber(path);
@@ -77,11 +88,13 @@ export function buildBrief(page: PageDoc): string {
           lines.push(`- **${label}:** ${c?.label || "—"} → ${c?.href || "⚠ no link"}`);
         } else if (spec.kind === "href") {
           lines.push(`- **${label}:** ${v || "⚠ no link"}`);
+        } else if (spec.kind === "icon") {
+          lines.push(`- **${label}:** ${v || "check"} (Agenics icon set, /specs)`);
         } else if (spec.kind === "image") {
           const slot = slots.find((s) => s.moduleIndex === mi && s.path === path);
           const im = v as ImageVal;
           lines.push(
-            `- **${label} (${slot?.ratio}):** ${im?.id ? `images/${slot?.file}` : "⚠ no image yet"} · alt: ${
+            `- **${label} (${slot?.ratio}):** ${im?.id || im?.src ? `images/${slot?.file}` : "⚠ no image yet"} · alt: ${
               im?.alt ? `"${im.alt}"` : "⚠ missing"
             }`,
           );
@@ -91,12 +104,24 @@ export function buildBrief(page: PageDoc): string {
     lines.push("");
   });
 
-  if (issues.length) {
+  const notes = page.modules.filter((m) => m.note);
+  if (issues.length || notes.length) {
     lines.push("## Open items", "");
     issues.forEach((i) => lines.push(`- ${i.level === "error" ? "**Fix:**" : "Check:"} ${i.message}`));
+    notes.forEach((m) => lines.push(`- Note on ${MODULES[m.type].code} ${MODULES[m.type].name}: ${m.note}`));
     lines.push("");
   }
   return lines.join("\n");
+}
+
+/** The stored upload, or the file bundled with the app for worked examples. */
+async function slotBlob(image?: ImageVal): Promise<Blob | undefined> {
+  if (image?.id) return getImageBlob(image.id);
+  if (image?.src) {
+    const res = await fetch(image.src);
+    return res.ok ? res.blob() : undefined;
+  }
+  return undefined;
 }
 
 function download(blob: Blob, name: string) {
@@ -121,8 +146,7 @@ export async function downloadHandoffZip(page: PageDoc) {
   const slots = imageSlots(page);
   const folder = zip.folder("images")!;
   for (const s of slots) {
-    if (!s.image?.id) continue;
-    const blob = await getImageBlob(s.image.id);
+    const blob = await slotBlob(s.image);
     if (blob) folder.file(s.file, blob);
   }
   zip.file("page.json", JSON.stringify({ format: FORMAT, page }, null, 2));

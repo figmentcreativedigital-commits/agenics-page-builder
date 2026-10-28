@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { IMAGE_KINDS, MODULES, MODULE_ORDER, limitLabel } from "@/lib/modules";
+import { BACKGROUNDS, IMAGE_KINDS, MODULES, MODULE_ORDER, limitLabel } from "@/lib/modules";
+import { IconSheet } from "./IconSheet";
 import { RECIPES } from "@/lib/recipes";
 import "./specs.css";
 
@@ -16,7 +17,7 @@ const COLORS = [
 
 const TINTS = [
   { name: "Silver 18%", hex: "#F2F2F3", use: "Alternate section background, image tiles" },
-  { name: "Cyan 12%", hex: "#E0F7FD", use: "Document type tags" },
+  { name: "Cyan 12%", hex: "#E0F7FD", use: "One highlight section per page; document type tags" },
 ];
 
 export default function SpecsPage() {
@@ -44,7 +45,7 @@ export default function SpecsPage() {
               <b>One H1, in the hero.</b> Every other heading is H2 (module title) or H3 (item title).
             </li>
             <li>
-              <b>Six to nine modules.</b> M01 opens and M11 closes every page; the recipe sets what goes between.
+              <b>Six to ten blocks.</b> A Hero opens and a Call to action closes every page; the recipe sets what goes between.
             </li>
             <li>
               <b>Buttons go somewhere specific:</b> a product page, a form or a file. Never a category page.
@@ -57,6 +58,10 @@ export default function SpecsPage() {
             </li>
             <li>
               <b>Alt text on every image.</b> One sentence on what the photo shows.
+            </li>
+            <li>
+              <b>Neighbouring sections never share a colored background.</b> Alternate white and Silver 18%; use Cyan 12% once as a
+              highlight and navy for at most one band between the hero and the closing call to action.
             </li>
           </ul>
         </section>
@@ -132,7 +137,7 @@ export default function SpecsPage() {
         </section>
 
         <section>
-          <h2>Five image ratios</h2>
+          <h2>Six image ratios</h2>
           <table className="sp-table">
             <thead>
               <tr>
@@ -161,6 +166,46 @@ export default function SpecsPage() {
             Imagery style: medical minimalism, implied action (a gloved hand holding a vial rather than the sampling itself), plain or
             transparent backgrounds or strong focal depth, Halyard Blue Nitrile gloves in every new shoot.
           </p>
+        </section>
+
+        <section>
+          <h2>Section backgrounds</h2>
+          <table className="sp-table">
+            <thead>
+              <tr>
+                <th scope="col">Background</th>
+                <th scope="col">Hex</th>
+                <th scope="col">Type and buttons on it</th>
+                <th scope="col">Blocks that can use it</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(Object.keys(BACKGROUNDS) as (keyof typeof BACKGROUNDS)[]).map((b) => (
+                <tr key={b}>
+                  <th scope="row">
+                    <span className="sp-chip" style={{ background: BACKGROUNDS[b].hex }} aria-hidden="true" /> {BACKGROUNDS[b].label}
+                  </th>
+                  <td>{BACKGROUNDS[b].hex}</td>
+                  <td>{BACKGROUNDS[b].note}</td>
+                  <td>
+                    {MODULE_ORDER.filter((t) => MODULES[t].backgrounds.includes(b))
+                      .map((t) => MODULES[t].name)
+                      .join(", ")}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p className="sp-note">Hero, Testimonial and Call to action always use navy. The builder’s Tidy backgrounds button alternates the rest.</p>
+        </section>
+
+        <section>
+          <h2>Icons</h2>
+          <p className="sp-note">
+            Drawn for this template: 24 × 24, 1.8 stroke, round ends. On the page each sits in a navy disc ringed in silver, echoing the rings
+            of the Agenics mark (cyan disc on navy sections). Click an icon to download its SVG.
+          </p>
+          <IconSheet />
         </section>
 
         <section>
@@ -200,9 +245,17 @@ export default function SpecsPage() {
                     <b>Layouts:</b> {m.variants.map((v) => v.label).join(" · ")}
                   </p>
                 ) : null}
+                {m.elements.length ? (
+                  <p>
+                    <b>Can be hidden:</b> {m.elements.map((e) => e.label).join(" · ")}
+                  </p>
+                ) : null}
+                <p>
+                  <b>Backgrounds:</b> {m.backgrounds.length ? m.backgrounds.map((b) => BACKGROUNDS[b].label).join(" · ") : "Navy (fixed)"}
+                </p>
                 {m.groups.length ? (
                   <p>
-                    <b>Content blocks:</b>{" "}
+                    <b>Repeating items:</b>{" "}
                     {m.groups
                       .map((g) => `${g.min}–${g.max} ${g.label}s (${g.recMin === g.recMax ? g.recMin : `${g.recMin}–${g.recMax}`} recommended)`)
                       .join(" · ")}
@@ -225,11 +278,13 @@ export default function SpecsPage() {
                             {f.label}
                             {f.optional ? <small> (optional)</small> : null}
                           </th>
-                          <td>{f.kind === "cta" ? "Button" : f.kind === "href" ? "Link" : f.kind === "image" ? "Image" : "Text"}</td>
+                          <td>{f.kind === "cta" ? "Button" : f.kind === "href" ? "Link" : f.kind === "image" ? "Image" : f.kind === "icon" ? "Icon" : "Text"}</td>
                           <td>
                             {f.kind === "image" && f.image
                               ? `${IMAGE_KINDS[f.image].ratio} · ${IMAGE_KINDS[f.image].w}×${IMAGE_KINDS[f.image].h}`
-                              : limitLabel(f.limit) || "—"}
+                              : f.kind === "icon"
+                                ? "Agenics icon set"
+                                : limitLabel(f.limit) || "—"}
                           </td>
                           <td>{f.guidance}</td>
                         </tr>
