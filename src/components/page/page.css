@@ -211,19 +211,28 @@
   height: 46px;
   width: auto;
 }
+/* As on agenics.com: plain uppercase links with wide tracking, a cart, and a navy pill */
 .agx-nav {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
-  gap: 8px 26px;
+  gap: 8px 34px;
 }
 .agx-nav a {
-  font-weight: 700;
-  font-size: 14px;
-  letter-spacing: 0.06em;
+  font-weight: 400;
+  font-size: 15px;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--ag-navy);
+  white-space: nowrap;
+  color: #1a1a1a;
   text-decoration: none;
+}
+.agx-nav .agx-nav__cart {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 17px;
+  letter-spacing: 0.06em;
 }
 .agx-burger {
   display: none;
@@ -243,11 +252,14 @@
 .agx-nav .agx-nav__pill {
   display: inline-flex;
   align-items: center;
-  min-height: 44px;
-  padding: 0 22px;
+  min-height: 46px;
+  padding: 0 30px;
   border-radius: 999px;
   background: var(--ag-navy);
   color: var(--ag-white);
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.1em;
 }
 .agx-footer {
   background: var(--ag-charcoal);
@@ -1218,8 +1230,8 @@ details p {
 }
 
 /* Narrow containers (phone and small tablet) ---------------------------- */
-@container agpage (max-width: 1040px) {
-  /* The full menu needs about 1,040px; below that it folds into the menu button */
+@container agpage (max-width: 1100px) {
+  /* The full menu (as on agenics.com) needs about 1,100px; below that it folds into the menu button */
   .agx-nav a,
   .agx-nav .agx-nav__pill {
     display: none;

@@ -58,6 +58,10 @@
   background: var(--ag-cyan);
   color: var(--ag-navy);
 }
+/* The page is laid out at the real screen width and scaled to fit (lib/devices) */
+.sv-body {
+  overflow-x: hidden;
+}
 .sv-stage {
   margin: 0 auto;
   background: var(--ag-white);
@@ -66,12 +70,6 @@
 .sv-stage--phone {
   margin-block: 24px;
   box-shadow: 0 2px 22px rgba(0, 30, 60, 0.14);
-}
-.sv-stage--tablet {
-  width: min(834px, 100%);
-}
-.sv-stage--phone {
-  width: min(390px, 100%);
 }
 .sv-missing {
   min-height: 100vh;

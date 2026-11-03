@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { PageRenderer } from "@/components/page/PageRenderer";
 import "@/components/page/page.css";
+import { fitScreen, fitStyle, useRoom } from "@/lib/devices";
 import type { PageDoc, Viewport } from "@/lib/types";
 import "./share.css";
 
@@ -14,7 +15,14 @@ const SIZES: { id: Viewport; label: string; d: string }[] = [
 
 /** Read-only page for people the link was shared with. */
 export function SharedPreview({ page, updated }: { page: PageDoc; updated: string }) {
-  const [size, setSize] = useState<Viewport>("desktop");
+  const [picked, setSize] = useState<Viewport | null>(null);
+  const body = useRef<HTMLDivElement>(null);
+  const room = useRoom(body);
+  // Until a size is picked, show the view that matches the visitor's screen
+  const size: Viewport = picked ?? (!room || room >= 1100 ? "desktop" : room >= 600 ? "tablet" : "phone");
+  // Desktop fills a wide window however wide it is. On a phone (no size switch) the page is
+  // simply drawn at the phone's own width.
+  const fit = room && room <= 560 ? { width: room, zoom: 1 } : fitScreen(size, room, { desktopMax: Infinity, nested: false });
   return (
     <div className="sv">
       <header className="sv-bar">
@@ -35,9 +43,11 @@ export function SharedPreview({ page, updated }: { page: PageDoc; updated: strin
           ))}
         </div>
       </header>
-      <main className={`sv-stage sv-stage--${size}`}>
-        <PageRenderer page={page} editing={false} specs={false} />
-      </main>
+      <div ref={body} className="sv-body">
+        <main className={`sv-stage sv-stage--${size}`} style={fitStyle(fit)}>
+          <PageRenderer page={page} editing={false} specs={false} />
+        </main>
+      </div>
     </div>
   );
 }

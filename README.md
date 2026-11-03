@@ -24,7 +24,7 @@ Built by Figment Creative for Agenics Labs. Follows the **Agenics Corporate Grap
 - **Link to a section on the same page.** The link popover lists the page's sections; picking one gives it a short anchor such as `#what-is-st108`.
 - **Leave a note for the team** on any block. Notes show on the canvas while editing and are listed in the brief. They are never published.
 - **Change the number of items** (points, cards, questions, paragraphs) within each block's limits.
-- **Preview** at desktop, tablet and phone widths, or open the clean page in a new tab.
+- **Preview** at desktop, tablet and phone widths, or open the clean page in a new tab. Each view is laid out at a real screen width (desktop 1,280 px or wider, tablet 834, phone 390) and scaled to fit the window, so desktop always shows the desktop layout and the full agenics.com menu, and the views always read largest to smallest. The line above the page shows the width and the scale.
 - **Share a preview link.** **Share** in the top bar makes a link such as `/share/5dBw9qSUx9` that anyone can open on any device. Viewers see the page as visitors would, with a desktop / tablet / phone switch, and can't edit it. The link shows the version you published: after changes, **Update the link** refreshes it at the same address, and **Stop sharing** turns it off. Only the browser that created a link can update or stop it.
 - **Undo everything.** ⌘Z / ⌘⇧Z. Press **?** for all shortcuts.
 

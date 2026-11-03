@@ -13,12 +13,20 @@ export function GlobalHeader() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/brand/agenics-logo-color.svg" alt="Agenics Labs" />
         </a>
+        {/* Mirrors the agenics.com header: Resources and Water Testing open menus on the live site */}
         <nav className="agx-nav" aria-label="Main">
-          <a href="#">Dental Water</a>
-          <a href="#">Sterile Processing</a>
-          <a href="#">Shop</a>
+          <a href="#">Home</a>
           <a href="#">Resources</a>
-          <a href="#">About</a>
+          <a href="#">Water Testing</a>
+          <a href="#">Login</a>
+          <a href="#" className="agx-nav__cart" aria-label="Cart, 0 items">
+            <svg width="26" height="22" viewBox="0 0 26 22" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M1 1.5h3.6l3.1 13.2h12.4l3-9.6H6" />
+              <circle cx="9.6" cy="19" r="1.5" />
+              <circle cx="18.4" cy="19" r="1.5" />
+            </svg>
+            <span>0</span>
+          </a>
           <a href="#" className="agx-nav__pill">
             Test Results
           </a>

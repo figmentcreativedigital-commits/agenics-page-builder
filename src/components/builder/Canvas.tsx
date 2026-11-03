@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { measure } from "@/lib/checks";
+import { SCREEN_LABEL, fitScreen, fitStyle, useRoom } from "@/lib/devices";
 import { MODULES } from "@/lib/modules";
 import { getAt } from "@/lib/path";
 import { plainText } from "@/lib/richtext";
@@ -329,9 +330,14 @@ function ElementBar() {
       const b = bar.current;
       if (el && b) {
         const r = el.getBoundingClientRect();
-        const top = r.top - b.offsetHeight - 8;
-        b.style.top = `${top < 64 ? r.bottom + 8 : top}px`;
-        b.style.left = `${Math.max(8, Math.min(r.left, window.innerWidth - b.offsetWidth - 8))}px`;
+        const left = Math.max(8, Math.min(r.left, window.innerWidth - b.offsetWidth - 8));
+        let top = r.top - b.offsetHeight - 8;
+        // Below the text when there is no room above it, or when the block's own toolbar is in the way
+        const fb = document.querySelector(`#mod-${focus.uid} > .pb-frame__bar`)?.getBoundingClientRect();
+        const hitsBar = !!fb && fb.height > 0 && top < fb.bottom && top + b.offsetHeight > fb.top && left < fb.right && left + b.offsetWidth > fb.left;
+        if (top < 64 || hitsBar) top = r.bottom + 8;
+        b.style.top = `${top}px`;
+        b.style.left = `${left}px`;
         b.style.opacity = "1";
       }
       raf = requestAnimationFrame(tick);
@@ -391,10 +397,14 @@ export function Canvas() {
   const insertSaved = useBuilder((s) => s.insertSaved);
   const moveItem = useBuilder((s) => s.moveItem);
   const stage = useRef<HTMLDivElement>(null);
+  const canvas = useRef<HTMLDivElement>(null);
+  const room = useRoom(canvas);
+  // Full-screen preview: desktop fills the window, as a visitor's browser would
+  const fit = fitScreen(viewport, room, preview ? { desktopMax: Infinity } : undefined);
   const [drop, setDrop] = useState<number | null>(null);
   const [dropMove, setDropMove] = useState(false);
 
-  if (!page) return <div className="pb-canvas" />;
+  if (!page) return <div ref={canvas} className="pb-canvas" />;
   const total = page.modules.length;
 
   const dropIndex = (y: number) => {
@@ -465,12 +475,19 @@ export function Canvas() {
 
   return (
     <div
+      ref={canvas}
       className="pb-canvas"
       onClick={(e) => {
         if (e.target === e.currentTarget) select(null);
       }}
     >
-      <div ref={stage} className={`pb-stage pb-stage--${viewport}`} {...dragProps}>
+      {!preview && room ? (
+        <p className="pb-stagecap" style={{ width: Math.round(fit.width * fit.zoom) }}>
+          {SCREEN_LABEL[viewport]} · {fit.width} px
+          {fit.zoom < 0.995 ? <span> · shown at {Math.round(fit.zoom * 100)}%</span> : null}
+        </p>
+      ) : null}
+      <div ref={stage} className={`pb-stage pb-stage--${viewport}`} style={fitStyle(fit)} {...dragProps}>
         <PageRenderer
           page={page}
           editing={!preview}
@@ -479,7 +496,7 @@ export function Canvas() {
             preview ? (
               node
             ) : (
-              <div className="pb-global" onClick={() => select(null)}>
+              <div className={`pb-global pb-global--${kind}`} onClick={() => select(null)}>
                 <span className="pb-global__tag">Site {kind} · same on every page</span>
                 {node}
               </div>
