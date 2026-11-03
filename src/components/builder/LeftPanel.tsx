@@ -498,7 +498,19 @@ function HistoryTab() {
 /* Rail + panel                                                        */
 /* ------------------------------------------------------------------ */
 
-export function LeftPanel({ tab, setTab, onNewPage }: { tab: Tab; setTab: (t: Tab) => void; onNewPage: () => void }) {
+export function LeftPanel({
+  tab,
+  setTab,
+  onNewPage,
+  onTour,
+  touring = false,
+}: {
+  tab: Tab;
+  setTab: (t: Tab) => void;
+  onNewPage: () => void;
+  onTour: () => void;
+  touring?: boolean;
+}) {
   const page = useBuilder((s) => activePage(s));
   const issues = useMemo(() => (page ? checkPage(page) : []), [page]);
   const errors = issues.filter((i) => i.level === "error").length;
@@ -521,6 +533,18 @@ export function LeftPanel({ tab, setTab, onNewPage }: { tab: Tab; setTab: (t: Ta
             ) : null}
           </button>
         ))}
+        {/* Always here, for anyone who wants the walkthrough again */}
+        <button
+          type="button"
+          className={`pb-rail__tour ${touring ? "is-on" : ""}`}
+          data-tour="tour"
+          title={touring ? "Start the tour again from the beginning" : "Take the guided tour"}
+          aria-label="Take the guided tour"
+          onClick={onTour}
+        >
+          <Icon name="tour" size={20} />
+          <span>Tour</span>
+        </button>
       </nav>
       <aside className="pb-left" data-tour="panel" aria-label={tabs.find((t) => t.id === tab)?.label}>
         <h2 className="pb-left__title">

@@ -305,6 +305,7 @@ export function Builder() {
   const [keys, setKeys] = useState(false);
   const [sharing, setSharing] = useState(false);
   const [tour, setTour] = useState(false);
+  const [tourRun, setTourRun] = useState(0);
   const preview = useBuilder((s) => s.preview);
 
   useEffect(() => {
@@ -383,6 +384,14 @@ export function Builder() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
+  const startTour = () => {
+    setKeys(false);
+    setSharing(false);
+    setNewPage(false);
+    setTourRun((n) => n + 1); // a click while it runs starts it again from the top
+    setTour(true);
+  };
+
   if (!ready) return <div className="pb-loading">Loading the page builder…</div>;
 
   return (
@@ -394,14 +403,9 @@ export function Builder() {
         }}
         onShortcuts={() => setKeys(true)}
         onShare={() => setSharing(true)}
-        onTour={() => {
-          setKeys(false);
-          setSharing(false);
-          setNewPage(false);
-          setTour(true);
-        }}
+        onTour={startTour}
       />
-      {!preview ? <LeftPanel tab={tab} setTab={setTab} onNewPage={() => setNewPage(true)} /> : null}
+      {!preview ? <LeftPanel tab={tab} setTab={setTab} onNewPage={() => setNewPage(true)} onTour={startTour} touring={tour} /> : null}
       <Canvas />
       {!preview ? <Inspector /> : null}
       <Toast />
@@ -409,7 +413,7 @@ export function Builder() {
       {keys ? <ShortcutsDialog onClose={() => setKeys(false)} /> : null}
       {sharing ? <ShareDialog onClose={() => setSharing(false)} /> : null}
       <ImageLibrary />
-      {tour ? <Tour tab={tab} setTab={setTab} onClose={() => setTour(false)} /> : null}
+      {tour ? <Tour key={tourRun} tab={tab} setTab={setTab} onClose={() => setTour(false)} /> : null}
     </div>
   );
 }

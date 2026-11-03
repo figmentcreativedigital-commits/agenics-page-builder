@@ -59,6 +59,12 @@ const P: Record<string, ReactElement> = {
       <path d="m6.8 10.2 2.2 2.2 4.3-4.4" />
     </>
   ),
+  tour: (
+    <>
+      <circle cx="10" cy="10" r="7.5" />
+      <path d="M12.9 7.1 11.3 11.3 7.1 12.9 8.7 8.7Z" />
+    </>
+  ),
   help: (
     <>
       <circle cx="10" cy="10" r="7.5" />

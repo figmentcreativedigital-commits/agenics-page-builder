@@ -88,7 +88,7 @@ export function Tour({ tab, setTab, onClose }: { tab: TourTab; setTab: (t: TourT
       if (how === "skip" && startState.current) {
         setTab(startState.current.tab);
         useBuilder.getState().setViewport(startState.current.viewport);
-        if (i === 0) useBuilder.getState().showToast("You can take the tour any time from Help (?) in the top bar.");
+        if (i === 0) useBuilder.getState().showToast("You can take the tour any time with Tour, at the bottom of the left rail.");
       }
       onClose();
     },

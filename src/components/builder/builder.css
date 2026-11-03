@@ -376,6 +376,18 @@
   border-radius: 0 3px 3px 0;
   background: var(--ag-cyan);
 }
+/* Tour sits at the foot of the rail, set apart from the panels above it */
+.pb-rail .pb-rail__tour {
+  margin-top: auto;
+  border: 1px dashed rgba(0, 187, 242, 0.55);
+}
+.pb-rail .pb-rail__tour svg {
+  color: var(--ag-cyan);
+}
+.pb-rail .pb-rail__tour.is-on {
+  background: rgba(0, 187, 242, 0.16);
+  color: var(--ag-white);
+}
 .pb-rail__badge {
   position: absolute;
   top: 4px;

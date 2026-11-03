@@ -12,7 +12,7 @@ Built by Figment Creative for Agenics Labs. Follows the **Agenics Corporate Grap
 
 ## Things you can do
 
-- **Take the guided tour.** It opens by itself the first time someone uses the builder in a browser, and any time from **Help › Take the guided tour**. Eighteen short steps spotlight the page, the side panels and the top bar, with Next / Back, the arrow keys, a chapter menu, and Escape to leave. The script is plain text in `src/lib/tour.ts`; a step whose target isn't on screen is skipped, so changing the tool never breaks it.
+- **Take the guided tour.** It opens by itself the first time someone uses the builder in a browser, and any time from the **Tour** button at the foot of the left rail (or **Help › Take the guided tour**). Clicking Tour while it runs starts it again from the top. Eighteen short steps spotlight the page, the side panels and the top bar, with Next / Back, the arrow keys, a chapter menu, and Escape to leave. The script is plain text in `src/lib/tour.ts`; a step whose target isn't on screen is skipped, so changing the tool never breaks it.
 
 - **Format paragraphs.** Bold, italic and links inside any paragraph slot, from the bar above the text or with ⌘B, ⌘I and ⌘K. Links can point at a page, a file, a full address or a section of the same page. Headings and buttons stay plain, as the brand guide sets them.
 - **Drag on the page.** Grab a block by the handle in its toolbar to move it. Grab any card, point, question, list item or paragraph by its handle to reorder it inside the block (or focus the handle and use the arrow keys).

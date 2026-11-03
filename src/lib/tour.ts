@@ -4,7 +4,8 @@ import type { Viewport } from "./types";
    THE GUIDED TOUR SCRIPT
 
    Shown once, automatically, the first time someone opens the
-   builder, and any time after from Help. Steps point at parts of
+   builder, and any time after from the Tour button at the foot of
+   the left rail (or Help). Steps point at parts of
    the tool by selector (most carry a data-tour attribute so a
    restyle can't break them). A step whose target isn't on screen
    is skipped, so editing the tool never strands the tour.
@@ -46,7 +47,7 @@ export const TOUR: TourChapter[] = [
       {
         id: "welcome",
         title: "Welcome to the Page Builder",
-        body: "You build Agenics web pages here from approved blocks, so every page stays on brand. This tour shows you around in about two minutes. Use Next and Back or the arrow keys. Escape ends it, and you can take it again any time from Help.",
+        body: "You build Agenics web pages here from approved blocks, so every page stays on brand. This tour shows you around in about two minutes. Use Next and Back or the arrow keys. Escape ends it, and the Tour button at the bottom left brings it back any time.",
         setup: { select: "none", viewport: "desktop" },
         place: "center",
       },
@@ -196,11 +197,12 @@ export const TOUR: TourChapter[] = [
     steps: [
       {
         id: "done",
+        target: '[data-tour="tour"]',
         title: "You're ready",
-        body: "Open Pages and start a new page, or practice on one of the examples. Anything you do can be undone.",
+        body: "Open Pages and start a new page, or practice on one of the examples. Anything you do can be undone. To see this tour again, click Tour, here at the bottom of the rail.",
         keys: ["⌘Z"],
         setup: { tab: "pages", select: "none" },
-        place: "center",
+        place: "right",
       },
     ],
   },
