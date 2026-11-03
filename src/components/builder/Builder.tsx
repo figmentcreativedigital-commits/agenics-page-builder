@@ -14,6 +14,8 @@ import { Inspector } from "./Inspector";
 import { LeftPanel, NewPageDialog, type Tab } from "./LeftPanel";
 import { ImageLibrary } from "./ImageLibrary";
 import { ShareDialog } from "./ShareDialog";
+import { Tour } from "./Tour";
+import { tourSeen } from "@/lib/tour";
 import { Icon } from "./ui";
 
 function useOutside(open: boolean, close: () => void) {
@@ -48,7 +50,7 @@ function ExportMenu() {
   };
 
   return (
-    <div className="pb-menu" ref={ref}>
+    <div className="pb-menu" ref={ref} data-tour="export">
       <button type="button" className="pb-btn pb-btn--cta" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
         <Icon name="download" size={16} /> Export
       </button>
@@ -96,16 +98,27 @@ function ExportMenu() {
   );
 }
 
-function HelpMenu({ onShortcuts }: { onShortcuts: () => void }) {
+function HelpMenu({ onShortcuts, onTour }: { onShortcuts: () => void; onTour: () => void }) {
   const [open, setOpen] = useState(false);
   const ref = useOutside(open, () => setOpen(false));
   return (
-    <div className="pb-menu" ref={ref}>
+    <div className="pb-menu" ref={ref} data-tour="help">
       <button type="button" className="pb-topicon" aria-label="Help" title="Help" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
         <Icon name="help" />
       </button>
       {open ? (
         <div className="pb-menu__list" role="menu">
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => {
+              setOpen(false);
+              onTour();
+            }}
+          >
+            Take the guided tour
+            <small>Two minutes around the builder</small>
+          </button>
           <button
             type="button"
             role="menuitem"
@@ -131,7 +144,7 @@ function HelpMenu({ onShortcuts }: { onShortcuts: () => void }) {
   );
 }
 
-function TopBar({ onReview, onShortcuts, onShare }: { onReview: () => void; onShortcuts: () => void; onShare: () => void }) {
+function TopBar({ onReview, onShortcuts, onShare, onTour }: { onReview: () => void; onShortcuts: () => void; onShare: () => void; onTour: () => void }) {
   const page = useBuilder((s) => activePage(s));
   const updatePage = useBuilder((s) => s.updatePage);
   const viewport = useBuilder((s) => s.viewport);
@@ -171,7 +184,7 @@ function TopBar({ onReview, onShortcuts, onShare }: { onReview: () => void; onSh
         </span>
       ) : null}
       <span className="pb-spacer" />
-      <div className="pb-seg pb-seg--dark" role="group" aria-label="Screen size">
+      <div className="pb-seg pb-seg--dark" role="group" aria-label="Screen size" data-tour="devices">
         {vps.map((v) => (
           <button key={v.id} type="button" aria-pressed={viewport === v.id} aria-label={v.label} title={v.label} onClick={() => setViewport(v.id)}>
             <Icon name={v.id} />
@@ -189,26 +202,27 @@ function TopBar({ onReview, onShortcuts, onShare }: { onReview: () => void; onSh
           <button
             type="button"
             className={`pb-topbtn ${showSpecs ? "is-on" : ""}`}
+            data-tour="guides"
             aria-pressed={showSpecs}
             onClick={toggleSpecs}
             title="Show the size limit on every text slot and image"
           >
             Guides
           </button>
-          <button type="button" className={`pb-topbtn pb-review ${errors ? "is-err" : issues.length ? "is-warn" : "is-ok"}`} onClick={onReview} title="What is left to do">
+          <button type="button" data-tour="review" className={`pb-topbtn pb-review ${errors ? "is-err" : issues.length ? "is-warn" : "is-ok"}`} onClick={onReview} title="What is left to do">
             <Icon name="review" size={16} />
             {issues.length ? (errors ? `${errors} to fix` : `${todo} to finish`) : "Ready"}
           </button>
         </>
       ) : null}
-      <button type="button" className={`pb-topbtn ${preview ? "is-on" : ""}`} aria-pressed={preview} onClick={() => setPreview(!preview)}>
+      <button type="button" data-tour="preview" className={`pb-topbtn ${preview ? "is-on" : ""}`} aria-pressed={preview} onClick={() => setPreview(!preview)}>
         <Icon name="eye" size={16} /> {preview ? "Back to editing" : "Preview"}
       </button>
-      <button type="button" className={`pb-topbtn ${page?.share ? "is-shared" : ""}`} onClick={onShare} title={page?.share ? "This page has a preview link" : "Make a link anyone can view"}>
+      <button type="button" data-tour="share" className={`pb-topbtn ${page?.share ? "is-shared" : ""}`} onClick={onShare} title={page?.share ? "This page has a preview link" : "Make a link anyone can view"}>
         <Icon name="link" size={16} /> Share
       </button>
       <ExportMenu />
-      <HelpMenu onShortcuts={onShortcuts} />
+      <HelpMenu onShortcuts={onShortcuts} onTour={onTour} />
     </header>
   );
 }
@@ -290,12 +304,15 @@ export function Builder() {
   const [newPage, setNewPage] = useState(false);
   const [keys, setKeys] = useState(false);
   const [sharing, setSharing] = useState(false);
+  const [tour, setTour] = useState(false);
   const preview = useBuilder((s) => s.preview);
 
   useEffect(() => {
     Promise.resolve(useBuilder.persist.rehydrate()).then(() => {
       useBuilder.getState().seedIfEmpty();
       setReady(true);
+      // First visit in this browser: offer the tour
+      if (!tourSeen()) setTour(true);
     });
   }, []);
 
@@ -377,6 +394,12 @@ export function Builder() {
         }}
         onShortcuts={() => setKeys(true)}
         onShare={() => setSharing(true)}
+        onTour={() => {
+          setKeys(false);
+          setSharing(false);
+          setNewPage(false);
+          setTour(true);
+        }}
       />
       {!preview ? <LeftPanel tab={tab} setTab={setTab} onNewPage={() => setNewPage(true)} /> : null}
       <Canvas />
@@ -386,6 +409,7 @@ export function Builder() {
       {keys ? <ShortcutsDialog onClose={() => setKeys(false)} /> : null}
       {sharing ? <ShareDialog onClose={() => setSharing(false)} /> : null}
       <ImageLibrary />
+      {tour ? <Tour tab={tab} setTab={setTab} onClose={() => setTour(false)} /> : null}
     </div>
   );
 }

@@ -466,7 +466,7 @@ export function Inspector() {
   const selected = useBuilder((s) => s.selectedUid);
   const mod = page?.modules.find((m) => m.uid === selected);
   return (
-    <aside className="pb-right" aria-label="Settings">
+    <aside className="pb-right" data-tour="settings" aria-label="Settings">
       {mod ? <ModuleInspector key={mod.uid} mod={mod} /> : <PageInspector />}
     </aside>
   );

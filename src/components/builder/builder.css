@@ -2151,3 +2151,204 @@ kbd {
 .pb-elbar .pb-elbar__fmt button i {
   color: inherit;
 }
+
+/* Guided tour ------------------------------------------------------------- */
+/* A ring around one part of the tool; the dim is the ring's own shadow, so the
+   highlighted part stays lit and nothing underneath is covered or blocked. */
+.pb-tour {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  pointer-events: none;
+}
+.pb-tour__ring,
+.pb-tour__dim {
+  position: fixed;
+  pointer-events: none;
+}
+.pb-tour__ring {
+  border-radius: 10px;
+  outline: 2px solid var(--ag-cyan);
+  outline-offset: 0;
+  box-shadow: 0 0 0 9999px rgba(0, 28, 52, 0.55);
+  transition: top 0.28s ease, left 0.28s ease, width 0.28s ease, height 0.28s ease;
+}
+.pb-tour__dim {
+  inset: 0;
+  background: rgba(0, 28, 52, 0.55);
+}
+.pb-tour__card {
+  position: fixed;
+  pointer-events: auto;
+  max-width: calc(100vw - 24px);
+  padding: 16px 18px 14px;
+  border-radius: 14px;
+  border-top: 3px solid var(--ag-cyan);
+  background: var(--ag-white);
+  color: var(--ag-charcoal);
+  box-shadow: 0 24px 60px rgba(0, 20, 40, 0.38);
+  font-family: var(--font-ui);
+  transition: top 0.22s ease, left 0.22s ease;
+}
+.pb-tour__card.is-pending {
+  opacity: 0;
+  pointer-events: none;
+}
+.pb-tour__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.pb-tour__chapter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  font: 700 11px/16px var(--font-ui);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ag-gray);
+  cursor: pointer;
+}
+.pb-tour__chapter span {
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+.pb-tour__chapter:hover {
+  color: var(--ag-navy);
+}
+.pb-tour__chapter svg {
+  transition: transform 0.15s ease;
+}
+.pb-tour__chapter svg.is-open {
+  transform: rotate(180deg);
+}
+.pb-tour__x {
+  display: inline-flex;
+  padding: 4px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--ag-gray);
+  cursor: pointer;
+}
+.pb-tour__x:hover {
+  background: var(--ag-silver-18);
+  color: var(--ag-navy);
+}
+.pb-tour__menu {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 6px;
+  display: grid;
+  gap: 2px;
+  border: 1px solid var(--ag-silver-40);
+  border-radius: 10px;
+  background: var(--ag-silver-18);
+}
+.pb-tour__menu button {
+  width: 100%;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px 9px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  font: 600 13px/18px var(--font-ui);
+  color: var(--ag-charcoal);
+  text-align: left;
+  cursor: pointer;
+}
+.pb-tour__menu button:hover {
+  background: var(--ag-cyan-12);
+  color: var(--ag-navy);
+}
+.pb-tour__menu button.is-on {
+  background: var(--ag-navy);
+  color: var(--ag-white);
+}
+.pb-tour__menu small {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ag-gray);
+}
+.pb-tour__menu button.is-on small {
+  color: #b9d6ea;
+}
+.pb-tour__card h3 {
+  margin: 10px 0 6px;
+  font: 800 19px/1.25 var(--font-head);
+  color: var(--ag-navy);
+}
+.pb-tour__body {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+}
+.pb-tour__keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0 0;
+}
+.pb-tour__keys kbd {
+  min-width: 24px;
+  padding: 2px 7px;
+  border: 1px solid var(--ag-silver);
+  border-bottom-width: 2px;
+  border-radius: 6px;
+  background: var(--ag-silver-18);
+  font: 700 12px/18px var(--font-ui);
+  color: var(--ag-navy);
+  text-align: center;
+}
+.pb-tour__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+}
+.pb-tour__count {
+  font-size: 12px;
+  color: var(--ag-gray);
+}
+.pb-tour__acts {
+  display: inline-flex;
+  gap: 6px;
+}
+.pb-tour__rail {
+  height: 3px;
+  margin-top: 12px;
+  border-radius: 999px;
+  background: var(--ag-silver-40);
+  overflow: hidden;
+}
+.pb-tour__rail i {
+  display: block;
+  height: 100%;
+  background: var(--ag-cyan);
+  transition: width 0.25s ease;
+}
+/* The + between blocks only shows on hover; during its step it stays visible */
+html[data-tour-step="insert"] .pb-insert[data-index="1"] .pb-insert__btn,
+html[data-tour-step="insert"] .pb-insert[data-index="1"] .pb-insert__line {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pb-tour__ring,
+  .pb-tour__card,
+  .pb-tour__rail i {
+    transition: none;
+  }
+}
+@media print {
+  .pb-tour {
+    display: none;
+  }
+}

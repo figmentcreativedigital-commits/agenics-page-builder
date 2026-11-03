@@ -522,7 +522,7 @@ export function LeftPanel({ tab, setTab, onNewPage }: { tab: Tab; setTab: (t: Ta
           </button>
         ))}
       </nav>
-      <aside className="pb-left" aria-label={tabs.find((t) => t.id === tab)?.label}>
+      <aside className="pb-left" data-tour="panel" aria-label={tabs.find((t) => t.id === tab)?.label}>
         <h2 className="pb-left__title">
           {tab === "add" ? "Add a block" : tab === "layers" ? "Page layers" : tab === "pages" ? "Your pages" : tab === "review" ? "Review" : "Version history"}
         </h2>

@@ -37,7 +37,7 @@ function InsertPoint({ index, active, moving = false }: { index: number; active:
   }, [open]);
 
   return (
-    <div ref={ref} className={`pb-insert ${open ? "is-open" : ""} ${active ? "is-drop" : ""}`}>
+    <div ref={ref} className={`pb-insert ${open ? "is-open" : ""} ${active ? "is-drop" : ""}`} data-index={index}>
       <span className="pb-insert__line" aria-hidden="true" />
       {active ? <span className="pb-insert__drop">{moving ? "Drop to move here" : "Drop to add here"}</span> : null}
       <button type="button" className="pb-insert__btn" onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label="Add a block here" title="Add a block here">
@@ -477,6 +477,7 @@ export function Canvas() {
     <div
       ref={canvas}
       className="pb-canvas"
+      data-tour="canvas"
       onClick={(e) => {
         if (e.target === e.currentTarget) select(null);
       }}
