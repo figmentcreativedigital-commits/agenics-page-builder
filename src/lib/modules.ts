@@ -77,6 +77,8 @@ export interface FieldSpec {
   limit?: Limit;
   image?: ImageKind;
   optional?: boolean;
+  /** Paragraph text that may carry bold, italic and inline links. */
+  rich?: boolean;
   guidance: string;
 }
 
@@ -154,7 +156,7 @@ const hero: ModuleMeta = {
     eyebrow: { label: "Eyebrow", kind: "text", limit: { chars: 30 }, optional: true, guidance: "Audience or product line" },
     h1: { label: "H1", kind: "text", limit: { chars: 45 }, guidance: "The outcome, not the company name. The only H1 on the page." },
     sub: { label: "Subhead", kind: "text", limit: { chars: 140 }, guidance: "One sentence: who it is for and what they get" },
-    body: { label: "Supporting paragraph", kind: "text", limit: { words: 35 }, optional: true, guidance: "What is included and how it works" },
+    body: { label: "Supporting paragraph", kind: "text", limit: { words: 35 }, optional: true, rich: true, guidance: "What is included and how it works" },
     cta1: { label: "Primary button", kind: "cta", limit: { chars: 25 }, guidance: "Verb + object. Links to a product page or form." },
     cta2: { label: "Secondary button", kind: "cta", limit: { chars: 25 }, optional: true, guidance: "Lower-commitment action" },
     image: { label: "Hero image", kind: "image", image: "hero", guidance: "Lab or practice photography" },
@@ -236,7 +238,7 @@ const intro: ModuleMeta = {
   ],
   fields: {
     h2: { label: "H2", kind: "text", limit: { chars: 60 }, guidance: "The problem this page solves" },
-    body: { label: "Intro", kind: "text", limit: { words: 60 }, guidance: "Name the guideline or risk in plain words" },
+    body: { label: "Intro", kind: "text", limit: { words: 60 }, rich: true, guidance: "Name the guideline or risk in plain words" },
     "paths.*.title": { label: "Path title", kind: "text", limit: { chars: 30 }, guidance: "Audience or option" },
     "paths.*.line": { label: "Path line", kind: "text", limit: { chars: 80 }, guidance: "Who should click" },
     "paths.*.link": { label: "Path link", kind: "cta", limit: { chars: 25 }, guidance: "Each card routes to a different page" },
@@ -281,7 +283,7 @@ const feature: ModuleMeta = {
     eyebrow: { label: "Eyebrow", kind: "text", limit: { chars: 30 }, optional: true, guidance: "Optional label above the heading" },
     h2: { label: "H2", kind: "text", limit: { chars: 50 }, guidance: "The main reason to choose this" },
     "benefits.*.title": { label: "Benefit title", kind: "text", limit: { chars: 40 }, guidance: "One benefit per item" },
-    "benefits.*.body": { label: "Benefit body", kind: "text", limit: { words: 30 }, guidance: "Proof for the benefit" },
+    "benefits.*.body": { label: "Benefit body", kind: "text", limit: { words: 30 }, rich: true, guidance: "Proof for the benefit" },
     cta: { label: "Button", kind: "cta", limit: { chars: 25 }, optional: true, guidance: "Secondary style" },
     image: { label: "Feature image", kind: "image", image: "feature", guidance: "Implied action, negative space" },
   },
@@ -324,7 +326,7 @@ const products: ModuleMeta = {
   groups: [{ key: "cards", label: "product card", min: 1, max: 3, recMin: 1, recMax: 3, make: productCard }],
   fields: {
     h2: { label: "H2", kind: "text", limit: { chars: 50 }, guidance: "Help the reader choose" },
-    intro: { label: "Intro", kind: "text", limit: { words: 40 }, guidance: "What separates the options" },
+    intro: { label: "Intro", kind: "text", limit: { words: 40 }, rich: true, guidance: "What separates the options" },
     "cards.*.type": { label: "Test type", kind: "text", limit: { chars: 30 }, guidance: "e.g. Mail-in R2A" },
     "cards.*.name": { label: "Product name", kind: "text", limit: { chars: 24 }, guidance: "With ™ where it applies" },
     "cards.*.tagline": { label: "Tagline", kind: "text", limit: { chars: 50 }, guidance: "What it does best" },
@@ -374,7 +376,7 @@ const steps: ModuleMeta = {
   fields: {
     h2: { label: "H2", kind: "text", limit: { chars: 40 }, guidance: "\"How it works\" or the program name" },
     "steps.*.title": { label: "Step title", kind: "text", limit: { chars: 30 }, guidance: "Say who does it" },
-    "steps.*.body": { label: "Step body", kind: "text", limit: { words: 25 }, guidance: "What happens" },
+    "steps.*.body": { label: "Step body", kind: "text", limit: { words: 25 }, rich: true, guidance: "What happens" },
   },
   elements: [el("steps.*.body", "Step descriptions")],
   backgrounds: ["silver", "white", "cyan"],
@@ -523,7 +525,7 @@ const faq: ModuleMeta = {
     help: { label: "Support line", kind: "text", limit: { chars: 40 }, optional: true, guidance: "Lead-in to the support link" },
     helpLink: { label: "Support link", kind: "cta", limit: { chars: 25 }, optional: true, guidance: "Contact page" },
     "items.*.q": { label: "Question", kind: "text", limit: { chars: 80 }, guidance: "Phrased the way customers ask it" },
-    "items.*.a": { label: "Answer", kind: "text", limit: { words: 80 }, guidance: "Answer in the first sentence" },
+    "items.*.a": { label: "Answer", kind: "text", limit: { words: 80 }, rich: true, guidance: "Answer in the first sentence" },
   },
   elements: [el("support", "Support line and link", ["help", "helpLink"])],
   backgrounds: ["white", "silver", "cyan"],
@@ -556,7 +558,7 @@ const ctaBand: ModuleMeta = {
   groups: [],
   fields: {
     h2: { label: "H2", kind: "text", limit: { chars: 45 }, guidance: "One next step" },
-    line: { label: "Line", kind: "text", limit: { chars: 130 }, guidance: "What happens after the click" },
+    line: { label: "Line", kind: "text", limit: { chars: 130 }, rich: true, guidance: "What happens after the click" },
     assure: { label: "Reassurance line", kind: "text", limit: { chars: 100 }, optional: true, guidance: "Short facts that remove doubt: no contracts, all materials included" },
     cta: { label: "Primary button", kind: "cta", limit: { chars: 25 }, guidance: "One primary only" },
     phone: { label: "Phone", kind: "text", limit: { chars: 16 }, optional: true, guidance: "Shown as a text link" },
@@ -595,7 +597,7 @@ const explainer: ModuleMeta = {
   fields: {
     eyebrow: { label: "Eyebrow", kind: "text", limit: { chars: 30 }, optional: true, guidance: "Topic or standard name" },
     h2: { label: "H2", kind: "text", limit: { chars: 60 }, guidance: "The question the reader is asking" },
-    "paras.*": { label: "Paragraph", kind: "text", limit: { words: 60 }, guidance: "Plain-language definition first, then why it matters" },
+    "paras.*": { label: "Paragraph", kind: "text", limit: { words: 60 }, rich: true, guidance: "Plain-language definition first, then why it matters" },
     listTitle: { label: "List heading", kind: "text", limit: { chars: 60 }, optional: true, guidance: "Introduces the list, e.g. “It includes:”" },
     "items.*": { label: "List item", kind: "text", limit: { chars: 70 }, guidance: "Parallel phrasing, each starting with a verb or noun" },
     cta: { label: "Button", kind: "cta", limit: { chars: 25 }, optional: true, guidance: "Link to the standard or a guide" },
@@ -635,10 +637,10 @@ const grid: ModuleMeta = {
   fields: {
     eyebrow: { label: "Eyebrow", kind: "text", limit: { chars: 30 }, optional: true, guidance: "Optional label above the heading" },
     h2: { label: "H2", kind: "text", limit: { chars: 60 }, guidance: "The idea the points add up to" },
-    intro: { label: "Intro", kind: "text", limit: { words: 50 }, optional: true, guidance: "Sets up the points in one or two sentences" },
+    intro: { label: "Intro", kind: "text", limit: { words: 50 }, optional: true, rich: true, guidance: "Sets up the points in one or two sentences" },
     "items.*.icon": { label: "Icon", kind: "icon", guidance: "From the Agenics icon set; one idea per icon" },
     "items.*.title": { label: "Point title", kind: "text", limit: { chars: 40 }, guidance: "Two to four words" },
-    "items.*.body": { label: "Point text", kind: "text", limit: { words: 30 }, guidance: "One sentence" },
+    "items.*.body": { label: "Point text", kind: "text", limit: { words: 30 }, rich: true, guidance: "One sentence" },
     cta: { label: "Button", kind: "cta", limit: { chars: 25 }, optional: true, guidance: "Primary style; one per module" },
   },
   elements: [el("eyebrow", "Eyebrow"), el("intro", "Intro"), el("items.*.icon", "Icons"), el("items.*.body", "Point text"), el("cta", "Button")],
@@ -675,10 +677,10 @@ const audience: ModuleMeta = {
     eyebrow: { label: "Eyebrow", kind: "text", limit: { chars: 30 }, optional: true, guidance: "Optional label above the heading" },
     h2: { label: "H2", kind: "text", limit: { chars: 50 }, guidance: "Who the product is built for" },
     sub: { label: "Subhead", kind: "text", limit: { chars: 70 }, optional: true, guidance: "Raleway Light; sharpens the heading" },
-    body: { label: "Intro", kind: "text", limit: { words: 50 }, optional: true, guidance: "What these segments have in common" },
+    body: { label: "Intro", kind: "text", limit: { words: 50 }, optional: true, rich: true, guidance: "What these segments have in common" },
     "items.*.icon": { label: "Icon", kind: "icon", guidance: "From the Agenics icon set" },
     "items.*.title": { label: "Segment", kind: "text", limit: { chars: 40 }, guidance: "The name customers use for themselves" },
-    "items.*.body": { label: "Examples", kind: "text", limit: { words: 25 }, guidance: "Specialties or facility types" },
+    "items.*.body": { label: "Examples", kind: "text", limit: { words: 25 }, rich: true, guidance: "Specialties or facility types" },
     cta: { label: "Button", kind: "cta", limit: { chars: 25 }, optional: true, guidance: "Outline style" },
     image: { label: "Photo", kind: "image", image: "landscape", guidance: "The setting these customers work in" },
   },
@@ -714,7 +716,7 @@ const statement: ModuleMeta = {
   fields: {
     eyebrow: { label: "Eyebrow", kind: "text", limit: { chars: 30 }, optional: true, guidance: "Optional label above the heading" },
     h2: { label: "H2", kind: "text", limit: { chars: 60 }, guidance: "The claim" },
-    "paras.*": { label: "Paragraph", kind: "text", limit: { words: 50 }, guidance: "The problem, then the alternative" },
+    "paras.*": { label: "Paragraph", kind: "text", limit: { words: 50 }, rich: true, guidance: "The problem, then the alternative" },
     statement: { label: "Statement line", kind: "text", limit: { chars: 100 }, optional: true, guidance: "Three short sentences at most; reads as the takeaway" },
     cta: { label: "Button", kind: "cta", limit: { chars: 25 }, optional: true, guidance: "Primary style" },
   },
@@ -748,7 +750,7 @@ const story: ModuleMeta = {
   fields: {
     eyebrow: { label: "Eyebrow", kind: "text", limit: { chars: 30 }, optional: true, guidance: "Optional label above the heading" },
     h2: { label: "H2", kind: "text", limit: { chars: 50 }, guidance: "The point of the section" },
-    "paras.*": { label: "Paragraph", kind: "text", limit: { words: 60 }, guidance: "One idea per paragraph" },
+    "paras.*": { label: "Paragraph", kind: "text", limit: { words: 60 }, rich: true, guidance: "One idea per paragraph" },
     cta: { label: "Button", kind: "cta", limit: { chars: 25 }, optional: true, guidance: "Outline style" },
     image: { label: "Image", kind: "image", image: "landscape", guidance: "Equipment, lab or setting" },
   },

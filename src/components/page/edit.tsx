@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Fragment,
   createContext,
   createElement,
   useContext,
@@ -17,6 +18,7 @@ import { IMAGE_KINDS, MODULES, bgOf, fieldSpec, isHidden, isOff, limitLabel, typ
 import { anchorFor, getAt, publicHref, toPattern } from "@/lib/path";
 import { activePage, useBuilder } from "@/lib/store";
 import type { CtaVal, ImageVal, ModuleData, ModuleStyle, ModuleType } from "@/lib/types";
+import { domToRich, parseRich, plainText, richToHtml, type RNode } from "@/lib/richtext";
 import { ICONS, ICON_NAMES, IconGlyph } from "./icons";
 
 /* ------------------------------------------------------------------ */
@@ -111,10 +113,40 @@ function noteText(spec?: FieldSpec) {
 /* Editable text                                                       */
 /* ------------------------------------------------------------------ */
 
+/** Rich text for the published page: only bold, italic and safe links. */
+function RichNodes({ nodes }: { nodes: RNode[] }) {
+  return (
+    <>
+      {nodes.map((n, i) => {
+        if (n.t === "text") return <Fragment key={i}>{n.v}</Fragment>;
+        if (n.t === "b")
+          return (
+            <strong key={i}>
+              <RichNodes nodes={n.c} />
+            </strong>
+          );
+        if (n.t === "i")
+          return (
+            <em key={i}>
+              <RichNodes nodes={n.c} />
+            </em>
+          );
+        const link = publicHref(n.href);
+        return (
+          <a key={i} className="agx-inline" href={link.href} {...(link.external ? { target: "_blank", rel: "noreferrer" } : {})}>
+            <RichNodes nodes={n.c} />
+          </a>
+        );
+      })}
+    </>
+  );
+}
+
 function Editable({
   as,
   className,
   value,
+  rich,
   over,
   label,
   uid,
@@ -127,6 +159,7 @@ function Editable({
   as: ElementType;
   className?: string;
   value: string;
+  rich: boolean;
   over: boolean;
   label: string;
   uid: string;
@@ -134,20 +167,23 @@ function Editable({
   removable: boolean;
   onChange: (v: string) => void;
   onFocus: () => void;
-  onBlur: () => void;
+  onBlur: (e: React.FocusEvent<HTMLElement>) => void;
 }) {
   const ref = useRef<HTMLElement>(null);
   useLayoutEffect(() => {
     const el = ref.current;
-    if (el && document.activeElement !== el && el.textContent !== value) el.textContent = value;
-  }, [value]);
+    if (!el || document.activeElement === el) return;
+    if (rich) {
+      if (domToRich(el) !== value) el.innerHTML = richToHtml(value);
+    } else if (el.textContent !== value) el.textContent = value;
+  }, [value, rich]);
 
   const Tag = as;
   return (
     <Tag
       ref={ref}
-      className={cx(className, "agx-ed")}
-      contentEditable="plaintext-only"
+      className={cx(className, "agx-ed", rich && "agx-ed--rich")}
+      contentEditable={rich ? "true" : "plaintext-only"}
       suppressContentEditableWarning
       role="textbox"
       aria-label={label}
@@ -157,7 +193,8 @@ function Editable({
       data-removable={removable ? "true" : undefined}
       data-over={over ? "true" : undefined}
       spellCheck
-      onInput={(e: React.FormEvent<HTMLElement>) => onChange(e.currentTarget.textContent ?? "")}
+      data-rich={rich ? "true" : undefined}
+      onInput={(e: React.FormEvent<HTMLElement>) => onChange(rich ? domToRich(e.currentTarget) : (e.currentTarget.textContent ?? ""))}
       onKeyDown={(e: React.KeyboardEvent<HTMLElement>) => {
         if (e.key === "Enter" || e.key === "Escape") {
           e.preventDefault();
@@ -194,8 +231,12 @@ export function T({
   const spec = specFor(ctx.type, path);
 
   if (!shown) return null;
-  if (!ctx.editing) return value ? createElement(as, { className }, value) : null;
-  const r = measure(value, spec?.limit);
+  const rich = !!spec?.rich;
+  if (!ctx.editing) {
+    if (!value) return null;
+    return createElement(as, { className }, rich ? <RichNodes nodes={parseRich(value)} /> : value);
+  }
+  const r = measure(rich ? plainText(value) : value, spec?.limit);
   return (
     <>
       {note && spec ? <Note>{noteText(spec)}</Note> : null}
@@ -203,6 +244,7 @@ export function T({
         as={as}
         className={className}
         value={value}
+        rich={rich}
         over={!!r?.over}
         label={spec?.label ?? path}
         uid={ctx.uid}
@@ -210,7 +252,11 @@ export function T({
         removable={!!elementFor(ctx.type, path)}
         onChange={(v) => update(ctx.uid, path, v)}
         onFocus={() => setFocus({ uid: ctx.uid, path })}
-        onBlur={() => setFocus(null)}
+        onBlur={(e) => {
+          // Moving into the formatting bar (for example to type a link) keeps the slot active
+          const to = e.relatedTarget as HTMLElement | null;
+          if (!to?.closest?.(".pb-elbar")) setFocus(null);
+        }}
       />
     </>
   );
@@ -521,6 +567,7 @@ export function Img({
   const stored = useImageUrl(im.id);
   const url = stored ?? (im.id ? null : im.src ?? null);
   const input = useRef<HTMLInputElement>(null);
+  const openLibrary = useBuilder((s) => s.setLibrary);
   const [drag, setDrag] = useState(false);
   const [busy, setBusy] = useState(false);
 
@@ -541,7 +588,17 @@ export function Img({
   const media = url ? (
     // Local blob URLs from IndexedDB or files bundled with the app; next/image cannot optimize blob URLs
     // eslint-disable-next-line @next/next/no-img-element
-    <img src={url} alt={im.alt} style={{ objectFit: fit, objectPosition: position }} />
+    <img
+      src={url}
+      alt={im.alt}
+      style={{
+        objectFit: fit,
+        objectPosition: im.focus ? `${im.focus.x}% ${im.focus.y}%` : position,
+        ...(im.zoom && im.zoom > 1
+          ? { transform: `scale(${im.zoom})`, transformOrigin: im.focus ? `${im.focus.x}% ${im.focus.y}%` : "50% 50%" }
+          : {}),
+      }}
+    />
   ) : (
     <Placeholder kind={kind} editing={ctx.editing && controls === "overlay"} />
   );
@@ -581,6 +638,15 @@ export function Img({
           }}
         >
           {busy ? "Saving…" : url ? "Replace" : "Add image"}
+        </button>
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            openLibrary({ uid: ctx.uid, path });
+          }}
+        >
+          Library
         </button>
         {url ? (
           <button
@@ -623,26 +689,95 @@ export function Img({
 /* Repeatable items                                                    */
 /* ------------------------------------------------------------------ */
 
+/** What is being dragged inside a block (dataTransfer can't be read during dragover). */
+export const ITEM_DRAG = "application/x-agenics-item";
+export let itemDrag: { uid: string; group: string; index: number } | null = null;
+
+/** Hover tools on a repeating item: drag to reorder (or arrow keys), and remove. */
 export function ItemRemove({ group, index }: { group: string; index: number }) {
   const ctx = useMod();
   const remove = useBuilder((s) => s.removeItem);
-  if (!ctx.editing) return null;
-  const g = MODULES[ctx.type].groups.find((x) => x.key === group);
+  const moveItem = useBuilder((s) => s.moveItem);
+  const ref = useRef<HTMLSpanElement>(null);
   const list = (getAt(ctx.data, group) as unknown[]) ?? [];
-  if (!g || list.length <= g.min) return null;
+  const g = MODULES[ctx.type].groups.find((x) => x.key === group);
+
+  // Label the item element so the canvas knows where a dragged item lands
+  useLayoutEffect(() => {
+    const item = ref.current?.closest<HTMLElement>(".agx-item");
+    if (!item) return;
+    item.dataset.uid = ctx.uid;
+    item.dataset.group = group;
+    item.dataset.index = String(index);
+  });
+
+  if (!ctx.editing || !g) return null;
+  const canMove = list.length > 1;
+  const canRemove = list.length > g.min;
+  if (!canMove && !canRemove) return null;
   return (
-    <button
-      type="button"
-      className="agx-itemx"
-      aria-label={`Remove ${g.label} ${index + 1}`}
-      title={`Remove ${g.label}`}
-      onClick={(e) => {
-        e.stopPropagation();
-        remove(ctx.uid, group, index);
-      }}
-    >
-      ×
-    </button>
+    <span className="agx-itemtools" ref={ref}>
+      {canMove ? (
+        <button
+          type="button"
+          className="agx-itemx agx-itemx--drag"
+          draggable
+          aria-label={`Move ${g.label} ${index + 1}. Drag, or use the arrow keys`}
+          title="Drag to reorder (or use the arrow keys)"
+          onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => {
+            const dir = e.key === "ArrowLeft" || e.key === "ArrowUp" ? -1 : e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : 0;
+            if (!dir) return;
+            e.preventDefault();
+            e.stopPropagation();
+            const to = index + dir;
+            if (to < 0 || to >= list.length) return;
+            moveItem(ctx.uid, group, index, to);
+            requestAnimationFrame(() =>
+              document
+                .querySelector<HTMLElement>(`.agx-item[data-uid="${ctx.uid}"][data-group="${group}"][data-index="${to}"] .agx-itemx--drag`)
+                ?.focus(),
+            );
+          }}
+          onDragStart={(e) => {
+            e.stopPropagation();
+            itemDrag = { uid: ctx.uid, group, index };
+            e.dataTransfer.setData(ITEM_DRAG, `${ctx.uid}|${group}|${index}`);
+            e.dataTransfer.effectAllowed = "move";
+            const item = ref.current?.closest<HTMLElement>(".agx-item");
+            if (item) e.dataTransfer.setDragImage(item, 24, 24);
+            requestAnimationFrame(() => item?.classList.add("is-moving"));
+          }}
+          onDragEnd={() => {
+            itemDrag = null;
+            document.querySelectorAll(".agx-item.is-moving, .agx-item.is-target").forEach((el) => el.classList.remove("is-moving", "is-target"));
+          }}
+        >
+          <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <circle cx="7" cy="5" r="1.6" />
+            <circle cx="13" cy="5" r="1.6" />
+            <circle cx="7" cy="10" r="1.6" />
+            <circle cx="13" cy="10" r="1.6" />
+            <circle cx="7" cy="15" r="1.6" />
+            <circle cx="13" cy="15" r="1.6" />
+          </svg>
+        </button>
+      ) : null}
+      {canRemove ? (
+        <button
+          type="button"
+          className="agx-itemx"
+          aria-label={`Remove ${g.label} ${index + 1}`}
+          title={`Remove ${g.label}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            remove(ctx.uid, group, index);
+          }}
+        >
+          ×
+        </button>
+      ) : null}
+    </span>
   );
 }
 

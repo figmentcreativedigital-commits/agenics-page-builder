@@ -1713,3 +1713,69 @@ tr.agx-item:hover .agx-itemx {
 .agx-para {
   display: block;
 }
+
+/* Inline formatting inside paragraphs */
+.agx strong {
+  font-weight: 700;
+}
+.agx-inline {
+  color: var(--ag-navy);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.agx-bg--navy .agx-inline,
+.agx-sec--navy .agx-inline,
+.agx-ctaband .agx-inline,
+.agx-hero .agx-inline {
+  color: var(--ag-cyan);
+}
+.agx--edit .agx-ed--rich a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--ag-cyan);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+/* Item tools: drag handle + remove */
+.agx-itemtools {
+  position: absolute;
+  top: -12px;
+  right: -10px;
+  z-index: 5;
+  display: inline-flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+.agx-itemtools .agx-itemx {
+  position: static;
+  opacity: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.agx-itemx--drag {
+  cursor: grab;
+  color: var(--ag-gray);
+}
+.agx-item:hover > .agx-itemtools,
+.agx-item:focus-within > .agx-itemtools,
+tr.agx-item:hover .agx-itemtools,
+.agx-itemtools:focus-within {
+  opacity: 1;
+}
+.agx-table th .agx-itemtools {
+  top: 4px;
+  right: auto;
+  left: -40px;
+}
+.agx--edit .agx-item.is-moving {
+  opacity: 0.4;
+}
+.agx--edit .agx-item.is-target {
+  outline: 3px dashed var(--ag-cyan);
+  outline-offset: 4px;
+  border-radius: 6px;
+}

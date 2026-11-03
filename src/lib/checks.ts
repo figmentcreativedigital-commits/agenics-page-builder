@@ -1,4 +1,5 @@
 import { IMAGE_KINDS, MODULES, bgOf, isShown, moduleFields } from "./modules";
+import { inlineLinks, plainText } from "./richtext";
 import { countWords, getAt } from "./path";
 import type { Bg, CtaVal, ImageVal, Limit, ModuleInstance, PageDoc } from "./types";
 
@@ -124,11 +125,17 @@ export function checkPage(page: PageDoc): Issue[] {
       {
         const v = getAt(m.data, path);
         if (spec.kind === "text") {
-          const s = String(v ?? "");
+          const raw = String(v ?? "");
+          const s = spec.rich ? plainText(raw) : raw;
           if (!s.trim() && !spec.optional) out.push({ level: "warn", moduleUid: m.uid, path, message: `${tag}: ${spec.label} is empty.` });
           if (isPlaceholder(s)) placeholders++;
           const r = measure(s, spec.limit);
           if (r?.over) out.push({ level: "error", moduleUid: m.uid, path, message: `${tag}: ${spec.label} is ${r.used}/${r.max} ${r.unit}. Shorten it.` });
+          if (spec.rich)
+            for (const l of inlineLinks(raw)) {
+              const bad = badHref(l.href) ?? anchorProblem(l.href);
+              if (bad) out.push({ level: "warn", moduleUid: m.uid, path, message: `${tag}: the link on “${l.text}” ${bad}.` });
+            }
         } else if (spec.kind === "cta") {
           const c = (v ?? { label: "", href: "" }) as CtaVal;
           if (spec.optional && !c.label.trim()) continue;

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { checkPage } from "@/lib/checks";
 import { downloadBrief, downloadHandoffZip, downloadPageJson, importPageJson } from "@/lib/exporters";
+import { saveVersion } from "@/lib/history";
 import { activePage, useBuilder } from "@/lib/store";
 import type { Viewport } from "@/lib/types";
 import "../page/page.css";
@@ -11,6 +12,7 @@ import "./builder.css";
 import { Canvas } from "./Canvas";
 import { Inspector } from "./Inspector";
 import { LeftPanel, NewPageDialog, type Tab } from "./LeftPanel";
+import { ImageLibrary } from "./ImageLibrary";
 import { ShareDialog } from "./ShareDialog";
 import { Icon } from "./ui";
 
@@ -241,7 +243,9 @@ const SHORTCUTS: [string, string][] = [
   ["Select the block above / below", "↑ · ↓"],
   ["Move the selected block", "⌥↑ · ⌥↓"],
   ["Duplicate the selected block", "⌘D"],
+  ["Copy / paste a block (works across pages)", "⌘C · ⌘V"],
   ["Delete the selected block", "Delete"],
+  ["Bold / italic / link, while typing a paragraph", "⌘B · ⌘I · ⌘K"],
   ["Preview on / off", "P"],
   ["Deselect · close", "Esc"],
   ["This list", "?"],
@@ -295,6 +299,29 @@ export function Builder() {
     });
   }, []);
 
+  // Automatic versions: when a page is opened, then every five minutes while it changes
+  useEffect(() => {
+    if (!ready) return;
+    const opened = new Set<string>();
+    const lastAuto: Record<string, number> = {};
+    const check = () => {
+      const page = activePage(useBuilder.getState());
+      if (!page) return;
+      if (!opened.has(page.id)) {
+        opened.add(page.id);
+        lastAuto[page.id] = Date.now();
+        saveVersion(page, "Opened", true);
+      } else if (Date.now() - (lastAuto[page.id] ?? 0) > 5 * 60 * 1000) {
+        lastAuto[page.id] = Date.now();
+        saveVersion(page, "Auto-saved", true);
+      }
+    };
+    check();
+    return useBuilder.subscribe((s, prev) => {
+      if (s.activeId !== prev.activeId || s.savedAt !== prev.savedAt) check();
+    });
+  }, [ready]);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const t = e.target as HTMLElement;
@@ -311,6 +338,12 @@ export function Builder() {
       } else if (mod && e.key.toLowerCase() === "d" && sel) {
         e.preventDefault();
         s.duplicateModule(sel);
+      } else if (mod && e.key.toLowerCase() === "c" && sel && !window.getSelection()?.toString()) {
+        e.preventDefault();
+        s.copyBlock(sel);
+      } else if (mod && e.key.toLowerCase() === "v" && !s.preview) {
+        e.preventDefault();
+        s.pasteBlock();
       } else if ((e.key === "Delete" || e.key === "Backspace") && sel && !s.preview) {
         e.preventDefault();
         s.removeModule(sel);
@@ -352,6 +385,7 @@ export function Builder() {
       {newPage ? <NewPageDialog onClose={() => setNewPage(false)} /> : null}
       {keys ? <ShortcutsDialog onClose={() => setKeys(false)} /> : null}
       {sharing ? <ShareDialog onClose={() => setSharing(false)} /> : null}
+      <ImageLibrary />
     </div>
   );
 }

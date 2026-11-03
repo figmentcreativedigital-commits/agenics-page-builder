@@ -5,6 +5,7 @@ import { checkPage, isPlaceholder, measure } from "./checks";
 import { blobToDataUrl, dataUrlToBlob, getImageBlob, putImage } from "./images";
 import { BACKGROUNDS, IMAGE_KINDS, MODULES, bgOf, isShown, moduleFields } from "./modules";
 import { expand, getAt, itemNumber, slugify, uid } from "./path";
+import { plainText } from "./richtext";
 import type { CtaVal, ImageVal, PageDoc } from "./types";
 
 const FORMAT = "agenics-page-builder@1";
@@ -51,7 +52,7 @@ export function buildBrief(page: PageDoc): string {
   lines.push(`- **Blocks:** ${page.modules.length}`);
   lines.push(`- **Exported:** ${new Date().toLocaleString("en-US")}`, "");
   lines.push(
-    "Build each block below as one Squarespace section, in this order. Fonts, colors and button styles come from Site Styles. Upload each image under the file name shown.",
+    "Build each block below as one Squarespace section, in this order. Fonts, colors and button styles come from Site Styles. Upload each image under the file name shown. Paragraph formatting is written as Markdown: **bold**, _italic_ and [link text](address).",
     "",
   );
 
@@ -79,8 +80,9 @@ export function buildBrief(page: PageDoc): string {
         if (spec.kind === "text") {
           const s = String(v ?? "");
           if (!s && spec.optional) continue;
-          const r = measure(s, spec.limit);
-          const flag = isPlaceholder(s) ? " ⚠ placeholder" : r?.over ? ` ⚠ over limit (${r.used}/${r.max})` : "";
+          const plain = spec.rich ? plainText(s) : s;
+          const r = measure(plain, spec.limit);
+          const flag = isPlaceholder(plain) ? " ⚠ placeholder" : r?.over ? ` ⚠ over limit (${r.used}/${r.max})` : "";
           lines.push(`- **${label}:** ${s || "—"}${flag}`);
         } else if (spec.kind === "cta") {
           const c = v as CtaVal;
@@ -96,6 +98,8 @@ export function buildBrief(page: PageDoc): string {
           lines.push(
             `- **${label} (${slot?.ratio}):** ${im?.id || im?.src ? `images/${slot?.file}` : "⚠ no image yet"} · alt: ${
               im?.alt ? `"${im.alt}"` : "⚠ missing"
+            }${im?.focus ? ` · focal point ${im.focus.x}% across, ${im.focus.y}% down` : ""}${
+              im?.zoom && im.zoom > 1 ? ` · zoomed to ${Math.round(im.zoom * 100)}%` : ""
             }`,
           );
         }

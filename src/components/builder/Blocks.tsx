@@ -6,6 +6,8 @@ import type { ModuleType } from "@/lib/types";
 import { ModuleThumb } from "./thumbs";
 
 export const DRAG_TYPE = "application/x-agenics-block";
+/** A block already on the page being moved by its toolbar handle. */
+export const MOVE_TYPE = "application/x-agenics-move";
 
 /** Block tiles grouped by category. Click to add, or drag onto the page. */
 export function BlockPicker({ onPick, compact = false, search = true }: { onPick: (t: ModuleType) => void; compact?: boolean; search?: boolean }) {

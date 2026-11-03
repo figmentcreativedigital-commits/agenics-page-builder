@@ -8,6 +8,15 @@ import { setAt, getAt, uid } from "./path";
 import { EXAMPLES, exampleDentalWater, exampleST108, makeModule, pageFromRecipe } from "./recipes";
 import type { ModuleInstance, ModuleStyle, ModuleType, PageDoc, ShareInfo, Viewport } from "./types";
 
+export interface SavedBlock {
+  id: string;
+  name: string;
+  module: ModuleInstance;
+  savedAt: number;
+}
+
+const CLIPBOARD = "agenics-page-builder:clipboard";
+
 /** Bump when a new worked example ships, so browsers that already have pages get it too. */
 const SEED_VERSION = 2;
 
@@ -21,11 +30,15 @@ interface BuilderState {
   showSpecs: boolean;
   preview: boolean;
   focus: { uid: string; path: string } | null;
+  /** The image slot the photo library is choosing for. */
+  library: { uid: string; path: string } | null;
   past: Snapshot[];
   future: Snapshot[];
   toast: { msg: string; undo?: boolean } | null;
   seeded: number;
   savedAt: number;
+  /** Blocks saved for reuse ("My blocks"), kept in this browser. */
+  saved: SavedBlock[];
 
   // pages
   seedIfEmpty: () => void;
@@ -41,9 +54,17 @@ interface BuilderState {
   // modules
   select: (uid: string | null) => void;
   addModule: (type: ModuleType, index?: number) => void;
+  insertModule: (mod: ModuleInstance, index?: number) => void;
+  copyBlock: (uid: string) => void;
+  pasteBlock: (index?: number) => void;
+  saveBlock: (uid: string, name?: string) => void;
+  deleteSaved: (id: string) => void;
+  insertSaved: (id: string, index?: number) => void;
   removeModule: (uid: string) => void;
   moveModule: (uid: string, dir: -1 | 1) => void;
   reorder: (fromUid: string, toUid: string) => void;
+  moveTo: (uid: string, index: number) => void;
+  moveItem: (uid: string, group: string, from: number, to: number) => void;
   duplicateModule: (uid: string) => void;
   setVariant: (uid: string, variant: string) => void;
   updateField: (uid: string, path: string, value: unknown) => void;
@@ -55,12 +76,14 @@ interface BuilderState {
   setNote: (uid: string, note: string) => void;
   selectAdjacent: (dir: -1 | 1) => void;
   tidyBackgrounds: () => number;
+  restoreVersion: (doc: PageDoc, when: string) => void;
 
   // ui
   setViewport: (v: Viewport) => void;
   toggleSpecs: () => void;
   setPreview: (on: boolean) => void;
   setFocus: (f: { uid: string; path: string } | null) => void;
+  setLibrary: (target: { uid: string; path: string } | null) => void;
   showToast: (msg: string, undo?: boolean) => void;
   clearToast: () => void;
 
@@ -92,6 +115,29 @@ export const useBuilder = create<BuilderState>()(
         });
       };
 
+      /** Put a block on the active page: at index, else after the selected block, else above the closing CTA. */
+      const insert = (mod: ModuleInstance, index?: number) => {
+        commit((mods) => {
+          const sel = get().selectedUid;
+          let at = index;
+          if (at === undefined) {
+            const selIdx = mods.findIndex((m) => m.uid === sel);
+            if (selIdx >= 0) at = selIdx + 1;
+            else if (mods.length && mods[mods.length - 1].type === "cta") at = mods.length - 1;
+            else at = mods.length;
+          }
+          const next = [...mods];
+          next.splice(at, 0, mod);
+          return next;
+        });
+        set({ selectedUid: mod.uid });
+        if (typeof window !== "undefined") {
+          requestAnimationFrame(() =>
+            document.getElementById(`mod-${mod.uid}`)?.scrollIntoView({ behavior: "smooth", block: "start" }),
+          );
+        }
+      };
+
       return {
         pages: [],
         activeId: null,
@@ -100,11 +146,13 @@ export const useBuilder = create<BuilderState>()(
         showSpecs: false,
         preview: false,
         focus: null,
+        library: null,
         past: [],
         future: [],
         toast: null,
         seeded: 0,
         savedAt: 0,
+        saved: [],
 
         seedIfEmpty: () => {
           const s = get();
@@ -188,27 +236,50 @@ export const useBuilder = create<BuilderState>()(
 
         select: (u) => set({ selectedUid: u }),
 
-        addModule: (type, index) => {
-          const mod = makeModule(type);
-          commit((mods) => {
-            const sel = get().selectedUid;
-            let at = index;
-            if (at === undefined) {
-              const selIdx = mods.findIndex((m) => m.uid === sel);
-              if (selIdx >= 0) at = selIdx + 1;
-              else if (mods.length && mods[mods.length - 1].type === "cta") at = mods.length - 1;
-              else at = mods.length;
-            }
-            const next = [...mods];
-            next.splice(at, 0, mod);
-            return next;
-          });
-          set({ selectedUid: mod.uid });
-          if (typeof window !== "undefined") {
-            requestAnimationFrame(() =>
-              document.getElementById(`mod-${mod.uid}`)?.scrollIntoView({ behavior: "smooth", block: "start" }),
-            );
+        addModule: (type, index) => insert(makeModule(type), index),
+
+        insertModule: (mod, index) => insert({ ...structuredClone(mod), uid: uid() }, index),
+
+        copyBlock: (u) => {
+          const mod = activePage(get())?.modules.find((m) => m.uid === u);
+          if (!mod) return;
+          try {
+            localStorage.setItem(CLIPBOARD, JSON.stringify(mod));
+          } catch {
+            /* ignore */
           }
+          get().showToast(`${MODULES[mod.type].name} copied. Paste it on any page with ⌘V.`);
+        },
+
+        pasteBlock: (index) => {
+          let mod: ModuleInstance | null = null;
+          try {
+            mod = JSON.parse(localStorage.getItem(CLIPBOARD) ?? "null");
+          } catch {
+            mod = null;
+          }
+          if (!mod || !(mod.type in MODULES)) {
+            get().showToast("Nothing to paste yet. Copy a block first.");
+            return;
+          }
+          get().insertModule(mod, index);
+          get().showToast(`${MODULES[mod.type].name} pasted`, true);
+        },
+
+        saveBlock: (u, name) => {
+          const mod = activePage(get())?.modules.find((m) => m.uid === u);
+          if (!mod) return;
+          const heading = String(mod.data.h1 ?? mod.data.h2 ?? MODULES[mod.type].name).replace(/[[\]]/g, "");
+          const block: SavedBlock = { id: uid(), name: (name ?? heading).slice(0, 60), module: structuredClone(mod), savedAt: Date.now() };
+          set((s) => ({ saved: [block, ...s.saved].slice(0, 60) }));
+          get().showToast(`Saved to My blocks as “${block.name}”`);
+        },
+
+        deleteSaved: (id) => set((s) => ({ saved: s.saved.filter((b) => b.id !== id) })),
+
+        insertSaved: (id, index) => {
+          const block = get().saved.find((b) => b.id === id);
+          if (block) get().insertModule(block.module, index);
         },
 
         removeModule: (u) => {
@@ -228,6 +299,30 @@ export const useBuilder = create<BuilderState>()(
             [next[i], next[j]] = [next[j], next[i]];
             return next;
           }),
+
+        moveTo: (u, index) =>
+          commit((mods) => {
+            const from = mods.findIndex((m) => m.uid === u);
+            if (from < 0) return mods;
+            const to = index > from ? index - 1 : index;
+            if (to === from) return mods;
+            const next = [...mods];
+            const [moved] = next.splice(from, 1);
+            next.splice(to, 0, moved);
+            return next;
+          }),
+
+        moveItem: (u, groupKey, from, to) =>
+          commit((mods) =>
+            mods.map((m) => {
+              if (m.uid !== u || from === to) return m;
+              const list = [...(((getAt(m.data, groupKey) as unknown[]) ?? []))];
+              if (from < 0 || from >= list.length || to < 0 || to >= list.length) return m;
+              const [moved] = list.splice(from, 1);
+              list.splice(to, 0, moved);
+              return { ...m, data: setAt(m.data, groupKey, list) };
+            }),
+          ),
 
         reorder: (fromUid, toUid) =>
           commit((mods) => {
@@ -317,6 +412,21 @@ export const useBuilder = create<BuilderState>()(
             false,
           ),
 
+        restoreVersion: (doc, when) => {
+          const page = activePage(get());
+          if (!page || page.id !== doc.id) return;
+          commit(() => structuredClone(doc.modules));
+          set((s) => ({
+            pages: s.pages.map((p) =>
+              p.id === page.id
+                ? { ...p, name: doc.name, slug: doc.slug, seoTitle: doc.seoTitle, metaDescription: doc.metaDescription, updatedAt: Date.now() }
+                : p,
+            ),
+            selectedUid: null,
+          }));
+          get().showToast(`Restored the version from ${when}`, true);
+        },
+
         tidyBackgrounds: () => {
           // Give neighbouring sections different backgrounds, using only the colors each block allows
           let changed = 0;
@@ -359,6 +469,7 @@ export const useBuilder = create<BuilderState>()(
         toggleSpecs: () => set((s) => ({ showSpecs: !s.showSpecs })),
         setPreview: (on) => set({ preview: on, selectedUid: on ? null : get().selectedUid }),
         setFocus: (f) => set({ focus: f }),
+        setLibrary: (target) => set({ library: target }),
         showToast: (msg, undo) => set({ toast: { msg, undo } }),
         clearToast: () => set({ toast: null }),
 
@@ -399,6 +510,7 @@ export const useBuilder = create<BuilderState>()(
         viewport: s.viewport,
         showSpecs: s.showSpecs,
         seeded: s.seeded,
+        saved: s.saved,
       }),
       migrate: (persisted, version) => {
         const state = persisted as { pages?: PageDoc[]; seeded?: number };

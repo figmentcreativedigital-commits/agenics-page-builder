@@ -27,6 +27,10 @@ export type ImageVal = {
   h?: number;
   name?: string;
   type?: string;
+  /** The part of the photo to keep in view when the slot crops it, in % of width and height. */
+  focus?: { x: number; y: number };
+  /** 1 = fit the slot; up to 2 = zoomed in around the focal point. */
+  zoom?: number;
 };
 
 // Module content is a plain JSON tree; each module's shape is defined by its defaults in lib/modules.ts.

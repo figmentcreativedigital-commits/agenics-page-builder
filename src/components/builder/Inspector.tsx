@@ -31,6 +31,9 @@ function ImageRow({ mod, path, label, kind }: { mod: ModuleInstance; path: strin
   const k = IMAGE_KINDS[kind];
   const has = !!(im.id || im.src);
   const small = has && im.w && im.h && (im.w < k.w * 0.75 || im.h < k.h * 0.75);
+  const openLibrary = useBuilder((s) => s.setLibrary);
+  const [adjust, setAdjust] = useState(false);
+  const focus = im.focus ?? { x: 50, y: 50 };
   return (
     <div className="pb-imgrow">
       <button type="button" className="pb-thumb" onClick={() => input.current?.click()} title={has ? "Replace image" : "Add image"}>
@@ -55,7 +58,55 @@ function ImageRow({ mod, path, label, kind }: { mod: ModuleInstance; path: strin
           onChange={(e) => update(mod.uid, `${path}.alt`, e.target.value)}
         />
         {small ? <span className="pb-warn">A bit small; it may look soft.</span> : null}
+        <div className="pb-actions">
+          <button type="button" className="pb-btn pb-btn--sm" onClick={() => openLibrary({ uid: mod.uid, path })}>
+            <Icon name="image" size={14} /> Library
+          </button>
+          {url ? (
+            <button type="button" className={`pb-btn pb-btn--sm ${adjust ? "pb-btn--on" : ""}`} aria-expanded={adjust} onClick={() => setAdjust((a) => !a)}>
+              <Icon name="focus" size={14} /> Focus and zoom
+            </button>
+          ) : null}
+        </div>
       </div>
+      {url && adjust ? (
+        <div className="pb-focus">
+          <p>Click the part of the photo that must stay in view when the slot crops it.</p>
+          <span
+            className="pb-focus__pick"
+            onClick={(e) => {
+              const r = e.currentTarget.getBoundingClientRect();
+              const x = Math.round(((e.clientX - r.left) / r.width) * 100);
+              const y = Math.round(((e.clientY - r.top) / r.height) * 100);
+              update(mod.uid, `${path}.focus`, { x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) });
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={url} alt="" draggable={false} />
+            <i style={{ left: `${focus.x}%`, top: `${focus.y}%` }} aria-hidden="true" />
+          </span>
+          <label className="pb-field">
+            <span className="pb-field__label">
+              Zoom <span className="pb-count">{Math.round((im.zoom ?? 1) * 100)}%</span>
+            </span>
+            <input
+              type="range"
+              min={1}
+              max={2}
+              step={0.05}
+              value={im.zoom ?? 1}
+              onChange={(e) => update(mod.uid, `${path}.zoom`, Number(e.target.value))}
+            />
+          </label>
+          <button
+            type="button"
+            className="pb-btn pb-btn--sm"
+            onClick={() => update(mod.uid, path, { ...im, focus: undefined, zoom: undefined })}
+          >
+            Reset
+          </button>
+        </div>
+      ) : null}
       <input
         ref={input}
         type="file"

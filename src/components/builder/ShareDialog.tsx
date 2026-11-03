@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { saveVersion } from "@/lib/history";
 import { ShareError, publishShare, stopShare } from "@/lib/share";
 import { activePage, useBuilder } from "@/lib/store";
 import { Icon } from "./ui";
@@ -35,6 +36,7 @@ export function ShareDialog({ onClose }: { onClose: () => void }) {
       const info = await publishShare(page, setBusy);
       // Compare against this browser's clock, which also stamps the page's edits
       setShare(page.id, { ...info, publishedAt: Date.now() });
+      saveVersion(page, share ? "Preview link updated" : "Preview link created", false);
     } catch (e) {
       setError(e instanceof ShareError ? e : new ShareError("Something went wrong. Try again."));
     } finally {

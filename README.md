@@ -12,6 +12,12 @@ Built by Figment Creative for Agenics Labs. Follows the **Agenics Corporate Grap
 
 ## Things you can do
 
+- **Format paragraphs.** Bold, italic and links inside any paragraph slot, from the bar above the text or with ⌘B, ⌘I and ⌘K. Links can point at a page, a file, a full address or a section of the same page. Headings and buttons stay plain, as the brand guide sets them.
+- **Drag on the page.** Grab a block by the handle in its toolbar to move it. Grab any card, point, question, list item or paragraph by its handle to reorder it inside the block (or focus the handle and use the arrow keys).
+- **Copy, paste and reuse.** ⌘C / ⌘V copies a block, also between pages. **⋯ › Save to My blocks** keeps a finished block at the top of the Add panel for reuse.
+- **Photos.** Every image slot has a **Library** with Agenics photography and everything uploaded in this browser. **Focus and zoom** in the settings panel sets the part of the photo that stays in view when the slot crops it; the brief passes the focal point on to Squarespace.
+- **Version history.** Versions save on their own when a page is opened and every few minutes while it changes, and whenever a preview link is created or updated. Save a named version any time, view any version, and restore it (restoring can be undone).
+
 - **Hide anything optional.** Hover a button and click ×, or use the bar above a text slot, or switch it off in **Show / hide**. Hidden elements keep their text, so they come back with one switch. The brief tells the developer to leave them out.
 - **Pick a layout** from thumbnails (for example, an Icon grid can be 3 across, 4 across, 2 × 2, or a heading with a 2 × 2 grid beside it).
 - **Pick a background** from the brand-safe set each block allows: White, Silver 18%, Cyan 12% or Navy. **Tidy backgrounds** alternates them in one click so sections stand apart, and Review flags two same-colored sections in a row.
@@ -19,7 +25,7 @@ Built by Figment Creative for Agenics Labs. Follows the **Agenics Corporate Grap
 - **Leave a note for the team** on any block. Notes show on the canvas while editing and are listed in the brief. They are never published.
 - **Change the number of items** (points, cards, questions, paragraphs) within each block's limits.
 - **Preview** at desktop, tablet and phone widths, or open the clean page in a new tab.
-- **Share a preview link.** **Share** in the top bar makes a link such as `/share/5dBw9qSUx9` that anyone can open on any device, without the builder password. Viewers see the page as visitors would, with a desktop / tablet / phone switch, and can't edit it. The link shows the version you published: after changes, **Update the link** refreshes it at the same address, and **Stop sharing** turns it off. Only the browser that created a link can update or stop it.
+- **Share a preview link.** **Share** in the top bar makes a link such as `/share/5dBw9qSUx9` that anyone can open on any device. Viewers see the page as visitors would, with a desktop / tablet / phone switch, and can't edit it. The link shows the version you published: after changes, **Update the link** refreshes it at the same address, and **Stop sharing** turns it off. Only the browser that created a link can update or stop it.
 - **Undo everything.** ⌘Z / ⌘⇧Z. Press **?** for all shortcuts.
 
 ## How the color works in the tool
@@ -81,7 +87,6 @@ npm run build    # production build check
 2. For preview links: **Storage › Create › Blob**, connect it to this project (Vercel adds the access token), then redeploy. If you choose a private store, also add `BLOB_ACCESS=private`.
 3. Add environment variables (Settings › Environment Variables), then redeploy:
    - `NEXT_PUBLIC_ADOBE_FONTS_KIT_ID`: the Adobe Fonts web project ID with Neue Kabel
-   - `BASIC_AUTH_USER` / `BASIC_AUTH_PASSWORD`: optional password for the builder. Preview links (`/share/…`) stay open so you can send them to people without the password.
 4. In Adobe Fonts, add the Vercel domain (and any custom domain) to the web project.
 5. Every push to `main` deploys to production; every pull request gets its own preview URL.
 

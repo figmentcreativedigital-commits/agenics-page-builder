@@ -6,14 +6,16 @@ import { CSS } from "@dnd-kit/utilities";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { checkPage, effectiveBg } from "@/lib/checks";
 import { MODULES } from "@/lib/modules";
+import { listVersions, onVersionsChange, saveVersion, type Version } from "@/lib/history";
 import { EXAMPLES, RECIPES } from "@/lib/recipes";
 import { activePage, useBuilder } from "@/lib/store";
 import type { ModuleInstance, ModuleType } from "@/lib/types";
-import { BlockPicker } from "./Blocks";
+import { PageRenderer } from "../page/PageRenderer";
+import { BlockPicker, DRAG_TYPE } from "./Blocks";
 import { ModuleThumb } from "./thumbs";
 import { BG_SWATCH, Icon } from "./ui";
 
-export type Tab = "add" | "layers" | "pages" | "review";
+export type Tab = "add" | "layers" | "pages" | "review" | "history";
 
 const scrollTo = (uid: string) =>
   requestAnimationFrame(() => document.getElementById(`mod-${uid}`)?.scrollIntoView({ behavior: "smooth", block: "start" }));
@@ -22,11 +24,47 @@ const scrollTo = (uid: string) =>
 /* Add                                                                 */
 /* ------------------------------------------------------------------ */
 
+function MyBlocks() {
+  const saved = useBuilder((s) => s.saved);
+  const insertSaved = useBuilder((s) => s.insertSaved);
+  const del = useBuilder((s) => s.deleteSaved);
+  if (!saved.length) return null;
+  return (
+    <div className="pb-blocks__group">
+      <p className="pb-blocks__cat">My blocks</p>
+      <div className="pb-blocks__grid">
+        {saved.map((b) => (
+          <div key={b.id} className="pb-tile pb-tile--saved">
+            <button
+              type="button"
+              className="pb-tile__main"
+              title={`${MODULES[b.module.type].name}, saved ${new Date(b.savedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`}
+              draggable
+              onDragStart={(e) => {
+                e.dataTransfer.setData(DRAG_TYPE, `saved:${b.id}`);
+                e.dataTransfer.effectAllowed = "copy";
+              }}
+              onClick={() => insertSaved(b.id)}
+            >
+              <ModuleThumb type={b.module.type} variant={b.module.variant} />
+              <span>{b.name}</span>
+            </button>
+            <button type="button" className="pb-tile__x" aria-label={`Remove ${b.name} from My blocks`} title="Remove from My blocks" onClick={() => del(b.id)}>
+              ×
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function AddTab() {
   const add = useBuilder((s) => s.addModule);
   return (
     <div className="pb-panel">
       <p className="pb-hint">Drag a block onto the page, or click to add it below the selected block.</p>
+      <MyBlocks />
       <BlockPicker onPick={(t) => add(t)} />
     </div>
   );
@@ -342,6 +380,121 @@ function ReviewTab() {
 }
 
 /* ------------------------------------------------------------------ */
+/* Version history                                                     */
+/* ------------------------------------------------------------------ */
+
+const stamp = (t: number) => {
+  const d = new Date(t);
+  const today = new Date();
+  const day =
+    d.toDateString() === today.toDateString()
+      ? "Today"
+      : d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+  return `${day}, ${d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}`;
+};
+
+function VersionPreview({ version, onClose, onRestore }: { version: Version; onClose: () => void; onRestore: () => void }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [onClose]);
+  return (
+    <div className="pb-modal" role="presentation" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="pb-dialog pb-version" role="dialog" aria-modal="true" aria-labelledby="ver-title">
+        <div className="pb-dialog__head">
+          <h2 id="ver-title">
+            {version.label} <small>{stamp(version.at)}</small>
+          </h2>
+          <span className="pb-actions">
+            <button type="button" className="pb-btn pb-btn--cta" onClick={onRestore}>
+              Restore this version
+            </button>
+            <button type="button" className="pb-mini" aria-label="Close" onClick={onClose}>
+              <Icon name="close" />
+            </button>
+          </span>
+        </div>
+        <div className="pb-version__page">
+          <PageRenderer page={version.page} editing={false} specs={false} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function HistoryTab() {
+  const page = useBuilder((s) => activePage(s));
+  const restore = useBuilder((s) => s.restoreVersion);
+  const [versions, setVersions] = useState<Version[] | null>(null);
+  const [name, setName] = useState("");
+  const [viewing, setViewing] = useState<Version | null>(null);
+  const pageId = page?.id;
+
+  useEffect(() => {
+    if (!pageId) return;
+    let live = true;
+    const load = () => listVersions(pageId).then((v) => live && setVersions(v));
+    load();
+    const off = onVersionsChange(load);
+    return () => {
+      live = false;
+      off();
+    };
+  }, [pageId]);
+
+  if (!page) return null;
+  const doRestore = async (v: Version) => {
+    await saveVersion(page, "Before restoring", false);
+    restore(v.page, stamp(v.at));
+    setViewing(null);
+  };
+
+  return (
+    <div className="pb-panel">
+      <p className="pb-hint">Versions save on their own when you open a page and every few minutes while you work. Restoring can be undone.</p>
+      <form
+        className="pb-saveversion"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          await saveVersion(page, name.trim() || "Saved version", false);
+          setName("");
+        }}
+      >
+        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Name this version (optional)" aria-label="Version name" />
+        <button type="submit" className="pb-btn pb-btn--primary">
+          Save
+        </button>
+      </form>
+      {versions === null ? <p className="pb-hint">Loading…</p> : null}
+      {versions?.length === 0 ? <p className="pb-hint">No versions yet.</p> : null}
+      <div className="pb-versions">
+        {versions?.map((v, i) => (
+          <div key={v.id} className={`pb-ver ${v.auto ? "" : "is-named"}`}>
+            <span className="pb-ver__dot" aria-hidden="true" />
+            <div className="pb-ver__main">
+              <b>{v.label}</b>
+              <small>
+                {stamp(v.at)} · {v.page.modules.length} blocks{i === 0 ? " · latest" : ""}
+              </small>
+            </div>
+            <span className="pb-ver__tools">
+              <button type="button" className="pb-btn pb-btn--sm" onClick={() => setViewing(v)}>
+                View
+              </button>
+              <button type="button" className="pb-btn pb-btn--sm" onClick={() => doRestore(v)}>
+                Restore
+              </button>
+            </span>
+          </div>
+        ))}
+      </div>
+      {viewing ? <VersionPreview version={viewing} onClose={() => setViewing(null)} onRestore={() => doRestore(viewing)} /> : null}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /* Rail + panel                                                        */
 /* ------------------------------------------------------------------ */
 
@@ -354,6 +507,7 @@ export function LeftPanel({ tab, setTab, onNewPage }: { tab: Tab; setTab: (t: Ta
     { id: "layers", label: "Layers", icon: "layers" },
     { id: "pages", label: "Pages", icon: "pages" },
     { id: "review", label: "Review", icon: "review" },
+    { id: "history", label: "History", icon: "history" },
   ];
   return (
     <>
@@ -369,11 +523,14 @@ export function LeftPanel({ tab, setTab, onNewPage }: { tab: Tab; setTab: (t: Ta
         ))}
       </nav>
       <aside className="pb-left" aria-label={tabs.find((t) => t.id === tab)?.label}>
-        <h2 className="pb-left__title">{tab === "add" ? "Add a block" : tab === "layers" ? "Page layers" : tab === "pages" ? "Your pages" : "Review"}</h2>
+        <h2 className="pb-left__title">
+          {tab === "add" ? "Add a block" : tab === "layers" ? "Page layers" : tab === "pages" ? "Your pages" : tab === "review" ? "Review" : "Version history"}
+        </h2>
         {tab === "add" ? <AddTab /> : null}
         {tab === "layers" ? <LayersTab /> : null}
         {tab === "pages" ? <PagesTab onNew={onNewPage} /> : null}
         {tab === "review" ? <ReviewTab /> : null}
+        {tab === "history" ? <HistoryTab /> : null}
       </aside>
     </>
   );

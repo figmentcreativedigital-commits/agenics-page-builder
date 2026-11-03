@@ -1,6 +1,6 @@
 "use client";
 
-import { createStore, del, get, set } from "idb-keyval";
+import { createStore, del, entries, get, set } from "idb-keyval";
 import { useCallback, useSyncExternalStore } from "react";
 import { uid } from "./path";
 import type { ImageVal } from "./types";
@@ -39,6 +39,18 @@ export async function deleteImage(id: string) {
   const old = urlCache.get(id);
   if (old) URL.revokeObjectURL(old);
   urlCache.delete(id);
+}
+
+/** Every image uploaded in this browser. */
+export async function listImages(): Promise<{ id: string; blob: Blob }[]> {
+  if (!store) return [];
+  const all = await entries<string, Blob>(store);
+  return all.filter(([, v]) => v instanceof Blob).map(([id, blob]) => ({ id, blob }));
+}
+
+/** Width and height of an image file. */
+export async function imageSize(file: Blob): Promise<{ w: number; h: number }> {
+  return measure(file);
 }
 
 async function measure(file: Blob): Promise<{ w: number; h: number }> {

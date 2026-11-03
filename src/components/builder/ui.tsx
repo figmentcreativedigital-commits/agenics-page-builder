@@ -78,6 +78,32 @@ const P: Record<string, ReactElement> = {
     </>
   ),
   sparkle: <path d="M10 2.5l1.6 4.4 4.4 1.6-4.4 1.6L10 14.5l-1.6-4.4L4 8.5l4.4-1.6zM15.5 13.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z" />,
+  more: (
+    <>
+      <circle cx="5" cy="10" r="1.4" />
+      <circle cx="10" cy="10" r="1.4" />
+      <circle cx="15" cy="10" r="1.4" />
+    </>
+  ),
+  history: (
+    <>
+      <path d="M3.5 10a6.5 6.5 0 1 0 2-4.7" />
+      <path d="M3 3.5v3h3M10 6.5V10l2.5 1.5" />
+    </>
+  ),
+  image: (
+    <>
+      <rect x="2.5" y="3.5" width="15" height="13" rx="1.6" />
+      <circle cx="7" cy="8" r="1.5" />
+      <path d="m3 15 4.5-4.5 3 3 2-2 4.5 4.5" />
+    </>
+  ),
+  focus: (
+    <>
+      <circle cx="10" cy="10" r="3" />
+      <path d="M10 2.5v3M10 14.5v3M2.5 10h3M14.5 10h3" />
+    </>
+  ),
   drag: (
     <>
       <circle cx="7.5" cy="5" r="1.2" />
@@ -96,8 +122,8 @@ export function Icon({ name, size = 18 }: { name: keyof typeof P | string; size?
       width={size}
       height={size}
       viewBox="0 0 20 20"
-      fill={name === "drag" ? "currentColor" : "none"}
-      stroke={name === "drag" ? "none" : "currentColor"}
+      fill={name === "drag" || name === "more" ? "currentColor" : "none"}
+      stroke={name === "drag" || name === "more" ? "none" : "currentColor"}
       strokeWidth="1.8"
       strokeLinecap="round"
       strokeLinejoin="round"
