@@ -11,6 +11,7 @@ import "./builder.css";
 import { Canvas } from "./Canvas";
 import { Inspector } from "./Inspector";
 import { LeftPanel, NewPageDialog, type Tab } from "./LeftPanel";
+import { ShareDialog } from "./ShareDialog";
 import { Icon } from "./ui";
 
 function useOutside(open: boolean, close: () => void) {
@@ -128,7 +129,7 @@ function HelpMenu({ onShortcuts }: { onShortcuts: () => void }) {
   );
 }
 
-function TopBar({ onReview, onShortcuts }: { onReview: () => void; onShortcuts: () => void }) {
+function TopBar({ onReview, onShortcuts, onShare }: { onReview: () => void; onShortcuts: () => void; onShare: () => void }) {
   const page = useBuilder((s) => activePage(s));
   const updatePage = useBuilder((s) => s.updatePage);
   const viewport = useBuilder((s) => s.viewport);
@@ -200,6 +201,9 @@ function TopBar({ onReview, onShortcuts }: { onReview: () => void; onShortcuts: 
       ) : null}
       <button type="button" className={`pb-topbtn ${preview ? "is-on" : ""}`} aria-pressed={preview} onClick={() => setPreview(!preview)}>
         <Icon name="eye" size={16} /> {preview ? "Back to editing" : "Preview"}
+      </button>
+      <button type="button" className={`pb-topbtn ${page?.share ? "is-shared" : ""}`} onClick={onShare} title={page?.share ? "This page has a preview link" : "Make a link anyone can view"}>
+        <Icon name="link" size={16} /> Share
       </button>
       <ExportMenu />
       <HelpMenu onShortcuts={onShortcuts} />
@@ -281,6 +285,7 @@ export function Builder() {
   const [tab, setTab] = useState<Tab>("add");
   const [newPage, setNewPage] = useState(false);
   const [keys, setKeys] = useState(false);
+  const [sharing, setSharing] = useState(false);
   const preview = useBuilder((s) => s.preview);
 
   useEffect(() => {
@@ -338,6 +343,7 @@ export function Builder() {
           setTab("review");
         }}
         onShortcuts={() => setKeys(true)}
+        onShare={() => setSharing(true)}
       />
       {!preview ? <LeftPanel tab={tab} setTab={setTab} onNewPage={() => setNewPage(true)} /> : null}
       <Canvas />
@@ -345,6 +351,7 @@ export function Builder() {
       <Toast />
       {newPage ? <NewPageDialog onClose={() => setNewPage(false)} /> : null}
       {keys ? <ShortcutsDialog onClose={() => setKeys(false)} /> : null}
+      {sharing ? <ShareDialog onClose={() => setSharing(false)} /> : null}
     </div>
   );
 }

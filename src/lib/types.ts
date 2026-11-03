@@ -56,6 +56,14 @@ export interface ModuleInstance {
   note?: string;
 }
 
+/** A shared preview link for a page. The secret lets this browser update or turn off the link. */
+export interface ShareInfo {
+  id: string;
+  secret: string;
+  url: string;
+  publishedAt: number;
+}
+
 export interface PageDoc {
   id: string;
   name: string;
@@ -66,6 +74,7 @@ export interface PageDoc {
   modules: ModuleInstance[];
   createdAt: number;
   updatedAt: number;
+  share?: ShareInfo;
 }
 
 export type Limit = { chars?: number; words?: number };

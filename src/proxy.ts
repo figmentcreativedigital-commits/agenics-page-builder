@@ -23,5 +23,7 @@ export function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|brand/|icon|robots.txt).*)"],
+  // Shared preview links (/share/…) and the files they use stay open, so people
+  // without the builder password can view them. Creating links (/api/share) is gated.
+  matcher: ["/((?!_next/static|_next/image|brand/|examples/|share/|icon|robots.txt).*)"],
 };

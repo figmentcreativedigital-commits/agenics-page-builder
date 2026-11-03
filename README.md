@@ -19,6 +19,7 @@ Built by Figment Creative for Agenics Labs. Follows the **Agenics Corporate Grap
 - **Leave a note for the team** on any block. Notes show on the canvas while editing and are listed in the brief. They are never published.
 - **Change the number of items** (points, cards, questions, paragraphs) within each block's limits.
 - **Preview** at desktop, tablet and phone widths, or open the clean page in a new tab.
+- **Share a preview link.** **Share** in the top bar makes a link such as `/share/5dBw9qSUx9` that anyone can open on any device, without the builder password. Viewers see the page as visitors would, with a desktop / tablet / phone switch, and can't edit it. The link shows the version you published: after changes, **Update the link** refreshes it at the same address, and **Stop sharing** turns it off. Only the browser that created a link can update or stop it.
 - **Undo everything.** ⌘Z / ⌘⇧Z. Press **?** for all shortcuts.
 
 ## How the color works in the tool
@@ -60,9 +61,11 @@ Both can be added again at any time from **Pages › New page › Start from a f
 | `src/lib/exporters.ts` | Brief, zip and page-file export and import |
 | `public/examples/` | Photography used by the worked examples |
 
-## Saving
+## Saving and sharing
 
-Pages are stored in the browser (localStorage; uploaded images in IndexedDB). Nothing is sent to a server. To move a page between people or computers, use **Export › Page file (.json)** and **Open a page file**. Shared server-side storage can be added later if several people need to edit the same pages.
+Pages are stored in the browser (localStorage; uploaded images in IndexedDB). Nothing leaves the browser until you share a preview link: then a copy of that page and its images is stored in the project's Vercel Blob store. To move an editable page between people or computers, use **Export › Page file (.json)** and **Open a page file**.
+
+Preview links need a Vercel Blob store connected to the project (one-time setup, below). Running locally without one, links are stored in `./.share-data` so the feature can be tried.
 
 ## Run locally
 
@@ -75,10 +78,11 @@ npm run build    # production build check
 ## Deploy with GitHub and Vercel
 
 1. In Vercel: **Add New › Project › Import** this repository. Vercel detects Next.js; no settings to change.
-2. Add environment variables (Settings › Environment Variables), then redeploy:
+2. For preview links: **Storage › Create › Blob**, connect it to this project (Vercel adds the access token), then redeploy. If you choose a private store, also add `BLOB_ACCESS=private`.
+3. Add environment variables (Settings › Environment Variables), then redeploy:
    - `NEXT_PUBLIC_ADOBE_FONTS_KIT_ID`: the Adobe Fonts web project ID with Neue Kabel
-   - `BASIC_AUTH_USER` / `BASIC_AUTH_PASSWORD`: optional password for the whole app
-3. In Adobe Fonts, add the Vercel domain (and any custom domain) to the web project.
-4. Every push to `main` deploys to production; every pull request gets its own preview URL.
+   - `BASIC_AUTH_USER` / `BASIC_AUTH_PASSWORD`: optional password for the builder. Preview links (`/share/…`) stay open so you can send them to people without the password.
+4. In Adobe Fonts, add the Vercel domain (and any custom domain) to the web project.
+5. Every push to `main` deploys to production; every pull request gets its own preview URL.
 
 The app sends `X-Robots-Tag: noindex` and a disallow-all `robots.txt`; it is an internal tool, not part of agenics.com.

@@ -90,3 +90,19 @@ export function countWords(s: string): number {
   const t = s.trim();
   return t ? t.split(/\s+/).length : 0;
 }
+
+/**
+ * Where a link goes on the published page. Site paths ("/shop/p/…") point at
+ * agenics.com, so previews and shared links behave like the live site.
+ * Anything that is not a web, mail, phone or in-page link is dropped.
+ */
+export function publicHref(href: string): { href: string; external: boolean } {
+  const h = (href || "").trim();
+  if (!h || h === "#") return { href: "#", external: false };
+  if (h.startsWith("#")) return { href: h, external: false };
+  if (h.startsWith("/") && !h.startsWith("//")) return { href: `https://www.agenics.com${h}`, external: true };
+  if (/^https?:\/\//i.test(h)) return { href: h, external: true };
+  if (/^(mailto|tel):/i.test(h)) return { href: h, external: false };
+  if (/^[a-z0-9-]+(\.[a-z0-9-]+)+(\/|$)/i.test(h)) return { href: `https://${h}`, external: true };
+  return { href: "#", external: false };
+}

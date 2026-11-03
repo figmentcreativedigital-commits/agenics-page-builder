@@ -6,7 +6,7 @@ import { effectiveBg } from "./checks";
 import { MODULES } from "./modules";
 import { setAt, getAt, uid } from "./path";
 import { EXAMPLES, exampleDentalWater, exampleST108, makeModule, pageFromRecipe } from "./recipes";
-import type { ModuleInstance, ModuleStyle, ModuleType, PageDoc, Viewport } from "./types";
+import type { ModuleInstance, ModuleStyle, ModuleType, PageDoc, ShareInfo, Viewport } from "./types";
 
 /** Bump when a new worked example ships, so browsers that already have pages get it too. */
 const SEED_VERSION = 2;
@@ -36,6 +36,7 @@ interface BuilderState {
   deletePage: (id: string) => void;
   setActive: (id: string) => void;
   updatePage: (patch: Partial<Omit<PageDoc, "id" | "modules">>) => void;
+  setShare: (pageId: string, share: ShareInfo | undefined) => void;
 
   // modules
   select: (uid: string | null) => void;
@@ -148,6 +149,7 @@ export const useBuilder = create<BuilderState>()(
             createdAt: Date.now(),
             updatedAt: Date.now(),
           };
+          delete copy.share; // a copy gets its own link when shared
           copy.modules = copy.modules.map((m) => ({ ...m, uid: uid() }));
           set((s) => ({ pages: [...s.pages, copy], activeId: copy.id, selectedUid: null, past: [], future: [] }));
         },
@@ -166,6 +168,17 @@ export const useBuilder = create<BuilderState>()(
         },
 
         setActive: (id) => set({ activeId: id, selectedUid: null, past: [], future: [], preview: false }),
+
+        setShare: (pageId, share) =>
+          set((s) => ({
+            // Publishing is not an edit, so updatedAt stays as it was
+            pages: s.pages.map((p) => {
+              if (p.id !== pageId) return p;
+              const next = { ...p, share };
+              if (!share) delete next.share;
+              return next;
+            }),
+          })),
 
         updatePage: (patch) =>
           set((s) => ({

@@ -134,6 +134,13 @@ function download(blob: Blob, name: string) {
   setTimeout(() => URL.revokeObjectURL(a.href), 2000);
 }
 
+/** Exports never carry the share secret: whoever imports a page gets their own link. */
+function withoutShare(page: PageDoc): PageDoc {
+  const copy = { ...page };
+  delete copy.share;
+  return copy;
+}
+
 const baseName = (page: PageDoc) => `agenics-${page.slug || slugify(page.name) || "page"}`;
 
 export function downloadBrief(page: PageDoc) {
@@ -149,7 +156,7 @@ export async function downloadHandoffZip(page: PageDoc) {
     const blob = await slotBlob(s.image);
     if (blob) folder.file(s.file, blob);
   }
-  zip.file("page.json", JSON.stringify({ format: FORMAT, page }, null, 2));
+  zip.file("page.json", JSON.stringify({ format: FORMAT, page: withoutShare(page) }, null, 2));
   const out = await zip.generateAsync({ type: "blob" });
   download(out, `${baseName(page)}-handoff.zip`);
 }
@@ -161,7 +168,7 @@ export async function downloadPageJson(page: PageDoc) {
     const blob = await getImageBlob(s.image.id);
     if (blob) images[s.image.id] = await blobToDataUrl(blob);
   }
-  const json = JSON.stringify({ format: FORMAT, page, images }, null, 2);
+  const json = JSON.stringify({ format: FORMAT, page: withoutShare(page), images }, null, 2);
   download(new Blob([json], { type: "application/json" }), `${baseName(page)}.page.json`);
 }
 
@@ -173,7 +180,7 @@ export async function importPageJson(file: File): Promise<PageDoc> {
   for (const [id, dataUrl] of Object.entries(images)) {
     await putImage(id, await dataUrlToBlob(dataUrl));
   }
-  const page = parsed.page as PageDoc;
+  const page = withoutShare(parsed.page as PageDoc);
   return {
     ...page,
     id: uid(),

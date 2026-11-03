@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment } from "react";
-import { getAt } from "@/lib/path";
+import { getAt, publicHref } from "@/lib/path";
 import { useBuilder } from "@/lib/store";
 import type { ModuleType } from "@/lib/types";
 import { Btn, IconSlot, Img, ItemAdd, ItemRemove, Note, Paras, Section, T, useMod, useShown } from "./edit";
@@ -357,7 +357,14 @@ function Resources() {
 function DocLink({ index }: { index: number }) {
   const { data, editing } = useMod();
   const href = String(getAt(data, `cards.${index}.href`) ?? "");
-  if (!editing) return <a className="agx-link" href={href || "#"}>Download PDF</a>;
+  if (!editing) {
+    const link = publicHref(href);
+    return (
+      <a className="agx-link" href={link.href} {...(link.external ? { target: "_blank", rel: "noreferrer" } : {})}>
+        Download PDF
+      </a>
+    );
+  }
   return <DocLinkEdit index={index} href={href} />;
 }
 

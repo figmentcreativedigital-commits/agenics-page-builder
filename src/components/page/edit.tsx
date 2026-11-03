@@ -14,7 +14,7 @@ import {
 import { measure } from "@/lib/checks";
 import { saveImage, useImageUrl } from "@/lib/images";
 import { IMAGE_KINDS, MODULES, bgOf, fieldSpec, isHidden, isOff, limitLabel, type ElementSpec, type FieldSpec } from "@/lib/modules";
-import { anchorFor, getAt, toPattern } from "@/lib/path";
+import { anchorFor, getAt, publicHref, toPattern } from "@/lib/path";
 import { activePage, useBuilder } from "@/lib/store";
 import type { CtaVal, ImageVal, ModuleData, ModuleStyle, ModuleType } from "@/lib/types";
 import { ICONS, ICON_NAMES, IconGlyph } from "./icons";
@@ -385,8 +385,9 @@ export function Btn({ path, variant, arrow = false, note = true }: { path: strin
   if (!shown) return null;
   if (!ctx.editing) {
     if (!c.label) return null;
+    const link = publicHref(c.href);
     return (
-      <a className={cls} href={c.href || "#"}>
+      <a className={cls} href={link.href} {...(link.external ? { target: "_blank", rel: "noreferrer" } : {})}>
         {c.label}
         {arrow ? " →" : null}
       </a>
