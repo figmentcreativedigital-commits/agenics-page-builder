@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { saveImage, useImageUrl } from "@/lib/images";
 import { BACKGROUNDS, IMAGE_KINDS, MODULES, bgOf, moduleFields } from "@/lib/modules";
 import { anchorFor, getAt, itemNumber, slugify } from "@/lib/path";
@@ -32,10 +32,19 @@ function ImageRow({ mod, path, label, kind }: { mod: ModuleInstance; path: strin
   const has = !!(im.id || im.src);
   const small = has && im.w && im.h && (im.w < k.w * 0.75 || im.h < k.h * 0.75);
   const openLibrary = useBuilder((s) => s.setLibrary);
-  const [adjust, setAdjust] = useState(false);
+  const [adjusting, setAdjust] = useState(false);
+  // A design tip's "Adjust the crop" opens Focus and zoom on that picture
+  const cropRequest = useBuilder((s) => s.cropRequest);
+  const requestCrop = useBuilder((s) => s.requestCrop);
+  const asked = cropRequest?.uid === mod.uid && cropRequest.path === path;
+  const adjust = adjusting || asked;
+  const row = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (asked) row.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, [asked]);
   const focus = im.focus ?? { x: 50, y: 50 };
   return (
-    <div className="pb-imgrow">
+    <div className={`pb-imgrow ${asked ? "is-asked" : ""}`} ref={row}>
       <button type="button" className="pb-thumb" onClick={() => input.current?.click()} title={has ? "Replace image" : "Add image"}>
         {url ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -63,7 +72,12 @@ function ImageRow({ mod, path, label, kind }: { mod: ModuleInstance; path: strin
             <Icon name="image" size={14} /> Library
           </button>
           {url ? (
-            <button type="button" className={`pb-btn pb-btn--sm ${adjust ? "pb-btn--on" : ""}`} aria-expanded={adjust} onClick={() => setAdjust((a) => !a)}>
+            <button type="button" className={`pb-btn pb-btn--sm ${adjust ? "pb-btn--on" : ""}`} aria-expanded={adjust}
+              onClick={() => {
+                if (asked) requestCrop(null);
+                setAdjust(!adjust);
+              }}
+            >
               <Icon name="focus" size={14} /> Focus and zoom
             </button>
           ) : null}
@@ -151,7 +165,11 @@ function ModuleInspector({ mod }: { mod: ModuleInstance }) {
   const setNote = useBuilder((s) => s.setNote);
   const dup = useBuilder((s) => s.duplicateModule);
   const remove = useBuilder((s) => s.removeModule);
-  const [tab, setTab] = useState<ITab>("content");
+  const [picked, setTab] = useState<ITab>("content");
+  // A design tip's "Adjust the crop" opens the Content tab at that picture
+  const cropRequest = useBuilder((s) => s.cropRequest);
+  const requestCrop = useBuilder((s) => s.requestCrop);
+  const tab: ITab = cropRequest?.uid === mod.uid ? "content" : picked;
 
   const fields = moduleFields(mod.type, mod.variant, mod.data, mod.hidden);
   const ctas = fields.filter((f) => f.spec.kind === "cta" || f.spec.kind === "href");
@@ -179,7 +197,16 @@ function ModuleInspector({ mod }: { mod: ModuleInstance }) {
             ["elements", hiddenCount ? `Show / hide · ${hiddenCount}` : "Show / hide"],
           ] as [ITab, string][]
         ).map(([id, label]) => (
-          <button key={id} type="button" role="tab" aria-selected={tab === id} onClick={() => setTab(id)}>
+          <button
+            key={id}
+            type="button"
+            role="tab"
+            aria-selected={tab === id}
+            onClick={() => {
+              requestCrop(null);
+              setTab(id);
+            }}
+          >
             {label}
           </button>
         ))}

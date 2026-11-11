@@ -6,7 +6,7 @@
 - **Blocks:** 9
 - **Exported:** (time)
 
-Build each block below as one Squarespace section, in this order. Fonts, colors and button styles come from Site Styles. Upload each image under the file name shown. Paragraph formatting is written as Markdown: **bold**, _italic_ and [link text](address).
+Build each block below as one Squarespace section, in this order. Fonts, colors and button styles come from Site Styles. Upload each image under the file name shown. Paragraph formatting is written as Markdown: **bold**, _italic_ and [link text](address). Text is the standard color for its background unless a line says "text color". Each image line says how the picture meets its frame.
 
 ## 1. M01 Hero — Photo background
 
@@ -40,7 +40,7 @@ _Squarespace: One row of four text blocks; swap for a logo gallery on partner pa
 
 _Squarespace: Centered text block plus 2–3 linked cards._
 
-- Background: White (#FFFFFF)
+- Background: Silver 18% (#F2F2F3)
 
 - **H2:** Why waterline testing matters
 - **Intro:** Dental unit waterlines build up biofilm that can push bacteria past the CDC limit of 500 CFU/mL. Routine testing shows whether your treatment protocol is working and documents compliance when your state board or an auditor asks.
@@ -88,7 +88,7 @@ _Squarespace: Code block holding an HTML table, styled once in Custom CSS. Never
 
 _Squarespace: One card = image + text + button blocks. Keep bullet counts equal across cards._
 
-- Background: White (#FFFFFF)
+- Background: Silver 18% (#F2F2F3)
 
 - **H2:** Our most-ordered dental tests
 - **Intro:** Save on mail-in bacteria testing with an annual kit, available on each product page.

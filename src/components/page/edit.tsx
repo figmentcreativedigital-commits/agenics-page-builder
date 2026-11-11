@@ -12,12 +12,14 @@ import {
   type ElementType,
   type ReactNode,
 } from "react";
+import { shownInk } from "@/lib/advice";
 import { measure } from "@/lib/checks";
+import { fitOf } from "@/lib/crop";
 import { saveImage, useImageUrl } from "@/lib/images";
 import { IMAGE_KINDS, MODULES, bgOf, fieldSpec, isHidden, isOff, limitLabel, type ElementSpec, type FieldSpec } from "@/lib/modules";
 import { anchorFor, getAt, publicHref, toPattern } from "@/lib/path";
 import { activePage, useBuilder } from "@/lib/store";
-import type { CtaVal, ImageVal, ModuleData, ModuleStyle, ModuleType } from "@/lib/types";
+import type { CtaVal, ImageKind, ImageVal, ModuleData, ModuleStyle, ModuleType, TextColor } from "@/lib/types";
 import { domToRich, parseRich, plainText, richToHtml, type RNode } from "@/lib/richtext";
 import { ICONS, ICON_NAMES, IconGlyph } from "./icons";
 
@@ -33,8 +35,12 @@ export interface ModCtx {
   hidden?: string[];
   style?: ModuleStyle;
   anchor?: string;
+  /** Text colors picked in the builder, by field path. */
+  colors?: Record<string, TextColor>;
   editing: boolean;
   specs: boolean;
+  /** Extra builder tools for a picture while editing (design tips), from the canvas. */
+  imageTools?: (uid: string, path: string, kind: ImageKind) => ReactNode;
 }
 
 const Ctx = createContext<ModCtx | null>(null);
@@ -232,6 +238,9 @@ export function T({
 
   if (!shown) return null;
   const rich = !!spec?.rich;
+  // A picked color shows only where it belongs: never cyan on a light background
+  const ink = shownInk(ctx, path);
+  className = cx(className, ink && `agx-ink agx-ink--${ink}`) || undefined;
   if (!ctx.editing) {
     if (!value) return null;
     return createElement(as, { className }, rich ? <RichNodes nodes={parseRich(value)} /> : value);
@@ -585,6 +594,8 @@ export function Img({
   };
 
   const k = IMAGE_KINDS[kind];
+  // A cut-out (transparent background) is shown whole inside its frame; a photo fills it
+  if (fitOf(im, kind) === "fit") fit = "contain";
   const media = url ? (
     // Local blob URLs from IndexedDB or files bundled with the app; next/image cannot optimize blob URLs
     // eslint-disable-next-line @next/next/no-img-element
@@ -593,7 +604,7 @@ export function Img({
       alt={im.alt}
       style={{
         objectFit: fit,
-        objectPosition: im.focus ? `${im.focus.x}% ${im.focus.y}%` : position,
+        objectPosition: fit === "contain" ? undefined : im.focus ? `${im.focus.x}% ${im.focus.y}%` : position,
         ...(im.zoom && im.zoom > 1
           ? { transform: `scale(${im.zoom})`, transformOrigin: im.focus ? `${im.focus.x}% ${im.focus.y}%` : "50% 50%" }
           : {}),
@@ -666,6 +677,7 @@ export function Img({
         ) : null}
         {url && !im.alt ? <span className="agx-imgbar__warn">No alt text</span> : null}
       </span>
+      {ctx.imageTools?.(ctx.uid, path, kind)}
       {elementFor(ctx.type, path) ? (
         <span className="agx-imgx">
           <ElementRemove path={path} />

@@ -10,7 +10,9 @@ import { activePage, useBuilder } from "@/lib/store";
 import type { ModuleInstance, ModuleType } from "@/lib/types";
 import { ITEM_DRAG, elementFor, itemDrag, specFor } from "../page/edit";
 import { PageRenderer } from "../page/PageRenderer";
+import { ImageAdvice, SeamAdvice } from "./Advice";
 import { BlockPicker, DRAG_TYPE, MOVE_TYPE } from "./Blocks";
+import { ColorTool } from "./ColorTool";
 import { Icon } from "./ui";
 
 /* ------------------------------------------------------------------ */
@@ -426,6 +428,9 @@ function FormatTools({ uid, path }: { uid: string; path: string }) {
   );
 }
 
+/** Design tips on a picture: a chip in its corner */
+const imageTools = (uid: string, path: string) => <ImageAdvice uid={uid} path={path} />;
+
 /**
  * The bar above the page. While you type it shows what you are editing, how much room is
  * left and the formatting buttons; otherwise the screen size. It never sits on the page,
@@ -464,6 +469,7 @@ function ContextBar({ caption }: { caption: string }) {
           </span>
         ) : null}
         {spec?.rich ? <FormatTools key={`${focus.uid}:${focus.path}`} uid={focus.uid} path={focus.path} /> : null}
+        {!isButton ? <ColorTool key={`color:${focus.uid}:${focus.path}`} mod={mod} path={focus.path} /> : null}
         {el ? (
           <button
             type="button"
@@ -645,6 +651,7 @@ export function Canvas() {
             page={page}
             editing={!preview}
             specs={showSpecs}
+            imageTools={imageTools}
             globalWrap={(kind, node) =>
               preview ? (
                 node
@@ -683,6 +690,7 @@ export function Canvas() {
                     }}
                   >
                     <FrameBar mod={mod} index={index} total={total} />
+                    <SeamAdvice uid={mod.uid} />
                     {node}
                     <NoteBadge mod={mod} />
                   </div>

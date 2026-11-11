@@ -10,6 +10,7 @@ import { activePage, useBuilder } from "@/lib/store";
 import type { Viewport } from "@/lib/types";
 import "../page/page.css";
 import "./builder.css";
+import { usePageAdvice } from "./Advice";
 import { Canvas } from "./Canvas";
 import { Inspector, SettingsStrip } from "./Inspector";
 import { LeftPanel, NewPageDialog, type Tab } from "./LeftPanel";
@@ -226,7 +227,10 @@ function TopBar({ onReview, onShortcuts, onShare, onTour }: { onReview: () => vo
   const undo = useBuilder((s) => s.undo);
   const redo = useBuilder((s) => s.redo);
   const issues = useMemo(() => (page ? checkPage(page) : []), [page]);
-  const { errors, todo } = leftToDo(issues);
+  // Design tips count toward what is left, as Review shows them
+  const tips = usePageAdvice();
+  const { errors, todo } = leftToDo(issues, tips);
+  const left = issues.length + tips.length;
 
   const vps: { id: Viewport; label: string }[] = [
     { id: "desktop", label: "Desktop" },
@@ -276,13 +280,13 @@ function TopBar({ onReview, onShortcuts, onShare, onTour }: { onReview: () => vo
           <button
             type="button"
             data-tour="review"
-            className={`pb-topbtn pb-review ${errors ? "is-err" : issues.length ? "is-warn" : "is-ok"}`}
+            className={`pb-topbtn pb-review ${errors ? "is-err" : left ? "is-warn" : "is-ok"}`}
             onClick={onReview}
             title="Review: what is left to do"
-            aria-label={issues.length ? `Review: ${errors ? `${errors} to fix` : `${todo} to finish`}` : "Review: ready"}
+            aria-label={left ? `Review: ${errors ? `${errors} to fix` : `${todo} to finish`}` : "Review: ready"}
           >
             <Icon name="review" size={16} />
-            {issues.length ? (
+            {left ? (
               <>
                 {errors || todo}
                 <span className="pb-wide">{errors ? " to fix" : " to finish"}</span>
@@ -458,7 +462,7 @@ export function Builder() {
       }
       if (typing) return;
       // While a dialog or a menu is open, keys belong to it: arrows and Delete never act on the page
-      if (document.querySelector(".pb-modal, .pb-ctxmenu, .pb-menu__list, .pb-more__menu")) return;
+      if (document.querySelector(".pb-modal, .pb-ctxmenu, .pb-menu__list, .pb-more__menu, .pb-colormenu, .pb-tippop")) return;
       const sel = s.selectedUid;
       if (mod && e.key.toLowerCase() === "z") {
         e.preventDefault();

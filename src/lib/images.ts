@@ -15,8 +15,35 @@ export async function saveImage(file: Blob, name?: string): Promise<ImageVal> {
   if (!store) throw new Error("IndexedDB is not available");
   const id = uid();
   await set(id, file, store);
-  const { w, h } = await measure(file);
-  return { id, alt: "", w, h, name: name ?? (file instanceof File ? file.name : undefined), type: file.type };
+  const [{ w, h }, cutout] = await Promise.all([measure(file), hasTransparency(file)]);
+  return { id, alt: "", w, h, name: name ?? (file instanceof File ? file.name : undefined), type: file.type, ...(cutout ? { cutout } : {}) };
+}
+
+/**
+ * Does the image have a transparent background (a cut-out)? Read from a small copy: a cut-out
+ * has clearly see-through pixels; a photo saved as PNG has none. JPEG can't be transparent.
+ */
+export async function hasTransparency(file: Blob): Promise<boolean> {
+  if (/jpe?g/i.test(file.type)) return false;
+  try {
+    const bmp = await createImageBitmap(file);
+    const scale = Math.min(1, 96 / Math.max(bmp.width, bmp.height));
+    const w = Math.max(1, Math.round(bmp.width * scale));
+    const h = Math.max(1, Math.round(bmp.height * scale));
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    const g = canvas.getContext("2d");
+    if (!g) return false;
+    g.drawImage(bmp, 0, 0, w, h);
+    bmp.close();
+    const px = g.getImageData(0, 0, w, h).data;
+    let clear = 0;
+    for (let i = 3; i < px.length; i += 4) if (px[i] < 200) clear++;
+    return clear / (w * h) > 0.02;
+  } catch {
+    return false;
+  }
 }
 
 export async function putImage(id: string, blob: Blob) {

@@ -6,7 +6,7 @@
 - **Blocks:** 10
 - **Exported:** (time)
 
-Build each block below as one Squarespace section, in this order. Fonts, colors and button styles come from Site Styles. Upload each image under the file name shown. Paragraph formatting is written as Markdown: **bold**, _italic_ and [link text](address).
+Build each block below as one Squarespace section, in this order. Fonts, colors and button styles come from Site Styles. Upload each image under the file name shown. Paragraph formatting is written as Markdown: **bold**, _italic_ and [link text](address). Text is the standard color for its background unless a line says "text color". Each image line says how the picture meets its frame.
 
 ## 1. M01 Hero — Photo background
 
@@ -19,7 +19,7 @@ _Squarespace: Section with a background image; set the focal point on the subjec
 - **Supporting paragraph:** Everything you need is included. Ordering is simple, pricing is straightforward with no contracts, and results are delivered online in a clear, user-friendly report.
 - **Primary button:** Order a test kit → #order
 - **Secondary button:** Learn about ST108 → #what-is-st108
-- **Hero image (16:9):** images/agenics-st108-water-testing-01-m01-hero-image-16x9.jpg · alt: "Gloved hand loading instrument trays into a sterilizer"
+- **Hero image (16:9):** images/agenics-st108-water-testing-01-m01-hero-image-16x9.jpg · alt: "Gloved hand loading instrument trays into a sterilizer" · fit: fill the 16:9 frame, cropped to fit (object-fit: cover)
 
 ## 2. M12 Explainer + list — Numbered list beside
 
@@ -78,7 +78,7 @@ _Squarespace: One card = image + text + button blocks. Keep bullet counts equal 
 - **Bullet 1.3:** Critical+ adds pH, hardness and more
 - **Shop button 1:** Order AffirmCritical → /shop/p/affirmcritical-9bepc
 - **Secondary link 1:** Sample submission form → /s/GP40000-Affirm_Critical_Sample-Submission-Form.pdf
-- **Product image 1 (1:1):** images/agenics-st108-water-testing-04-m05-product-image-1-1x1.png · alt: "AffirmCritical test kit with sample vials, instructions and mailer"
+- **Product image 1 (1:1):** images/agenics-st108-water-testing-04-m05-product-image-1-1x1.png · alt: "AffirmCritical test kit with sample vials, instructions and mailer" · fit: whole image inside the frame, not cropped (object-fit: contain)
 - **Test type 2:** Utility water · quarterly
 - **Product name 2:** AffirmUtility™
 - **Tagline 2:** For ST108 utility water sources
@@ -87,7 +87,7 @@ _Squarespace: One card = image + text + button blocks. Keep bullet counts equal 
 - **Bullet 2.3:** Utility+ adds pH, hardness and more
 - **Shop button 2:** Order AffirmUtility → /shop/p/affirmutility-5b8af
 - **Secondary link 2:** Sample submission form → /s/GP40010-Affirm_Utility_Sample-Submission-Form.pdf
-- **Product image 2 (1:1):** images/agenics-st108-water-testing-04-m05-product-image-2-1x1.png · alt: "AffirmUtility test kit with sample vials, instructions and mailer"
+- **Product image 2 (1:1):** images/agenics-st108-water-testing-04-m05-product-image-2-1x1.png · alt: "AffirmUtility test kit with sample vials, instructions and mailer" · fit: whole image inside the frame, not cropped (object-fit: contain)
 
 ## 5. M13 Icon grid — 3 across
 
@@ -152,7 +152,7 @@ _Squarespace: Text blocks beside an image block; flip the image when the module 
 - **Paragraph 1:** ST108 calls for water quality management programs that include testing, monitoring, documentation, review and corrective actions.
 - **Paragraph 2:** Agenics Affirm™ provides a simple option for testing and reporting, with results delivered online in a user-friendly format.
 - **Paragraph 3:** That gives the facility the information it needs to incorporate testing results into its broader ST108 water quality management program.
-- **Image (3:2):** images/agenics-st108-water-testing-08-m16-image-3x2.jpg · alt: "Open sterilizer with wrapped instrument packs loaded on its racks"
+- **Image (3:2):** images/agenics-st108-water-testing-08-m16-image-3x2.jpg · alt: "Open sterilizer with wrapped instrument packs loaded on its racks" · fit: fill the 3:2 frame, cropped to fit (object-fit: cover)
 
 ## 9. M10 FAQ
 

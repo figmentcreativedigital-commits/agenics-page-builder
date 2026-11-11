@@ -24,7 +24,13 @@ Built by Figment Creative for Agenics Labs. Follows the **Agenics Corporate Grap
 
 - **Hide anything optional.** Hover a button and click ×, or use the bar above the page while you type, or switch it off in **Show / hide**. Hidden elements keep their text, so they come back with one switch. The brief tells the developer to leave them out.
 - **Pick a layout** from thumbnails (for example, an Icon grid can be 3 across, 4 across, 2 × 2, or a heading with a 2 × 2 grid beside it).
-- **Pick a background** from the brand-safe set each block allows: White, Silver 18%, Cyan 12% or Navy. **Tidy backgrounds** alternates them in one click so sections stand apart, and Review flags two same-colored sections in a row.
+- **Pick a background** from the brand-safe set each block allows: White, Silver 18%, Cyan 12% or Navy. **Tidy backgrounds** alternates them in one click so sections stand apart. New pages from every template start with alternating backgrounds.
+- **Design tips.** The builder points out three graphic choices that weaken a page, where they happen, with a picture of the problem and one-click fixes (or **Keep as is**). Tips show as amber chips on the page and under **Design tips** in Review, count toward what is left, hide in Preview, and each fix is one undo step.
+  - *The same background, block after block* (White included): **Alternate the backgrounds** uses only the colors each block allows, Silver 18% first and Cyan 12% only if the page has no cyan block yet; **Tighten the gaps** sets compact spacing.
+  - *A photo that loses a large share to its frame* (under 60% showing): the chip says how much shows; **Choose a 4:5 photo** opens the library, **Adjust the crop** opens Focus and zoom on that photo.
+  - *A text color that doesn't belong on its background*, such as cyan text after a navy block turns white. The page shows the standard color until you choose.
+- **Text colors.** While typing in body text, **Color** in the bar above the page offers the brand colors that belong on that background: Navy, AG Gray and Charcoal on White, Silver 18% and Cyan 12%; White and Cyan on Navy. Cyan is never offered or shown on a light background. Headlines and buttons keep the color the brand sets. The brief writes each pick in words with its value, such as `text color: Navy (#004278)`.
+- **Cut-outs.** An upload with a transparent background is spotted and shown whole inside its frame instead of cropped. The brief says how every image meets its frame: `fill the 4:5 frame, cropped to fit (object-fit: cover)` or `whole image inside the frame, not cropped (object-fit: contain)`.
 - **Link to a section on the same page.** The link popover lists the page's sections; picking one gives it a short anchor such as `#what-is-st108`.
 - **Leave a note for the team** on any block. Notes show on the canvas while editing and are listed in the brief. They are never published.
 - **Change the number of items** (points, cards, questions, paragraphs) within each block's limits.
@@ -68,9 +74,11 @@ Both can be added again at any time from **Pages › New page › Start from a f
 | `src/components/page/` | How blocks render (`modules.tsx`), in-place editing (`edit.tsx`), icons, page styles |
 | `src/components/builder/` | The builder: top bar, rail and panels, canvas, settings panel, block thumbnails |
 | `src/lib/checks.ts` | Review checks |
+| `src/lib/advice.ts`, `src/components/builder/Advice.tsx` | Design tips: the three rules and their fixes, and the chips and cards that show them |
+| `src/lib/ink.ts`, `src/lib/crop.ts` | Text colors allowed on each background; how a photo or cut-out meets its frame |
 | `src/lib/exporters.ts` | Brief, zip and page-file export and import |
 | `src/lib/upgrade.ts` | Saved-page upgrades: pages from older versions of the builder open in today's form |
-| `qa/` | Quality checks: end-to-end, undo, old pages, export parity, view, speed, tour, accessibility and screenshot suites |
+| `qa/` | Quality checks: end-to-end, undo, old pages, export parity, view, design tips, speed, tour, accessibility and screenshot suites |
 | `src/lib/tour.ts`, `src/components/builder/Tour.tsx` | The guided tour: its script, and the spotlight that runs it |
 | `public/examples/` | Photography used by the worked examples |
 
@@ -101,6 +109,7 @@ npm run qa -- undo typing  # some suites
 | `upgrade` | Browser storage, page files and a share link made by the last release open with nothing lost; pages from before October 2026 are upgraded on purpose |
 | `export` | The brief, zip and page file match the recorded baseline (`qa/baseline`); record a new one with `QA_RECORD=1` when a change is intended |
 | `view` | Zoom and Fit (menu and keys, also while typing, kept after a reload), folding panels, focus mode, the floating left panel at 1,024 px, the text bar above the page, the block menu (right-click and ⇧F10, keys stay inside it), hover outlines, one shared Review count, old view settings |
+| `tips` | Every template and example starts with no design tips; the three tips, their cards, fixes, undo and Keep as is; text colors by background (never cyan on light); cut-outs; the brief and page file carry colors and image fit |
 | `typing` | Typing p75 under 50 ms on a 19-section page, no layout shift while typing, adding a section in about 120 ms |
 | `tour` | The tour opens once, every step has its target, the keys and the Tour button work |
 | `axe` | No accessibility violations beyond the known list in `qa/baseline/axe.json`, on every panel, menu and dialog, the share preview and the spec sheet |

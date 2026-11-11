@@ -2661,3 +2661,287 @@ html[data-tour-step="insert"] .pb-insert[data-index="1"] .pb-insert__line {
   color: var(--ag-white);
   font-size: 11px;
 }
+
+/* Design tips ------------------------------------------------------------- */
+/* A chip on the page where a graphic choice could be better; amber, like the other
+   things that want attention, but a suggestion, never a blocker. */
+.pb-tipchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px 4px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--pb-amber-line);
+  background: var(--pb-amber-bg);
+  color: var(--pb-amber-ink);
+  font: 700 12px/1.2 var(--font-ui);
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 30, 60, 0.16);
+  cursor: pointer;
+}
+.pb-tipchip:hover,
+.pb-tipchip[aria-expanded="true"] {
+  border-color: var(--pb-amber-ink);
+}
+.pb-tipchip--image {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 4;
+}
+/* On the line between two blocks with the same background; off to the right, clear of
+   the + that adds a block there */
+.pb-tipseam {
+  position: absolute;
+  top: 0;
+  right: 24px;
+  z-index: 16;
+  display: flex;
+  gap: 6px;
+  transform: translateY(-50%);
+}
+.pb-stage :is(.pb-tipchip--image, .pb-tipseam) {
+  zoom: var(--pb-unzoom, 1);
+}
+.pb--preview .pb-tipseam,
+.pb--preview .pb-tipchip {
+  display: none;
+}
+
+/* The card: what is happening, a picture of it, and the fixes */
+.pb-tippop {
+  position: fixed;
+  z-index: 200;
+  width: 340px;
+  max-width: calc(100vw - 24px);
+  max-height: calc(100vh - 24px);
+  overflow: auto;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--ag-white);
+  box-shadow: 0 16px 40px rgba(0, 30, 60, 0.24), 0 0 0 1px rgba(0, 30, 60, 0.08);
+}
+.pb-tip {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.pb-tip__title {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0;
+  color: var(--ag-navy);
+  font: 800 15px/1.3 var(--font-ui);
+}
+.pb-tip__title svg {
+  flex: none;
+  margin-top: 1px;
+  color: #b07a00;
+}
+.pb-tip__why {
+  margin: 0;
+  color: var(--ag-charcoal);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.pb-tip__fixes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+/* Fix labels wrap in the narrow Review rather than run out of it */
+.pb-tip__fixes .pb-btn {
+  max-width: 100%;
+  white-space: normal;
+  text-align: left;
+}
+.pb-tip__keep {
+  margin-left: auto;
+  padding: 4px 2px;
+  border: 0;
+  background: none;
+  color: var(--ag-gray);
+  font: 700 12px/1.2 var(--font-ui);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.pb-tip__keep:hover {
+  color: var(--ag-navy);
+}
+.pb-tip__pic {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--ag-silver-18);
+}
+.pb-tip__pic > svg {
+  transform: rotate(-90deg);
+  color: var(--ag-gray);
+}
+.pb-tip__pic figure {
+  margin: 0;
+}
+.pb-tip__pic figcaption {
+  margin-bottom: 4px;
+  color: var(--ag-gray);
+  font: 700 11px/1.2 var(--font-ui);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+/* Sections as blocks: neighbours with one background melt into one slab */
+.pb-tip__run {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 130px;
+}
+.pb-tip__run > div {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #d3dce0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.pb-tip__run span {
+  display: block;
+  height: 24px;
+  padding: 0 7px;
+  overflow: hidden;
+  color: var(--ag-navy);
+  font: 600 10px/24px var(--font-ui);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.pb-tip__run span.is-dark {
+  color: var(--ag-white);
+}
+/* The photo with its frame where it lands; the rest dimmed */
+.pb-tip__crop {
+  position: relative;
+  width: 100%;
+  max-height: 200px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: #d9e0e3;
+}
+.pb-tip__crop img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.pb-tip__crop i {
+  position: absolute;
+  box-shadow: 0 0 0 999px rgba(0, 30, 60, 0.58);
+  outline: 2px solid var(--ag-white);
+}
+.pb-tip__crop i.is-round {
+  border-radius: 50%;
+}
+.pb-tip__crop figcaption {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  margin: 0;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--ag-white);
+  color: var(--ag-navy);
+  text-transform: none;
+  letter-spacing: 0;
+}
+/* The picked text color on its background, next to the standard one */
+.pb-tip__ink {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.pb-tip__ink > div {
+  padding: 12px 10px;
+  border-radius: 6px;
+  border: 1px solid #d3dce0;
+  font: 700 14px/1.2 var(--font-ui);
+  text-align: center;
+  white-space: nowrap;
+}
+/* In the Review */
+.pb-tips .pb-rgroup__head svg {
+  flex: none;
+  color: #b07a00;
+}
+.pb-tips .pb-rgroup .pb-tip {
+  padding: 4px 12px 12px;
+}
+.pb-tips .pb-tip__title {
+  display: none;
+}
+.pb-tips__again {
+  align-self: flex-start;
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  color: var(--ag-gray);
+  font: 700 12px/1.2 var(--font-ui);
+  text-decoration: underline;
+  cursor: pointer;
+}
+/* The picture a tip asked to crop */
+.pb-imgrow.is-asked {
+  outline: 2px solid var(--ag-cyan);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+/* Text color, in the bar above the page ---------------------------------- */
+.pb-elbar__color {
+  position: relative;
+  display: inline-flex;
+}
+.pb-swatch {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.7), 0 0 0 2px rgba(0, 30, 60, 0.35);
+}
+.pb-swatch.is-default {
+  background: linear-gradient(135deg, #ffffff 0 50%, #4a4a4c 50% 100%);
+}
+.pb-colormenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 80;
+  min-width: 170px;
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  border-radius: 10px;
+  background: var(--ag-white);
+  border: 1px solid var(--ag-silver-40);
+  box-shadow: 0 14px 44px rgba(0, 30, 60, 0.24);
+}
+.pb-elbar .pb-colormenu button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--ag-charcoal);
+  font-size: 13px;
+  text-align: left;
+}
+.pb-elbar .pb-colormenu button:hover,
+.pb-elbar .pb-colormenu button:focus-visible {
+  background: var(--ag-cyan-12);
+  outline: none;
+}
+.pb-colormenu button svg {
+  margin-left: auto;
+  color: var(--ag-navy);
+}

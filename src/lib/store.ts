@@ -7,7 +7,8 @@ import { MODULES } from "./modules";
 import { setAt, getAt, uid } from "./path";
 import { EXAMPLES, exampleDentalWater, exampleST108, makeModule, pageFromRecipe } from "./recipes";
 import type { Zoom } from "./devices";
-import type { ModuleInstance, ModuleStyle, ModuleType, PageDoc, ShareInfo, Viewport } from "./types";
+import { remapColors } from "./ink";
+import type { ModuleInstance, ModuleStyle, ModuleType, PageDoc, ShareInfo, TextColor, Viewport } from "./types";
 import { upgradeModule, upgradePage } from "./upgrade";
 
 export interface SavedBlock {
@@ -81,6 +82,17 @@ interface BuilderState {
   removeItem: (uid: string, group: string, index: number) => void;
   setElement: (uid: string, elementId: string, on: boolean) => void;
   setStyle: (uid: string, patch: ModuleStyle) => void;
+  /** Style several blocks in one undo step (a design tip's fix). */
+  restyle: (changes: { uid: string; patch: ModuleStyle }[]) => void;
+  /** A brand color for one piece of body text; null puts it back to the background's standard color. */
+  setTextColor: (uid: string, path: string, color: TextColor | null) => void;
+  /** Put several pieces of text back to their standard color, in one undo step. */
+  clearTextColors: (uid: string, paths: string[]) => void;
+  /** "Keep as is" on a design tip. */
+  keepAdvice: (id: string) => void;
+  /** Open Focus and zoom for one image, in the settings panel. */
+  cropRequest: { uid: string; path: string } | null;
+  requestCrop: (target: { uid: string; path: string } | null) => void;
   setAnchor: (uid: string, anchor: string) => void;
   setNote: (uid: string, note: string) => void;
   selectAdjacent: (dir: -1 | 1) => void;
@@ -359,7 +371,14 @@ export const useBuilder = create<BuilderState>()(
               if (from < 0 || from >= list.length || to < 0 || to >= list.length) return m;
               const [moved] = list.splice(from, 1);
               list.splice(to, 0, moved);
-              return { ...m, data: setAt(m.data, groupKey, list) };
+              // Picked text colors travel with their item
+              const colors = remapColors(m.colors, groupKey, (i) => {
+                if (i === from) return to;
+                if (from < to && i > from && i <= to) return i - 1;
+                if (from > to && i >= to && i < from) return i + 1;
+                return i;
+              });
+              return { ...m, data: setAt(m.data, groupKey, list), colors };
             }),
           ),
 
@@ -411,7 +430,8 @@ export const useBuilder = create<BuilderState>()(
               const group = MODULES[m.type].groups.find((g) => g.key === groupKey);
               const list = (getAt(m.data, groupKey) as unknown[]) ?? [];
               if (!group || list.length <= group.min) return m;
-              return { ...m, data: setAt(m.data, groupKey, list.filter((_, i) => i !== index)) };
+              const colors = remapColors(m.colors, groupKey, (i) => (i === index ? -1 : i > index ? i - 1 : i));
+              return { ...m, data: setAt(m.data, groupKey, list.filter((_, i) => i !== index)), colors };
             }),
           ),
 
@@ -435,6 +455,43 @@ export const useBuilder = create<BuilderState>()(
 
         setStyle: (u, patch) =>
           commit((mods) => mods.map((m) => (m.uid === u ? { ...m, style: { ...m.style, ...patch } } : m))),
+
+        restyle: (changes) =>
+          commit((mods) =>
+            mods.map((m) => {
+              const patch = changes.filter((c) => c.uid === m.uid).reduce<ModuleStyle>((a, c) => ({ ...a, ...c.patch }), {});
+              return Object.keys(patch).length ? { ...m, style: { ...m.style, ...patch } } : m;
+            }),
+          ),
+
+        setTextColor: (u, path, color) =>
+          commit((mods) =>
+            mods.map((m) => {
+              if (m.uid !== u || (m.colors?.[path] ?? null) === color) return m;
+              const colors = { ...(m.colors ?? {}) };
+              if (color) colors[path] = color;
+              else delete colors[path];
+              return { ...m, colors: Object.keys(colors).length ? colors : undefined };
+            }),
+          ),
+
+        clearTextColors: (u, paths) =>
+          commit((mods) =>
+            mods.map((m) => {
+              if (m.uid !== u || !m.colors) return m;
+              const colors = Object.fromEntries(Object.entries(m.colors).filter(([p]) => !paths.includes(p)));
+              return { ...m, colors: Object.keys(colors).length ? colors : undefined };
+            }),
+          ),
+
+        keepAdvice: (id) =>
+          set((s) => ({
+            pages: s.pages.map((p) => (p.id === s.activeId ? { ...p, keep: [...new Set([...(p.keep ?? []), id])], updatedAt: Date.now() } : p)),
+            savedAt: Date.now(),
+          })),
+
+        cropRequest: null,
+        requestCrop: (target) => set({ cropRequest: target }),
 
         setAnchor: (u, anchor) =>
           edit(`${u}:#anchor`, (mods) => mods.map((m) => (m.uid === u ? { ...m, anchor: anchor || undefined } : m))),

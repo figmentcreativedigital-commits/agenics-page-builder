@@ -1,3 +1,4 @@
+import { KEEP_ENOUGH, fitOf, frameCrop } from "./crop";
 import { IMAGE_KINDS, MODULES, bgOf, isShown, moduleFields } from "./modules";
 import { inlineLinks, plainText } from "./richtext";
 import { countWords, getAt } from "./path";
@@ -18,10 +19,14 @@ export type Issue = {
 
 /**
  * What is left, in one count shared by the top bar, the Review badge and the Review summary:
- * the errors to fix, else the blocks (and the page itself) that still have something to finish.
+ * the errors to fix, else the blocks (and the page itself) that still have something to finish,
+ * design tips included.
  */
-export function leftToDo(issues: Issue[]): { errors: number; todo: number } {
-  return { errors: issues.filter((i) => i.level === "error").length, todo: new Set(issues.map((i) => i.moduleUid ?? "page")).size };
+export function leftToDo(issues: Issue[], tips: { uid: string }[] = []): { errors: number; todo: number } {
+  return {
+    errors: issues.filter((i) => i.level === "error").length,
+    todo: new Set([...issues.map((i) => i.moduleUid ?? "page"), ...tips.map((t) => t.uid)]).size,
+  };
 }
 
 const PLACEHOLDER = /\[[^\]]*\]/;
@@ -101,17 +106,7 @@ export function checkPage(page: PageDoc): Issue[] {
     return null;
   };
 
-  // Neighbouring sections with the same colored background blur into one
-  const shades = mods.map(effectiveBg);
-  for (let i = 1; i < mods.length; i++) {
-    const a = shades[i - 1];
-    if (a && a !== "white" && a === shades[i])
-      out.push({
-        level: "warn",
-        moduleUid: mods[i].uid,
-        message: `${MODULES[mods[i - 1].type].name} and ${MODULES[mods[i].type].name} are both ${a === "navy" ? "navy" : a === "cyan" ? "cyan" : "silver"}. Change one background, or use Tidy backgrounds.`,
-      });
-  }
+  // Neighbouring blocks with the same background: a design tip (lib/advice), with fixes
 
   // Modules
   mods.forEach((m) => {
@@ -168,7 +163,10 @@ export function checkPage(page: PageDoc): Issue[] {
             if (im.w < k.w * 0.75 || im.h < k.h * 0.75)
               out.push({ level: "warn", moduleUid: m.uid, path, message: `${tag}: ${spec.label} is small (${im.w}×${im.h}); use ${k.w}×${k.h} so it stays sharp.` });
             const ratio = im.w / im.h;
-            if (Math.abs(ratio - k.r) / k.r > 0.08)
+            // A cut-out is fitted inside its frame, not cropped; a photo that loses a large share gets a design tip instead
+            const keep = m.type === "hero" ? null : frameCrop(im, spec.image!);
+            const tipped = !!keep && keep.kept < KEEP_ENOUGH;
+            if (fitOf(im, spec.image!) === "fill" && !tipped && Math.abs(ratio - k.r) / k.r > 0.08)
               out.push({ level: "warn", moduleUid: m.uid, path, message: `${tag}: ${spec.label} is not ${k.ratio}, so its edges will be cropped.` });
           }
         }
