@@ -13,7 +13,8 @@ export default async function smoke(browser) {
     await openPageNamed(page, name);
     const review = (await page.locator(".pb-review").innerText()).trim();
     const blocks = await page.locator(".pb-frame").count();
-    check(`${name} opens with no errors`, !errors.length && blocks > 0 && !/to fix/.test(review), errors[0] ?? `${blocks} blocks, Review says “${review}”`);
+    const tips = await page.locator(".pb-tipchip").count();
+    check(`${name} opens with no errors${name.startsWith("Example") ? " and no design tips" : ""}`, !errors.length && blocks > 0 && !/to fix/.test(review) && tips === 0, errors[0] ?? `${blocks} blocks, ${tips} tips, Review says “${review.replace(/\s+/g, " ")}”`);
   }
 
   // Add a block from the Add panel

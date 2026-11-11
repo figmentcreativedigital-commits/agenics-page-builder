@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import type { ModuleInstance, PageDoc } from "@/lib/types";
-import { ModuleProvider } from "./edit";
+import { ModuleProvider, type ModCtx } from "./edit";
 import { RENDERERS } from "./modules";
 
 export function GlobalHeader() {
@@ -84,7 +84,17 @@ export function GlobalFooter() {
   );
 }
 
-export function ModuleView({ mod, editing, specs }: { mod: ModuleInstance; editing: boolean; specs: boolean }) {
+export function ModuleView({
+  mod,
+  editing,
+  specs,
+  imageTools,
+}: {
+  mod: ModuleInstance;
+  editing: boolean;
+  specs: boolean;
+  imageTools?: ModCtx["imageTools"];
+}) {
   const Render = RENDERERS[mod.type];
   return (
     <ModuleProvider
@@ -96,8 +106,10 @@ export function ModuleView({ mod, editing, specs }: { mod: ModuleInstance; editi
         hidden: mod.hidden,
         style: mod.style,
         anchor: mod.anchor,
+        colors: mod.colors,
         editing,
         specs,
+        imageTools,
       }}
     >
       <Render />
@@ -111,12 +123,14 @@ export function PageRenderer({
   specs,
   wrap,
   globalWrap,
+  imageTools,
 }: {
   page: PageDoc;
   editing: boolean;
   specs: boolean;
   wrap?: (mod: ModuleInstance, index: number, node: ReactNode) => ReactNode;
   globalWrap?: (kind: "header" | "footer", node: ReactNode) => ReactNode;
+  imageTools?: ModCtx["imageTools"];
 }) {
   const gw = globalWrap ?? ((_k, n) => n);
   return (
@@ -124,7 +138,7 @@ export function PageRenderer({
       {gw("header", <GlobalHeader />)}
       <main>
         {page.modules.map((m, i) => {
-          const node = <ModuleView key={m.uid} mod={m} editing={editing} specs={specs} />;
+          const node = <ModuleView key={m.uid} mod={m} editing={editing} specs={specs} imageTools={editing ? imageTools : undefined} />;
           return wrap ? wrap(m, i, node) : node;
         })}
       </main>

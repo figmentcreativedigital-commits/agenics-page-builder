@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { imageSize, listImages, saveImage } from "@/lib/images";
+import { hasTransparency, imageSize, listImages, saveImage } from "@/lib/images";
 import { IMAGE_KINDS } from "@/lib/modules";
 import { getAt } from "@/lib/path";
 import { AGENICS_PHOTOS } from "@/lib/photos";
@@ -113,8 +113,8 @@ export function ImageLibrary() {
                 type="button"
                 className={`pb-lib-item ${current?.id === u.id ? "is-on" : ""}`}
                 onClick={async () => {
-                  const { w, h } = await imageSize(u.blob);
-                  choose({ id: u.id, alt: "", w, h, type: u.blob.type });
+                  const [{ w, h }, cutout] = await Promise.all([imageSize(u.blob), hasTransparency(u.blob)]);
+                  choose({ id: u.id, alt: "", w, h, type: u.blob.type, ...(cutout ? { cutout } : {}) });
                 }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}

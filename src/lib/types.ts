@@ -27,6 +27,8 @@ export type ImageVal = {
   h?: number;
   name?: string;
   type?: string;
+  /** Has a transparent background (a cut-out). Measured on upload; library photos say so. */
+  cutout?: boolean;
   /** The part of the photo to keep in view when the slot crops it, in % of width and height. */
   focus?: { x: number; y: number };
   /** 1 = fit the slot; up to 2 = zoomed in around the focal point. */
@@ -58,7 +60,12 @@ export interface ModuleInstance {
   anchor?: string;
   /** Note for the team; shown on the canvas and listed in the brief. */
   note?: string;
+  /** Text colors picked in the builder, by field path ("sub", "cards.2.body"). Unset = the background's default. */
+  colors?: Record<string, TextColor>;
 }
+
+/** A brand color picked for a piece of body text. Headlines keep the color the brand sets. */
+export type TextColor = "navy" | "gray" | "charcoal" | "white" | "cyan";
 
 /** A shared preview link for a page. The secret lets this browser update or turn off the link. */
 export interface ShareInfo {
@@ -79,6 +86,8 @@ export interface PageDoc {
   createdAt: number;
   updatedAt: number;
   share?: ShareInfo;
+  /** Design tips someone chose to keep as is (ids from lib/advice). */
+  keep?: string[];
 }
 
 export type Limit = { chars?: number; words?: number };

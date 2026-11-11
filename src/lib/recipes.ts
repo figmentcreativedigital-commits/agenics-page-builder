@@ -1,3 +1,4 @@
+import { alternated } from "./advice";
 import { LIBRARY, MODULES } from "./modules";
 import { uid } from "./path";
 import type { ImageVal, ModuleInstance, ModuleStyle, ModuleType, PageDoc } from "./types";
@@ -90,10 +91,13 @@ export function pageFromRecipe(recipeId: string, name: string): PageDoc {
     seoTitle: "",
     metaDescription: "",
     recipe: recipe.id,
-    modules: recipe.modules.map((m) => {
-      const [type, variant] = m.split(":") as [ModuleType, string | undefined];
-      return makeModule(type, variant);
-    }),
+    // New pages start with alternating backgrounds, so blocks never run together
+    modules: alternated(
+      recipe.modules.map((m) => {
+        const [type, variant] = m.split(":") as [ModuleType, string | undefined];
+        return makeModule(type, variant);
+      }),
+    ),
     createdAt: now,
     updatedAt: now,
   };
@@ -169,7 +173,7 @@ export function exampleDentalWater(): PageDoc {
           { title: "In-office testing", line: "Monitor between lab tests with a paddle you read in your office.", link: link("See MyCheck", "/shop/p/mycheck") },
           { title: "Mail-in lab testing", line: "Send samples to our lab for counts you can document.", link: link("Compare lab tests", "#compare") },
         ],
-      }),
+      }, { style: { bg: "silver" } }),
       m(
         "compare",
         "default",
@@ -220,7 +224,7 @@ export function exampleDentalWater(): PageDoc {
             image: noImg("Box of MyCheck in-office test paddles"),
           },
         ],
-      }),
+      }, { style: { bg: "silver" } }),
       m("proof", "stats", {
         quote: "Working with Agenics has been a true collaboration centered on prioritizing patient safety above all else.",
         name: "Dr. Huy Than, DDS",

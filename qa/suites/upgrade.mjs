@@ -5,9 +5,30 @@ import path from "node:path";
 import { BASE, FIXTURES, activeDoc, check, content, fixture, openBuilder, openPageNamed, same, startSuite, storeState, watchErrors } from "../lib.mjs";
 import { MODULES_HIDDEN_BY_DEFAULT } from "../fixtures/hidden-by-default.mjs";
 
+/**
+ * November 2026, on purpose: an untouched copy of the Dental Water example takes Silver 18% on
+ * its second and fourth light blocks, so it opens with no design tip. This puts those two
+ * backgrounds back for comparison, and says whether they were changed.
+ */
+function withoutExampleBackgrounds(page) {
+  if (!page?.name?.startsWith("Example — Dental Water")) return { modules: page?.modules, changed: null };
+  let changed = 0;
+  const modules = page.modules.map((m, i) => {
+    if ((i !== 2 && i !== 4) || m.style?.bg !== "silver") return m;
+    changed++;
+    const style = { ...m.style };
+    delete style.bg;
+    const out = { ...m, style };
+    if (!Object.keys(style).length) delete out.style;
+    return out;
+  });
+  return { modules, changed };
+}
+
 /** The optional hero and CTA lines are back, hidden, and nothing else differs. */
-function upgradedOnPurpose(oldPage, newPage) {
+function upgradedOnPurpose(oldPage, newPageAsSaved) {
   const problems = [];
+  const newPage = { ...newPageAsSaved, modules: withoutExampleBackgrounds(newPageAsSaved).modules };
   oldPage.modules.forEach((m, i) => {
     const n = newPage.modules[i];
     if (!n) return problems.push(`block ${i + 1} missing`);
@@ -36,8 +57,14 @@ export default async function upgradeSuite(browser, { appDir }) {
     const st = await storeState(page);
     const before = stored.state.pages;
     const after = st.pages.filter((p) => before.some((b) => b.id === p.id));
-    const unchanged = before.every((b) => same(b.modules, after.find((a) => a.id === b.id)?.modules));
+    const unchanged = before.every((b) => same(b.modules, withoutExampleBackgrounds(after.find((a) => a.id === b.id)).modules));
+    const example = withoutExampleBackgrounds(after.find((a) => a.name.startsWith("Example — Dental Water")));
     check("Pages saved in this browser by the last release open unchanged", after.length === before.length && unchanged && !errors.length, errors[0] ?? `${after.length} of ${before.length} pages, content ${unchanged ? "identical" : "changed"}`);
+    if (example.changed !== null) {
+      await openPageNamed(page, "Example — Dental Water");
+      const tips = await page.locator(".pb-tipchip").count();
+      check("…the Dental Water example takes alternating backgrounds on purpose, and shows no design tip", example.changed === 2 && tips === 0, `${example.changed} backgrounds changed, ${tips} tips`);
+    }
     await openPageNamed(page, "QA saved page");
     const doc = await activeDoc(page);
     check("…and the edited one shows its edits", (await page.locator(".pb-frame").count()) === doc.modules.length && doc.modules[2].note === "Saved before the release", `${doc.modules.length} blocks, note “${doc.modules[2].note}”`);

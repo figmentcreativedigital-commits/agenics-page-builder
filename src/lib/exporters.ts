@@ -1,7 +1,10 @@
 "use client";
 
 import JSZip from "jszip";
+import { adviseOn, shownInk } from "./advice";
 import { checkPage, isPlaceholder, measure } from "./checks";
+import { fitOf } from "./crop";
+import { TEXT_COLORS } from "./ink";
 import { blobToDataUrl, dataUrlToBlob, getImageBlob, putImage } from "./images";
 import { BACKGROUNDS, IMAGE_KINDS, MODULES, bgOf, isShown, moduleFields } from "./modules";
 import { expand, getAt, itemNumber, slugify, uid } from "./path";
@@ -45,6 +48,7 @@ export function buildBrief(page: PageDoc): string {
   const lines: string[] = [];
   const slots = imageSlots(page);
   const issues = checkPage(page);
+  const tips = adviseOn(page);
   lines.push(`# ${page.name}`, "");
   lines.push(`- **URL slug:** /${page.slug || "[set a slug]"}`);
   lines.push(`- **SEO title:** ${page.seoTitle || "[missing]"} (${page.seoTitle.length}/60)`);
@@ -52,7 +56,7 @@ export function buildBrief(page: PageDoc): string {
   lines.push(`- **Blocks:** ${page.modules.length}`);
   lines.push(`- **Exported:** ${new Date().toLocaleString("en-US")}`, "");
   lines.push(
-    "Build each block below as one Squarespace section, in this order. Fonts, colors and button styles come from Site Styles. Upload each image under the file name shown. Paragraph formatting is written as Markdown: **bold**, _italic_ and [link text](address).",
+    "Build each block below as one Squarespace section, in this order. Fonts, colors and button styles come from Site Styles. Upload each image under the file name shown. Paragraph formatting is written as Markdown: **bold**, _italic_ and [link text](address). Text is the standard color for its background unless a line says \"text color\". Each image line says how the picture meets its frame.",
     "",
   );
 
@@ -83,7 +87,9 @@ export function buildBrief(page: PageDoc): string {
           const plain = spec.rich ? plainText(s) : s;
           const r = measure(plain, spec.limit);
           const flag = isPlaceholder(plain) ? " ⚠ placeholder" : r?.over ? ` ⚠ over limit (${r.used}/${r.max})` : "";
-          lines.push(`- **${label}:** ${s || "—"}${flag}`);
+          // A picked text color, in plain words with its value
+          const ink = shownInk(m, path);
+          lines.push(`- **${label}:** ${s || "—"}${flag}${ink ? ` · text color: ${TEXT_COLORS[ink].label} (${TEXT_COLORS[ink].hex})` : ""}`);
         } else if (spec.kind === "cta") {
           const c = v as CtaVal;
           if (!c?.label && spec.optional) continue;
@@ -95,10 +101,17 @@ export function buildBrief(page: PageDoc): string {
         } else if (spec.kind === "image") {
           const slot = slots.find((s) => s.moduleIndex === mi && s.path === path);
           const im = v as ImageVal;
+          const has = !!(im?.id || im?.src);
+          // How the picture meets its frame, in plain words with the CSS value
+          const fit = !has
+            ? ""
+            : fitOf(im, spec.image!) === "fit"
+              ? " · fit: whole image inside the frame, not cropped (object-fit: contain)"
+              : ` · fit: fill the ${slot?.ratio} frame, cropped to fit (object-fit: cover)`;
           lines.push(
             `- **${label} (${slot?.ratio}):** ${im?.id || im?.src ? `images/${slot?.file}` : "⚠ no image yet"} · alt: ${
               im?.alt ? `"${im.alt}"` : "⚠ missing"
-            }${im?.focus ? ` · focal point ${im.focus.x}% across, ${im.focus.y}% down` : ""}${
+            }${fit}${im?.focus ? ` · focal point ${im.focus.x}% across, ${im.focus.y}% down` : ""}${
               im?.zoom && im.zoom > 1 ? ` · zoomed to ${Math.round(im.zoom * 100)}%` : ""
             }`,
           );
@@ -109,9 +122,10 @@ export function buildBrief(page: PageDoc): string {
   });
 
   const notes = page.modules.filter((m) => m.note);
-  if (issues.length || notes.length) {
+  if (issues.length || notes.length || tips.length) {
     lines.push("## Open items", "");
     issues.forEach((i) => lines.push(`- ${i.level === "error" ? "**Fix:**" : "Check:"} ${i.message}`));
+    tips.forEach((t) => lines.push(`- Design tip: ${t.title}.`));
     notes.forEach((m) => lines.push(`- Note on ${MODULES[m.type].code} ${MODULES[m.type].name}: ${m.note}`));
     lines.push("");
   }

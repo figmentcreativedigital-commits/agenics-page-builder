@@ -161,7 +161,7 @@ export const TOUR: TourChapter[] = [
         id: "review",
         target: '[data-tour="review"]',
         title: "Review",
-        body: "A short list of what's left: missing links, text over its limit, images without a description. Click an item to jump to it. When the button says Ready, the page is done.",
+        body: "A short list of what's left: missing links, text over its limit, images without a description, and design tips with one-click fixes. Click an item to jump to it. When the button says Ready, the page is done.",
         setup: { tab: "review" },
       },
       {

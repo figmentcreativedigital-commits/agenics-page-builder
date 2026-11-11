@@ -56,6 +56,34 @@ export default async function axeSuite(browser) {
     ["View menu", async () => page.keyboard.press("Escape").then(() => page.locator("[data-tour=view] > button").click()), tool],
     ["Block menu", async () => page.keyboard.press("Escape").then(() => page.locator(".pb-frame").nth(1).click({ button: "right", position: { x: 300, y: 120 } })), tool],
     [
+      "Design tip card",
+      async () => {
+        await page.keyboard.press("Escape");
+        await selectBlock(page, 2);
+        await settingsTab(page, "Style");
+        await page.locator(".pb-swatches button", { hasText: "White" }).first().click();
+        await page.locator(".pb-tipchip").first().click();
+      },
+      tool,
+    ],
+    [
+      "Review with design tips",
+      async () => {
+        await page.keyboard.press("Escape");
+        await openPanel(page, "Review");
+        await page.locator(".pb-tips .pb-rgroup__head").first().click();
+      },
+      tool,
+    ],
+    [
+      "Text color menu",
+      async () => {
+        await page.locator(".pb-frame").nth(1).locator(".agx-ed[data-path='paras.0']").click();
+        await page.locator(".pb-elbar__color > button").click();
+      },
+      tool,
+    ],
+    [
       "Side panels folded",
       async () => {
         await page.keyboard.press("Escape");

@@ -11,6 +11,7 @@ import { EXAMPLES, RECIPES } from "@/lib/recipes";
 import { activePage, useBuilder } from "@/lib/store";
 import type { ModuleInstance, ModuleType } from "@/lib/types";
 import { PageRenderer } from "../page/PageRenderer";
+import { AdviceList, usePageAdvice } from "./Advice";
 import { BlockPicker, DRAG_TYPE } from "./Blocks";
 import { ModuleThumb } from "./thumbs";
 import { BG_SWATCH, Icon } from "./ui";
@@ -306,6 +307,7 @@ function ReviewTab() {
   const select = useBuilder((s) => s.select);
   const issues = useMemo(() => (page ? checkPage(page) : []), [page]);
   const [open, setOpen] = useState<string | null>(null);
+  const tips = usePageAdvice();
   if (!page) return null;
   const errors = issues.filter((i) => i.level === "error");
   const go = (uid?: string) => {
@@ -322,7 +324,7 @@ function ReviewTab() {
 
   return (
     <div className="pb-panel">
-      {issues.length === 0 ? (
+      {issues.length + tips.length === 0 ? (
         <div className="pb-ok">
           <Icon name="review" size={22} />
           <span>
@@ -331,7 +333,7 @@ function ReviewTab() {
         </div>
       ) : (
         <div className={`pb-score ${errors.length ? "pb-score--err" : ""}`}>
-          <b>{errors.length ? `${errors.length} to fix` : `${leftToDo(issues).todo} to finish`}</b>
+          <b>{errors.length ? `${errors.length} to fix` : `${leftToDo(issues, tips).todo} to finish`}</b>
           <span>Click an item to jump to it</span>
         </div>
       )}
@@ -381,6 +383,7 @@ function ReviewTab() {
           })}
         </div>
       ) : null}
+      <AdviceList />
     </div>
   );
 }
@@ -521,7 +524,8 @@ export function LeftPanel({
   const open = useBuilder((s) => s.panels.left && !s.focusMode);
   const setPanel = useBuilder((s) => s.setPanel);
   const issues = useMemo(() => (page ? checkPage(page) : []), [page]);
-  const { errors, todo } = leftToDo(issues);
+  const tips = usePageAdvice();
+  const { errors, todo } = leftToDo(issues, tips);
   const title = (t: Tab) => (t === "add" ? "Add a block" : t === "layers" ? "Page layers" : t === "pages" ? "Your pages" : t === "review" ? "Review" : "Version history");
   const tabs: { id: Tab; label: string; icon: string }[] = [
     { id: "add", label: "Add", icon: "add" },
@@ -552,7 +556,7 @@ export function LeftPanel({
             <Icon name={t.icon} size={20} />
             <span>{t.label}</span>
             {/* The same number the top bar shows */}
-            {t.id === "review" && issues.length ? <i className={`pb-rail__badge ${errors ? "is-err" : ""}`}>{errors || todo}</i> : null}
+            {t.id === "review" && issues.length + tips.length ? <i className={`pb-rail__badge ${errors ? "is-err" : ""}`}>{errors || todo}</i> : null}
           </button>
         ))}
         {/* Always here, for anyone who wants the walkthrough again */}

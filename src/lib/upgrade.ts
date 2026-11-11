@@ -42,9 +42,28 @@ export function upgradeModule(m: ModuleInstance): ModuleInstance {
   return MODULE_UPGRADES.reduce((mod, u) => u.run(mod), m);
 }
 
+type PageUpgrade = { since: string; run: (p: PageDoc) => PageDoc };
+
+const PAGE_UPGRADES: PageUpgrade[] = [
+  {
+    // The Dental Water example shipped with four white blocks in a row. Copies whose
+    // backgrounds were never touched take the alternating backgrounds the example has now
+    // (Silver 18% on the second and fourth). A copy someone restyled is left alone.
+    since: "Nov 2026",
+    run: (p) => {
+      if (p.recipe !== "product-line" || !p.name.startsWith("Example — Dental Water")) return p;
+      const run = p.modules.slice(1, 5);
+      if (run.map((m) => m.type).join() !== "trust,intro,compare,products" || run.some((m) => m.style?.bg)) return p;
+      const silver = new Set([run[1].uid, run[3].uid]);
+      return { ...p, modules: p.modules.map((m) => (silver.has(m.uid) ? { ...m, style: { ...m.style, bg: "silver" as const } } : m)) };
+    },
+  },
+];
+
 /** Today's form of a saved page. The same object when nothing needed to change. */
 export function upgradePage(p: PageDoc): PageDoc {
   if (!Array.isArray(p?.modules)) return p;
   const modules = p.modules.map(upgradeModule);
-  return modules.some((m, i) => m !== p.modules[i]) ? { ...p, modules } : p;
+  const page = modules.some((m, i) => m !== p.modules[i]) ? { ...p, modules } : p;
+  return PAGE_UPGRADES.reduce((doc, u) => u.run(doc), page);
 }

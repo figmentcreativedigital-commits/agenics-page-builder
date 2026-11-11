@@ -1791,3 +1791,26 @@ tr.agx-item:hover .agx-itemtools,
   outline-offset: 4px;
   border-radius: 6px;
 }
+
+/* Text colors picked in the builder (body text only; headlines keep the brand's color).
+   The builder adds the class only where the color belongs: never cyan on a light background. */
+.agx .agx-ink--navy,
+.agx .agx-ink--navy p {
+  color: var(--ag-navy) !important;
+}
+.agx .agx-ink--gray,
+.agx .agx-ink--gray p {
+  color: var(--ag-gray) !important;
+}
+.agx .agx-ink--charcoal,
+.agx .agx-ink--charcoal p {
+  color: var(--ag-charcoal) !important;
+}
+.agx .agx-ink--white,
+.agx .agx-ink--white p {
+  color: var(--ag-white) !important;
+}
+.agx .agx-ink--cyan,
+.agx .agx-ink--cyan p {
+  color: var(--ag-cyan) !important;
+}
