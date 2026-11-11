@@ -34,13 +34,18 @@ function upgradedOnPurpose(oldPage, newPageAsSaved) {
     if (!n) return problems.push(`block ${i + 1} missing`);
     const keys = MODULES_HIDDEN_BY_DEFAULT[m.type] ?? [];
     for (const k of keys) {
+      if (k in m.data) continue; // the saved page already had this slot
       if (!(k in n.data)) problems.push(`${m.type} has no ${k}`);
       if (!(n.hidden ?? []).includes(k)) problems.push(`${m.type} ${k} not hidden`);
     }
+    const added = keys.filter((k) => !(k in m.data));
     const strip = (x) => {
       const data = { ...x.data };
-      keys.forEach((k) => delete data[k]);
-      return { ...x, uid: undefined, data, hidden: (x.hidden ?? []).filter((h) => !keys.includes(h)) };
+      added.forEach((k) => delete data[k]);
+      const hidden = (x.hidden ?? []).filter((h) => !added.includes(h));
+      const out = { ...x, uid: undefined, data, hidden };
+      if (!hidden.length) delete out.hidden;
+      return out;
     };
     if (!same(strip(m), strip(n))) problems.push(`${m.type} content changed`);
   });
@@ -57,9 +62,10 @@ export default async function upgradeSuite(browser, { appDir }) {
     const st = await storeState(page);
     const before = stored.state.pages;
     const after = st.pages.filter((p) => before.some((b) => b.id === p.id));
-    const unchanged = before.every((b) => same(b.modules, withoutExampleBackgrounds(after.find((a) => a.id === b.id)).modules));
+    // Allowed on purpose: the table's new optional parts arrive hidden (and the example's two backgrounds, below)
+    const unchanged = before.every((b) => !upgradedOnPurpose(b, after.find((a) => a.id === b.id)).length);
     const example = withoutExampleBackgrounds(after.find((a) => a.name.startsWith("Example — Dental Water")));
-    check("Pages saved in this browser by the last release open unchanged", after.length === before.length && unchanged && !errors.length, errors[0] ?? `${after.length} of ${before.length} pages, content ${unchanged ? "identical" : "changed"}`);
+    check("Pages saved in this browser by the last release open with nothing lost", after.length === before.length && unchanged && !errors.length, errors[0] ?? `${after.length} of ${before.length} pages, content ${unchanged ? "identical" : "changed"}`);
     if (example.changed !== null) {
       await openPageNamed(page, "Example — Dental Water");
       const tips = await page.locator(".pb-tipchip").count();

@@ -671,6 +671,19 @@
   background: var(--ag-silver-18);
 }
 
+.agx-tablenotes {
+  margin-top: 14px;
+  gap: 6px;
+}
+.agx-tablenotes p {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ag-gray);
+}
+.agx-tablecta {
+  margin-top: 22px;
+}
+
 /* M09 Resources --------------------------------------------------------- */
 .agx-docs {
   display: grid;

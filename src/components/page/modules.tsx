@@ -280,12 +280,15 @@ function Proof() {
 function Compare() {
   const { data } = useMod();
   const columns = list(data, "columns");
+  const notesOn = useShown("notes");
+  const ctaOn = useShown("cta");
   return (
     <Section label="Comparison">
       <div className="agx-wrap">
         <div className="agx-head">
           <T path="h2" as="h2" className="agx-h2" />
-          <Note>Live HTML table · 4 rows × 5 columns max · cells 8 words max</Note>
+          <T path="intro" as="p" className="agx-lead" />
+          <Note>Live HTML table · 10 rows × 8 columns max · cells 14 words max</Note>
         </div>
         <div className="agx-tablebox">
           <table className="agx-table">
@@ -319,6 +322,12 @@ function Compare() {
           </table>
         </div>
         <ItemAdd group="rows" />
+        {notesOn ? <Paras group="notes" className="agx-tablenotes" /> : null}
+        {ctaOn ? (
+          <div className="agx-btns agx-tablecta">
+            <Btn path="cta" variant="outline" />
+          </div>
+        ) : null}
       </div>
     </Section>
   );

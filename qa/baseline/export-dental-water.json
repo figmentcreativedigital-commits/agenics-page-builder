@@ -88,6 +88,14 @@
       "variant": "default",
       "data": {
         "h2": "Compare dental water tests",
+        "intro": "[How to read this table, in one or two sentences.]",
+        "notes": [
+          "[A footnote, or what an abbreviation means.]"
+        ],
+        "cta": {
+          "label": "[Learn more]",
+          "href": ""
+        },
         "columns": [
           "Test",
           "Method",
@@ -134,6 +142,11 @@
           }
         ]
       },
+      "hidden": [
+        "intro",
+        "notes",
+        "cta"
+      ],
       "anchor": "compare"
     },
     {

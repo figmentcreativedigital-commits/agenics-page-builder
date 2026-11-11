@@ -275,11 +275,17 @@ export function exampleDentalWater(): PageDoc {
 
 const ST108 = "/examples/st108";
 
+/** The page name, also used to add this version to browsers that have the first one. */
+export const ST108_NAME = "Example — ST108 (Affirm), rev 2";
+
 export function exampleST108(): PageDoc {
   const now = Date.now();
   return {
     id: uid(),
-    name: "Example — ST108 (Affirm)",
+    // Rebuilt to the client's feedback of Nov 10, 2026: more education (water categories,
+    // standards, testing frequency), qualification and steam testing, the sample report,
+    // turnaround and pass or fail, and a clear route to a person.
+    name: ST108_NAME,
     slug: "st108-water-testing",
     seoTitle: "ST108 Water Quality Testing Kits | Agenics Labs",
     metaDescription:
@@ -320,6 +326,93 @@ export function exampleST108(): PageDoc {
           ],
         },
         { hidden: ["eyebrow", "cta"], anchor: "what-is-st108" },
+      ),
+      m(
+        "compare",
+        "default",
+        {
+          h2: "The Three ST108 Water Categories",
+          intro: "ST108 sorts the water used in device processing into three categories. Find the ones your facility uses to know which test kit to order.",
+          columns: ["Water category", "What it is", "Where it's used"],
+          rows: [
+            { cells: ["Utility water", "Water as it comes from the tap, sometimes with basic treatment", "Flushing, washing, and rinsing before the final rinse"] },
+            { cells: ["Critical water", "Water treated to remove microorganisms, endotoxin, and minerals", "The final rinse of devices, and other steps where water touches the device last"] },
+            { cells: ["Steam", "Water turned to steam for sterilization, tested as condensate", "Steam sterilizers"] },
+          ],
+        },
+        { hidden: ["notes", "cta"], style: { bg: "silver" }, anchor: "water-categories", note: "Table supplied by Brianna, Nov 10." },
+      ),
+      m(
+        "compare",
+        "default",
+        {
+          h2: "Water Quality Standards for Routine Monitoring",
+          intro: "The limits ST108 sets for each water category. Your Affirm report checks every result against them.",
+          columns: ["Measurement", "Units", "Utility", "Critical", "Steam ¹"],
+          rows: [
+            { cells: ["pH at 25 °C", "pH", "6.5 – 9.5", "5.0 – 7.5", "5.0 – 9.2 ²"] },
+            { cells: ["Conductivity", "µS/cm", "<500", "<10", "<10"] },
+            { cells: ["Total alkalinity", "mg CaCO3/L", "<400", "<8", "<8"] },
+            { cells: ["Total hardness", "mg CaCO3/L", "<150", "<1", "<1"] },
+            { cells: ["Bacteria", "CFU/mL", "<500 ³", "<10", "N/A"] },
+            { cells: ["Endotoxin", "EU/mL", "N/A ³", "<10", "N/A"] },
+            { cells: ["Color and turbidity", "Visual", "Colorless, clear, without sediment", "Colorless, clear, without sediment", "Colorless, clear, without sediment"] },
+            { cells: ["Testing frequency", "Schedule", "Quarterly", "Monthly", "Quarterly"] },
+          ],
+          notes: [
+            "¹ Sampled as steam condensate.",
+            "² For local steam generation, the condensate pH should be 5.0 to 7.5. For boiler-treated steam, most boilers should be treated to maintain a condensate pH of 7.5 to 9.2.",
+            "³ When utility water is used after chemical high-level disinfection as a final rinse, bacteria should be <10 CFU/mL and endotoxin <10 EU/mL.",
+          ],
+        },
+        {
+          hidden: ["cta"],
+          anchor: "standards",
+          note: "Typed out from the table image on agenics.com/medical, so it is a real table that search engines can read. Please check every figure against the source.",
+        },
+      ),
+      m(
+        "compare",
+        "default",
+        {
+          h2: "Testing Frequency: Treatment System Water",
+          intro: "How often ST108 calls for each test on the water treatment system, and where to take the sample.",
+          columns: ["Water property", "Sample location", "Utility water", "Critical water"],
+          rows: [
+            { cells: ["Bacteria", "Loop out and loop return", "N/A", "Monthly"] },
+            { cells: ["Endotoxin", "Loop out and loop return", "N/A", "Monthly"] },
+            { cells: ["pH", "After the last treatment step", "Quarterly", "Monthly"] },
+            { cells: ["Conductivity", "After the last treatment step", "Quarterly", "Daily"] },
+            { cells: ["Alkalinity", "After the last treatment step", "Quarterly", "Monthly"] },
+            { cells: ["Hardness", "After the last treatment step", "Quarterly", "Monthly"] },
+            { cells: ["Visual inspection", "System", "Daily", "Daily"] },
+          ],
+        },
+        {
+          hidden: ["notes", "cta"],
+          style: { bg: "silver" },
+          anchor: "testing-frequency",
+          note: "Typed out from the frequency table image on agenics.com/medical, with the letters spelled out. The image's legend has no entry for D; it is written here as Daily. Please confirm.",
+        },
+      ),
+      m(
+        "compare",
+        "default",
+        {
+          h2: "Testing Frequency: Point of Use Water",
+          intro: "How often ST108 calls for each test where the water is used.",
+          columns: ["Water property", "Sample location", "Utility water", "Critical water", "Steam condensate"],
+          rows: [
+            { cells: ["Bacteria", "Each point of use", "N/A", "Monthly", "N/A"] },
+            { cells: ["Endotoxin", "Each point of use", "N/A", "Monthly", "N/A"] },
+            { cells: ["pH", "First point of use on loop", "Quarterly", "Monthly", "Quarterly"] },
+            { cells: ["Conductivity", "First point of use on loop", "Quarterly", "Monthly", "Quarterly"] },
+            { cells: ["Alkalinity", "First point of use on loop", "Quarterly", "Monthly", "Quarterly"] },
+            { cells: ["Hardness", "First point of use on loop", "Quarterly", "Monthly", "Quarterly"] },
+            { cells: ["Visual inspection", "Each point of use", "Daily", "Daily", "Daily"] },
+          ],
+        },
+        { hidden: ["notes", "cta"], note: "Typed out from the frequency table image on agenics.com/medical, with the letters spelled out (D written as Daily; please confirm)." },
       ),
       m(
         "grid",
@@ -375,6 +468,16 @@ export function exampleST108(): PageDoc {
         },
       ),
       m(
+        "statement",
+        "split",
+        {
+          h2: "Qualification and Steam Testing",
+          paras: ["Qualification tests, including ionic contaminants and TOC, and tests for steam water are also available. Contact us for more information."],
+          cta: link("Contact us", "/agenics-contact"),
+        },
+        { hidden: ["eyebrow", "statement"], style: { bg: "cyan" }, note: "Wording from agenics.com/medical." },
+      ),
+      m(
         "grid",
         "cols-3",
         {
@@ -415,7 +518,7 @@ export function exampleST108(): PageDoc {
           statement: "No contracts. No complicated service model. All needed testing materials included.",
           cta: link("Order a test kit", "#order"),
         },
-        { hidden: ["eyebrow"], style: { bg: "cyan" } },
+        { hidden: ["eyebrow"], style: { bg: "silver" } },
       ),
       m(
         "story",
@@ -425,11 +528,25 @@ export function exampleST108(): PageDoc {
           paras: [
             "ST108 calls for water quality management programs that include testing, monitoring, documentation, review and corrective actions.",
             "Agenics Affirm™ provides a simple option for testing and reporting, with results delivered online in a user-friendly format.",
-            "That gives the facility the information it needs to incorporate testing results into its broader ST108 water quality management program.",
+            "Results are ready within 5 business days of the lab receiving your sample, and every measurement is marked in range or out of range against the ST108 standard. That gives the facility the information it needs to incorporate testing results into its broader ST108 water quality management program.",
           ],
-          image: fileImg(`${ST108}/st108-sterilizer-chamber-3x2.jpg`, 1254, 837, "Open sterilizer with wrapped instrument packs loaded on its racks"),
+          cta: link("See a sample report", "/s/Critical-Plus-Sample-Report.pdf"),
+          image: {
+            ...fileImg(
+              `${ST108}/st108-sample-report-3x2.png`,
+              1800,
+              1200,
+              "Sample Agenics ST108 critical water report: a results page with each measurement marked in range or out of range, and a page of plate photos",
+            ),
+            type: "image/png",
+            cutout: true,
+          },
         },
-        { hidden: ["eyebrow", "cta"] },
+        {
+          hidden: ["eyebrow"],
+          anchor: "sample-report",
+          note: "Upload the Critical Plus sample report PDF to Squarespace and point the button at it; the address here is a placeholder. The picture shows both pages of the report, with the plate page's green changed to Agenics navy and cyan.",
+        },
       ),
       m(
         "faq",
@@ -449,9 +566,15 @@ export function exampleST108(): PageDoc {
               q: "Is ST108 only relevant to hospitals?",
               a: "No. Agenics Affirm™ is designed with non-acute and outpatient healthcare in mind, including ambulatory surgery centers, office-based surgical practices and community-based healthcare facilities.",
             },
+            {
+              q: "Have a question that isn’t answered here?",
+              a: "Ask Dewy, our chat assistant, any time: [Ask Dewy](/ask). Or [contact us](/agenics-contact) and a person on our team will help.",
+            },
           ],
+          help: "Not sure which kit you need? We’re happy to help.",
+          helpLink: link("Contact us", "/agenics-contact"),
         },
-        { hidden: ["support"], style: { bg: "silver" }, anchor: "faq" },
+        { style: { bg: "silver" }, anchor: "faq" },
       ),
       m(
         "cta",

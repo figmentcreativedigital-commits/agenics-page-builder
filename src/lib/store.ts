@@ -5,7 +5,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { effectiveBg } from "./checks";
 import { MODULES } from "./modules";
 import { setAt, getAt, uid } from "./path";
-import { EXAMPLES, exampleDentalWater, exampleST108, makeModule, pageFromRecipe } from "./recipes";
+import { EXAMPLES, ST108_NAME, exampleDentalWater, exampleST108, makeModule, pageFromRecipe } from "./recipes";
 import type { Zoom } from "./devices";
 import { remapColors } from "./ink";
 import type { ModuleInstance, ModuleStyle, ModuleType, PageDoc, ShareInfo, TextColor, Viewport } from "./types";
@@ -21,7 +21,7 @@ export interface SavedBlock {
 const CLIPBOARD = "agenics-page-builder:clipboard";
 
 /** Bump when a new worked example ships, so browsers that already have pages get it too. */
-const SEED_VERSION = 2;
+const SEED_VERSION = 3;
 
 type Snapshot = { pageId: string; modules: ModuleInstance[] };
 
@@ -118,6 +118,22 @@ interface BuilderState {
 
 const HISTORY = 60;
 
+/** A table's rows always have one cell per column: new cells are added empty-ish, extra ones dropped. */
+function fitTable(data: ModuleInstance["data"]): ModuleInstance["data"] {
+  const n = ((data.columns as unknown[]) ?? []).length;
+  const rows = ((data.rows as { cells: string[] }[]) ?? []).map((r) => {
+    const cells = [...(r.cells ?? [])];
+    while (cells.length < n) cells.push("[Value]");
+    return cells.length === r.cells?.length ? r : { ...r, cells: cells.slice(0, n) };
+  });
+  return { ...data, rows };
+}
+
+function dropColumn(data: ModuleInstance["data"], index: number): ModuleInstance["data"] {
+  const rows = ((data.rows as { cells: string[] }[]) ?? []).map((r) => ({ ...r, cells: (r.cells ?? []).filter((_, i) => i !== index) }));
+  return { ...data, rows };
+}
+
 export const activePage = (s: Pick<BuilderState, "pages" | "activeId">) =>
   s.pages.find((p) => p.id === s.activeId) ?? null;
 
@@ -211,7 +227,8 @@ export const useBuilder = create<BuilderState>()(
           }
           if (s.seeded < SEED_VERSION) {
             // Existing browsers: add the examples that shipped since their last visit, leave their pages alone
-            const add = s.pages.some((p) => p.name.startsWith("Example — ST108")) ? [] : [exampleST108()];
+            // (Version 3: the ST108 example rebuilt to the client's feedback. An earlier copy stays beside it.)
+            const add = s.pages.some((p) => p.name.startsWith(ST108_NAME)) ? [] : [exampleST108()];
             set({ pages: [...s.pages, ...add], seeded: SEED_VERSION });
           }
           if (!get().activeId || !activePage(get())) set({ activeId: get().pages[0].id });
@@ -419,7 +436,8 @@ export const useBuilder = create<BuilderState>()(
               const group = MODULES[m.type].groups.find((g) => g.key === groupKey);
               const list = (getAt(m.data, groupKey) as unknown[]) ?? [];
               if (!group || list.length >= group.max) return m;
-              return { ...m, data: setAt(m.data, groupKey, [...list, group.make()]) };
+              const data = setAt(m.data, groupKey, [...list, group.make()]);
+              return { ...m, data: m.type === "compare" ? fitTable(data) : data };
             }),
           ),
 
@@ -431,7 +449,9 @@ export const useBuilder = create<BuilderState>()(
               const list = (getAt(m.data, groupKey) as unknown[]) ?? [];
               if (!group || list.length <= group.min) return m;
               const colors = remapColors(m.colors, groupKey, (i) => (i === index ? -1 : i > index ? i - 1 : i));
-              return { ...m, data: setAt(m.data, groupKey, list.filter((_, i) => i !== index)), colors };
+              // A table's column goes with its cells in every row
+              const base = m.type === "compare" && groupKey === "columns" ? dropColumn(m.data, index) : m.data;
+              return { ...m, data: setAt(base, groupKey, list.filter((_, i) => i !== index)), colors };
             }),
           ),
 

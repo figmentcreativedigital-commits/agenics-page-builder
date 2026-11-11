@@ -50,9 +50,10 @@ Built by Figment Creative for Agenics Labs. Follows the **Agenics Corporate Grap
 ## Worked examples
 
 - **Example — Dental Water**: the Product line recipe rebuilt from /dental-water.
-- **Example — ST108 (Affirm)**: every line of the 10.26 copy deck, built with the newer blocks (Explainer + list, Icon grid, Who it's for, Statement, Text + image), hidden elements, navy and cyan sections, in-page anchors and the client's photography. The kit-chooser block is an addition, with a note saying so.
+- **Example — ST108 (Affirm), rev 2**: every line of the 10.26 copy deck, built with the newer blocks (Explainer + list, Icon grid, Who it's for, Statement, Text + image), hidden elements, navy and cyan sections, in-page anchors and the client's photography. The kit-chooser block is an addition, with a note saying so. Rev 2 follows the client's feedback of Nov 10, 2026: tables for the three water categories, the routine monitoring standards and the testing frequencies (typed out as real tables), a qualification and steam testing callout, the sample report with turnaround and in range or out of range, and a route to a person from the FAQ.
 
-Both can be added again at any time from **Pages › New page › Start from a finished example**. Browsers that used an earlier version receive the ST108 example once, alongside their own pages.
+Both can be added again at any time from **Pages › New page › Start from a finished example**. Browsers that used an earlier version receive the current ST108 example once, alongside their own pages (an earlier copy of it stays).
+- **Tables.** The Table block holds up to ten rows and eight columns, with an optional intro, notes under the table and a button. It is a real HTML table, so search engines can read it, and it scrolls sideways on phones.
 
 ## Brand implementation
 
