@@ -51,11 +51,12 @@ _Squarespace: Centered text block plus 2–3 linked cards._
 - **Path line 2:** Send samples to our lab for counts you can document.
 - **Path link 2:** Compare lab tests → #compare
 
-## 4. M08 Comparison table
+## 4. M08 Table
 
 _Squarespace: Code block holding an HTML table, styled once in Custom CSS. Never a picture of a table._
 
 - Background: White (#FFFFFF) · Section link: #compare (set as the section's anchor ID)
+- Hidden (leave out of the build): Intro, Notes under the table, Button
 
 - **H2:** Compare dental water tests
 - **Column heading 1:** Test
@@ -198,7 +199,7 @@ _Squarespace: Navy section with the wave divider. One primary button._
 ## Open items
 
 - Check: Hero (block 1): Hero image needs an image (16:9).
-- Check: Comparison table (block 4): 5 [bracketed] placeholders to replace.
+- Check: Table (block 4): 5 [bracketed] placeholders to replace.
 - Check: Product cards (block 5): "Flow cytometry guide" has no link.
 - Check: Product cards (block 5): Product image needs an image (1:1).
 - Check: Product cards (block 5): "Shop StandardCheck" has no link.
