@@ -76,6 +76,8 @@ const P: Record<string, ReactElement> = {
   link: <path d="M8.5 11.5a3.5 3.5 0 0 0 5 0l2.5-2.5a3.5 3.5 0 0 0-5-5l-.8.8M11.5 8.5a3.5 3.5 0 0 0-5 0L4 11a3.5 3.5 0 0 0 5 5l.8-.8" />,
   download: <path d="M10 3.5v9M6 9l4 4 4-4M4 16.5h12" />,
   check: <path d="M4.5 10.5 8.5 14.5 15.5 6" />,
+  sound: <path d="M3.5 8v4h3l4 3.5v-11l-4 3.5ZM13.5 7.5a3.5 3.5 0 0 1 0 5M15.5 5.5a6.5 6.5 0 0 1 0 9" />,
+  soundOff: <path d="M3.5 8v4h3l4 3.5v-11l-4 3.5ZM13.5 8l4 4M17.5 8l-4 4" />,
   bulb: <path d="M7.5 15.5h5M8.5 18h3M10 2.5a5 5 0 0 0-3 9c.6.5 1 1.2 1 2v.5h4v-.5c0-.8.4-1.5 1-2a5 5 0 0 0-3-9Z" />,
   chevronDown: <path d="M6 8l4 4 4-4" />,
   panelLeft: (

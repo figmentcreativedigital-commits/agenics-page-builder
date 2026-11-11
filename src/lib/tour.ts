@@ -47,7 +47,7 @@ export const TOUR: TourChapter[] = [
       {
         id: "welcome",
         title: "Welcome to the Page Builder",
-        body: "You build Agenics web pages here from approved blocks, so every page stays on brand. This tour shows you around in about two minutes. Use Next and Back or the arrow keys. Escape ends it, and the Tour button at the bottom left brings it back any time.",
+        body: "You build Agenics web pages here from approved blocks, so every page stays on brand. This tour shows you around in about two minutes, and the speaker at the top reads it aloud. Use Next and Back or the arrow keys. Escape ends it, and the Tour button at the bottom left brings it back any time.",
         setup: { select: "none", viewport: "desktop" },
         place: "center",
       },
@@ -66,6 +66,14 @@ export const TOUR: TourChapter[] = [
         place: "center",
       },
       {
+        id: "textbar",
+        target: ".pb-ctx",
+        title: "The bar above the page",
+        body: "While you type, this bar names the text you're in and counts it against its limit. In paragraphs it has bold, italic and link. Color offers the brand colors that read well on that background. Headlines keep the color the brand sets.",
+        keys: ["⌘B", "⌘I", "⌘K"],
+        setup: { select: "none" },
+      },
+      {
         id: "block",
         needsBlock: true,
         target: ".pb-frame.is-selected",
@@ -79,8 +87,8 @@ export const TOUR: TourChapter[] = [
         needsBlock: true,
         target: ".pb-frame.is-selected > .pb-frame__bar",
         title: "The block toolbar",
-        body: "Drag the handle to move the block, or use the arrows. Duplicate or delete it here too. The ⋯ menu copies the block, or saves it to My blocks so you can reuse it.",
-        keys: ["⌘D", "⌘C", "⌘V", "Delete"],
+        body: "Drag the handle to move the block, or use the arrows. Duplicate or delete it here too. The ⋯ menu copies the block, or saves it to My blocks so you can reuse it. Right-click a block for the same actions.",
+        keys: ["⌘D", "⌘C", "⌘V", "Delete", "⇧F10"],
         setup: { select: "first" },
       },
       {
@@ -92,14 +100,6 @@ export const TOUR: TourChapter[] = [
         setup: { select: "first" },
         place: "left",
       },
-      {
-        id: "insert",
-        needsBlock: true,
-        target: ['.pb-insert[data-index="1"] .pb-insert__btn', ".pb-insert .pb-insert__btn"],
-        title: "Add a block anywhere",
-        body: "Hover between two blocks and a + appears. Click it to pick a block for that spot.",
-        setup: { select: "none" },
-      },
     ],
   },
   {
@@ -110,7 +110,7 @@ export const TOUR: TourChapter[] = [
         id: "add",
         target: '[data-tour="panel"]',
         title: "Add",
-        body: "Every block, grouped by what it's for. Drag one onto the page, or click it to add it below the block you've selected. The panel then closes to give the page room. Blocks you save appear at the top under My blocks. Click an icon on this rail again to close its panel.",
+        body: "Every block, grouped by what it's for. Drag one onto the page, or click it to add it below the block you've selected. On the page, a + appears between two blocks to add one right there. The panel then closes to give the page room. Blocks you save appear at the top under My blocks. Click an icon on this rail again to close its panel.",
         setup: { tab: "add" },
         place: "right",
       },

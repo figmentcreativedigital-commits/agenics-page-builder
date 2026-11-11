@@ -12,7 +12,7 @@ Built by Figment Creative for Agenics Labs. Follows the **Agenics Corporate Grap
 
 ## Things you can do
 
-- **Take the guided tour.** It opens by itself the first time someone uses the builder in a browser, and any time from the **Tour** button at the foot of the left rail (or **Help › Take the guided tour**). Clicking Tour while it runs starts it again from the top. Eighteen short steps spotlight the page, the side panels and the top bar, with Next / Back, the arrow keys, a chapter menu, and Escape to leave. The script is plain text in `src/lib/tour.ts`; a step whose target isn't on screen is skipped, so changing the tool never breaks it.
+- **Take the guided tour.** It opens by itself the first time someone uses the builder in a browser, and any time from the **Tour** button at the foot of the left rail (or **Help › Take the guided tour**). Clicking Tour while it runs starts it again from the top. Eighteen short steps spotlight the page, the side panels and the top bar, with Next / Back, the arrow keys, a chapter menu, and Escape to leave. The speaker on each card turns on **Read aloud** (off by default, remembered in this browser). The script is plain text in `src/lib/tour.ts`; a step whose target isn't on screen is skipped, so changing the tool never breaks it.
 
 - **Format paragraphs.** Bold, italic and links inside any paragraph slot, from the bar above the page or with ⌘B, ⌘I and ⌘K. Links can point at a page, a file, a full address or a section of the same page. Headings and buttons stay plain, as the brand guide sets them.
 - **Drag on the page.** Grab a block by the handle in its toolbar to move it. Grab any card, point, question, list item or paragraph by its handle to reorder it inside the block (or focus the handle and use the arrow keys).
@@ -80,6 +80,7 @@ Both can be added again at any time from **Pages › New page › Start from a f
 | `src/lib/upgrade.ts` | Saved-page upgrades: pages from older versions of the builder open in today's form |
 | `qa/` | Quality checks: end-to-end, undo, old pages, export parity, view, design tips, speed, tour, accessibility and screenshot suites |
 | `src/lib/tour.ts`, `src/components/builder/Tour.tsx` | The guided tour: its script, and the spotlight that runs it |
+| `src/lib/narration.ts`, `src/lib/speech.ts`, `src/app/api/voice/` | Read aloud: what may be voiced, the player with its browser-voice fallback, and the server route that voices a card once and caches it |
 | `public/examples/` | Photography used by the worked examples |
 
 ## Saving and sharing
@@ -111,7 +112,7 @@ npm run qa -- undo typing  # some suites
 | `view` | Zoom and Fit (menu and keys, also while typing, kept after a reload), folding panels, focus mode, the floating left panel at 1,024 px, the text bar above the page, the block menu (right-click and ⇧F10, keys stay inside it), hover outlines, one shared Review count, old view settings |
 | `tips` | Every template and example starts with no design tips; the three tips, their cards, fixes, undo and Keep as is; text colors by background (never cyan on light); cut-outs; the brief and page file carry colors and image fit |
 | `typing` | Typing p75 under 50 ms on a 19-section page, no layout shift while typing, adding a section in about 120 ms |
-| `tour` | The tour opens once, every step has its target, the keys and the Tour button work |
+| `tour` | The tour opens once, every step has its target, the keys and the Tour button work; 18 steps or fewer; Read aloud turns on and is remembered; the narrator voices tour cards only |
 | `axe` | No accessibility violations beyond the known list in `qa/baseline/axe.json`, on every panel, menu and dialog, the share preview and the spec sheet |
 | `screens` | Screenshots at 1,280, 834 and 390 px in `qa/out/screens`, with nothing spilling out |
 
@@ -129,6 +130,7 @@ npm run build    # production build check
 2. For preview links: **Storage › Create › Blob**, connect it to this project (Vercel adds the access token), then redeploy. If you choose a private store, also add `BLOB_ACCESS=private`.
 3. Add environment variables (Settings › Environment Variables), then redeploy:
    - `NEXT_PUBLIC_ADOBE_FONTS_KIT_ID`: the Adobe Fonts web project ID with Neue Kabel
+   - `GOOGLE_TTS_API_KEY` (optional, the tour narrator): a Google Cloud key with the Text-to-Speech API on; the key the Figment Page Builder uses works. The tour's **Read aloud** then uses Google's Chirp 3 HD voices (Charon by default), voiced on the server once per card and voice and cached across deploys. The whole tour is about 3,500 characters per voice. Only tour cards can be voiced, and the key never reaches the browser. Without the key, Read aloud uses the browser's own voice.
 4. In Adobe Fonts, add the Vercel domain (and any custom domain) to the web project.
 5. Every push to `main` deploys to production; every pull request gets its own preview URL.
 

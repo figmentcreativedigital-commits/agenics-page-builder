@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { activePage, useBuilder } from "@/lib/store";
+import { tourReading } from "@/lib/narration";
+import { loadNarrator, loadPrefs, narrator, savePrefs, speechSupported, type NarratorInfo, type ReadPrefs } from "@/lib/speech";
 import { TOUR, TOUR_STEPS, markTourSeen, type TourTab } from "@/lib/tour";
 import { Icon } from "./ui";
 
@@ -66,6 +68,25 @@ export function Tour({ tab, setTab, onClose }: { tab: TourTab; setTab: (t: TourT
   const returnFocus = useRef<HTMLElement | null>(null);
   const step = TOUR_STEPS[i];
   const last = i === TOUR_STEPS.length - 1;
+
+  /* Read aloud: off unless the visitor turns it on; remembered in this browser */
+  const [read, setRead] = useState<ReadPrefs>(() => (typeof window === "undefined" ? { on: false, voice: "" } : loadPrefs()));
+  const [voices, setVoices] = useState<NarratorInfo["voices"]>([]);
+  const [canRead] = useState(() => speechSupported());
+  useEffect(() => {
+    void loadNarrator().then((n) => setVoices(n.voices));
+    return () => narrator.stop();
+  }, []);
+  const readPrefs = (p: ReadPrefs) => {
+    setRead(p);
+    savePrefs(p);
+  };
+  // Each card is read once it is on screen (a step that gets skipped is never read)
+  useEffect(() => {
+    if (!read.on || pending) return;
+    const next = TOUR_STEPS[i + 1];
+    void narrator.say(tourReading(step), read.voice, next ? tourReading(next) : undefined);
+  }, [i, pending, read.on, read.voice, step]);
 
   useEffect(() => {
     startState.current = { tab, viewport: useBuilder.getState().viewport };
@@ -267,6 +288,21 @@ export function Tour({ tab, setTab, onClose }: { tab: TourTab; setTab: (t: TourT
               <path d="M2 3.5l3 3 3-3" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
+          {canRead || voices.length ? (
+            <button
+              type="button"
+              className="pb-tour__sound"
+              aria-pressed={read.on}
+              aria-label="Read aloud"
+              title={read.on ? "Stop reading the tour aloud" : "Read the tour aloud"}
+              onClick={() => {
+                if (read.on) narrator.stop();
+                readPrefs({ ...read, on: !read.on });
+              }}
+            >
+              <Icon name={read.on ? "sound" : "soundOff"} size={16} />
+            </button>
+          ) : null}
           <button type="button" className="pb-tour__x" aria-label="End the tour" title="End the tour (Esc)" onClick={() => end("skip")}>
             <Icon name="close" size={14} />
           </button>
@@ -300,6 +336,19 @@ export function Tour({ tab, setTab, onClose }: { tab: TourTab; setTab: (t: TourT
               <kbd key={k}>{k}</kbd>
             ))}
           </p>
+        ) : null}
+
+        {read.on && voices.length ? (
+          <label className="pb-tour__voice">
+            <span>Voice</span>
+            <select value={voices.some((v) => v.name === read.voice) ? read.voice : voices[0].name} onChange={(e) => readPrefs({ ...read, voice: e.target.value })}>
+              {voices.map((v) => (
+                <option key={v.name} value={v.name}>
+                  {v.name} · {v.trait}
+                </option>
+              ))}
+            </select>
+          </label>
         ) : null}
 
         <div className="pb-tour__foot">
