@@ -2945,3 +2945,42 @@ html[data-tour-step="insert"] .pb-insert[data-index="1"] .pb-insert__line {
   margin-left: auto;
   color: var(--ag-navy);
 }
+
+
+
+/* Read aloud: the speaker sits beside the close button; cyan-tinted while it reads */
+.pb-tour__sound {
+  display: inline-flex;
+  margin-left: auto;
+  margin-right: -6px;
+  padding: 4px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--ag-gray);
+  cursor: pointer;
+}
+.pb-tour__sound:hover {
+  background: var(--ag-silver-18);
+  color: var(--ag-navy);
+}
+.pb-tour__sound[aria-pressed="true"] {
+  background: var(--ag-cyan-12);
+  color: var(--ag-navy);
+}
+.pb-tour__voice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  color: var(--ag-gray);
+  font: 700 12px/1.2 var(--font-ui);
+}
+.pb-tour__voice select {
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--ag-silver);
+  background: var(--ag-white);
+  color: var(--ag-charcoal);
+  font: 600 12px/1.3 var(--font-ui);
+}

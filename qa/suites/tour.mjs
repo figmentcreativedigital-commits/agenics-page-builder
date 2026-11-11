@@ -1,5 +1,19 @@
 // The guided tour: opens the first time, every step has its target, keys work, Tour restarts it.
-import { TOUR_KEY, check, openBuilder, openPanel, startSuite } from "../lib.mjs";
+import { BASE, TOUR_KEY, check, openBuilder, openPanel, startSuite } from "../lib.mjs";
+
+/** The narrator's key for a passage (cyrb53, base 36), as lib/speech-text makes it. */
+function speechKey(str) {
+  let h1 = 0xdeadbeef;
+  let h2 = 0x41c6ce57;
+  for (let i = 0; i < str.length; i++) {
+    const ch = str.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
+}
 
 export default async function tour(browser) {
   startSuite("Guided tour");
@@ -7,6 +21,26 @@ export default async function tour(browser) {
   const opened = await page.waitForSelector(".pb-tour__card", { timeout: 8000 }).then(() => true).catch(() => false);
   check("The tour opens by itself the first time", opened);
   if (!opened) return ctx.close();
+
+  // Read aloud: off at first, one click turns it on, and the choice is kept
+  const first = `${await page.locator(".pb-tour__card h3").innerText()}. ${await page.locator(".pb-tour__body").innerText()}`;
+  const sound = page.locator(".pb-tour__sound");
+  const offAtFirst = (await sound.getAttribute("aria-pressed")) === "false";
+  await sound.click();
+  const on = (await sound.getAttribute("aria-pressed")) === "true";
+  const kept = await page.evaluate(() => JSON.parse(localStorage.getItem("agenics-page-builder:read-aloud") ?? "{}"));
+  await sound.click();
+  check("Read aloud is off until asked for, turns on with the speaker, and is remembered", offAtFirst && on && kept.on === true && (await sound.getAttribute("aria-pressed")) === "false", JSON.stringify(kept));
+
+  // The narrator: only tour cards can be voiced, and without the key the browser's voice reads
+  const status = await fetch(`${BASE}/api/voice/status`).then((r) => r.json());
+  const card = await fetch(`${BASE}/api/voice/${speechKey(first.replace(/\s+/g, " ").trim())}?v=Charon`);
+  const other = await fetch(`${BASE}/api/voice/abc123?v=Charon`);
+  check(
+    "The narrator voices tour cards only, with Charon as the voice, and stays off without its key",
+    status.default === "Charon" && status.enabled === false && card.status === 503 && other.status === 404,
+    `status ${JSON.stringify(status)}, a tour card ${card.status}, anything else ${other.status}`,
+  );
 
   const titles = [];
   const problems = [];
@@ -32,6 +66,11 @@ export default async function tour(browser) {
   }
   await page.waitForTimeout(300);
   check("Every step shows, with its card on screen and clear of its target", titles.length >= 15 && !problems.length, problems[0] ?? `${titles.length} steps`);
+  check(
+    "The tour is 18 steps or fewer and covers the text bar, the View menu and design tips",
+    titles.length <= 18 && titles.includes("The bar above the page") && titles.includes("Zoom, guides and focus") && titles.length === new Set(titles).size,
+    `${titles.length} steps`,
+  );
   check("Finish closes the tour and remembers it", (await page.locator(".pb-tour").count()) === 0 && (await page.evaluate((k) => localStorage.getItem(k), TOUR_KEY)) === "seen");
 
   await page.reload();
