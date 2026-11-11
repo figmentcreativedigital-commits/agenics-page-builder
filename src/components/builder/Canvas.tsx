@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { measure } from "@/lib/checks";
-import { SCREEN_LABEL, fitScreen, fitStyle, useRoom } from "@/lib/devices";
+import { SCREEN_LABEL, fitScreen, fitStyle, fitZoom, useRoom } from "@/lib/devices";
 import { MODULES } from "@/lib/modules";
 import { getAt } from "@/lib/path";
 import { plainText } from "@/lib/richtext";
@@ -67,6 +67,8 @@ function FrameBar({ mod, index, total }: { mod: ModuleInstance; index: number; t
   const move = useBuilder((s) => s.moveModule);
   const dup = useBuilder((s) => s.duplicateModule);
   const remove = useBuilder((s) => s.removeModule);
+  const settingsHidden = useBuilder((s) => s.focusMode || !s.panels.right);
+  const setPanel = useBuilder((s) => s.setPanel);
   const stop = (fn: () => void) => (e: React.MouseEvent) => {
     e.stopPropagation();
     fn();
@@ -114,6 +116,11 @@ function FrameBar({ mod, index, total }: { mod: ModuleInstance; index: number; t
       <button type="button" title="Delete (Delete key)" aria-label="Delete block" onClick={stop(() => remove(mod.uid))}>
         <Icon name="trash" size={16} />
       </button>
+      {settingsHidden ? (
+        <button type="button" title="Settings for this block" aria-label="Show settings" onClick={stop(() => setPanel("right", true))}>
+          <Icon name="settings" size={16} />
+        </button>
+      ) : null}
       <MoreMenu mod={mod} index={index} />
     </div>
   );
@@ -130,8 +137,13 @@ function MoreMenu({ mod, index }: { mod: ModuleInstance; index: number }) {
     const onDoc = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
     document.addEventListener("mousedown", onDoc);
-    return () => document.removeEventListener("mousedown", onDoc);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDoc);
+      document.removeEventListener("keydown", onKey);
+    };
   }, [open]);
   const run = (fn: () => void) => (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -157,6 +169,104 @@ function MoreMenu({ mod, index }: { mod: ModuleInstance; index: number }) {
         </span>
       ) : null}
     </span>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Right-click (or ⇧F10) on a block: the block toolbar's actions        */
+/* ------------------------------------------------------------------ */
+
+type MenuAt = { uid: string; x: number; y: number };
+
+function BlockMenu({ at, onClose }: { at: MenuAt; onClose: () => void }) {
+  const page = useBuilder((s) => activePage(s));
+  const s = useBuilder.getState();
+  const ref = useRef<HTMLDivElement>(null);
+  const [pos, setPos] = useState({ left: at.x, top: at.y });
+  const index = page?.modules.findIndex((m) => m.uid === at.uid) ?? -1;
+  const total = page?.modules.length ?? 0;
+
+  // Keep the menu on screen, focus its first item, and close on Escape or a click elsewhere
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    setPos({ left: Math.max(8, Math.min(at.x, window.innerWidth - r.width - 8)), top: Math.max(8, Math.min(at.y, window.innerHeight - r.height - 8)) });
+    el.querySelector<HTMLButtonElement>("button:not(:disabled)")?.focus();
+  }, [at]);
+  useEffect(() => {
+    const onDoc = (e: MouseEvent) => !ref.current?.contains(e.target as Node) && onClose();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.stopPropagation();
+        onClose();
+      } else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+        // The arrows move through the menu, not between blocks
+        e.preventDefault();
+        e.stopPropagation();
+        const items = Array.from(ref.current?.querySelectorAll<HTMLButtonElement>("button:not(:disabled)") ?? []);
+        const i = items.indexOf(document.activeElement as HTMLButtonElement);
+        items[(i + (e.key === "ArrowDown" ? 1 : -1) + items.length) % items.length]?.focus();
+      } else if (e.key === "Tab") {
+        onClose();
+      }
+    };
+    document.addEventListener("mousedown", onDoc);
+    document.addEventListener("keydown", onKey, true);
+    // Closes when the person scrolls or resizes (not on the scroll that selecting a block may cause)
+    window.addEventListener("wheel", onClose, { passive: true });
+    window.addEventListener("resize", onClose);
+    return () => {
+      document.removeEventListener("mousedown", onDoc);
+      document.removeEventListener("keydown", onKey, true);
+      window.removeEventListener("wheel", onClose);
+      window.removeEventListener("resize", onClose);
+    };
+  }, [onClose]);
+
+  if (index < 0) return null;
+  const meta = MODULES[page!.modules[index].type];
+  const run = (fn: () => void) => () => {
+    onClose();
+    fn();
+  };
+  return (
+    <div ref={ref} className="pb-ctxmenu" role="menu" aria-label={`${meta.name} actions`} style={pos}>
+      <p aria-hidden="true">{meta.name}</p>
+      <button type="button" role="menuitem" disabled={index === 0} onClick={run(() => s.moveModule(at.uid, -1))}>
+        <Icon name="up" size={16} /> Move up <kbd>⌥↑</kbd>
+      </button>
+      <button type="button" role="menuitem" disabled={index === total - 1} onClick={run(() => s.moveModule(at.uid, 1))}>
+        <Icon name="down" size={16} /> Move down <kbd>⌥↓</kbd>
+      </button>
+      <button type="button" role="menuitem" onClick={run(() => s.duplicateModule(at.uid))}>
+        <Icon name="copy" size={16} /> Duplicate <kbd>⌘D</kbd>
+      </button>
+      <hr />
+      <button type="button" role="menuitem" onClick={run(() => s.copyBlock(at.uid))}>
+        <Icon name="copy" size={16} /> Copy block <kbd>⌘C</kbd>
+      </button>
+      <button type="button" role="menuitem" onClick={run(() => s.pasteBlock(index + 1))}>
+        <Icon name="plus" size={16} /> Paste below <kbd>⌘V</kbd>
+      </button>
+      <button type="button" role="menuitem" onClick={run(() => s.saveBlock(at.uid))}>
+        <Icon name="add" size={16} /> Save to My blocks
+      </button>
+      <button
+        type="button"
+        role="menuitem"
+        onClick={run(() => {
+          s.select(at.uid);
+          s.setPanel("right", true);
+        })}
+      >
+        <Icon name="settings" size={16} /> Settings
+      </button>
+      <hr />
+      <button type="button" role="menuitem" className="is-danger" onClick={run(() => s.removeModule(at.uid))}>
+        <Icon name="trash" size={16} /> Delete <kbd>Delete</kbd>
+      </button>
+    </div>
   );
 }
 
@@ -316,39 +426,27 @@ function FormatTools({ uid, path }: { uid: string; path: string }) {
   );
 }
 
-function ElementBar() {
+/**
+ * The bar above the page. While you type it shows what you are editing, how much room is
+ * left and the formatting buttons; otherwise the screen size. It never sits on the page,
+ * so it never covers text.
+ */
+function ContextBar({ caption }: { caption: string }) {
   const focus = useBuilder((s) => s.focus);
   const page = useBuilder((s) => activePage(s));
   const setElement = useBuilder((s) => s.setElement);
-  const bar = useRef<HTMLDivElement>(null);
+  const mod = focus ? page?.modules.find((m) => m.uid === focus.uid) : undefined;
 
-  useEffect(() => {
-    if (!focus) return;
-    let raf = 0;
-    const tick = () => {
-      const el = slotEl(focus.uid, focus.path);
-      const b = bar.current;
-      if (el && b) {
-        const r = el.getBoundingClientRect();
-        const left = Math.max(8, Math.min(r.left, window.innerWidth - b.offsetWidth - 8));
-        let top = r.top - b.offsetHeight - 8;
-        // Below the text when there is no room above it, or when the block's own toolbar is in the way
-        const fb = document.querySelector(`#mod-${focus.uid} > .pb-frame__bar`)?.getBoundingClientRect();
-        const hitsBar = !!fb && fb.height > 0 && top < fb.bottom && top + b.offsetHeight > fb.top && left < fb.right && left + b.offsetWidth > fb.left;
-        if (top < 64 || hitsBar) top = r.bottom + 8;
-        b.style.top = `${top}px`;
-        b.style.left = `${left}px`;
-        b.style.opacity = "1";
-      }
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [focus]);
-
-  if (!focus || !page) return null;
-  const mod = page.modules.find((m) => m.uid === focus.uid);
-  if (!mod) return null;
+  if (!focus || !mod) {
+    return (
+      <div className="pb-ctx">
+        <p className="pb-ctx__cap">
+          {caption}
+          <span> · Click any text on the page to change it</span>
+        </p>
+      </div>
+    );
+  }
   const spec = specFor(mod.type, focus.path);
   const value = String(getAt(mod.data, focus.path) ?? "");
   const r = measure(spec?.rich ? plainText(value) : value, spec?.limit);
@@ -356,27 +454,29 @@ function ElementBar() {
   const isButton = focus.path.endsWith(".label");
 
   return (
-    <div ref={bar} className="pb-elbar" role="toolbar" aria-label="Text tools" style={{ opacity: 0 }}>
-      <b>{isButton ? `${spec?.label ?? "Button"} text` : spec?.label ?? "Text"}</b>
-      {r ? (
-        <span className={r.over ? "is-over" : ""}>
-          {r.over ? `${r.used - r.max} over · ` : ""}
-          {r.used}/{r.max} {r.unit}
-        </span>
-      ) : null}
-      {spec?.rich ? <FormatTools key={`${focus.uid}:${focus.path}`} uid={focus.uid} path={focus.path} /> : null}
-      {el ? (
-        <button
-          type="button"
-          onMouseDown={(e) => e.preventDefault()}
-          onClick={() => {
-            (document.activeElement as HTMLElement | null)?.blur();
-            setElement(mod.uid, el.id, false);
-          }}
-        >
-          <Icon name="eyeOff" size={14} /> Remove {el.label.toLowerCase()}
-        </button>
-      ) : null}
+    <div className="pb-ctx">
+      <div className="pb-elbar" role="toolbar" aria-label="Text tools">
+        <b>{isButton ? `${spec?.label ?? "Button"} text` : spec?.label ?? "Text"}</b>
+        {r ? (
+          <span className={`pb-elbar__count ${r.over ? "is-over" : ""}`} aria-live="polite">
+            {r.over ? `${r.used - r.max} over · ` : ""}
+            {r.used}/{r.max} {r.unit}
+          </span>
+        ) : null}
+        {spec?.rich ? <FormatTools key={`${focus.uid}:${focus.path}`} uid={focus.uid} path={focus.path} /> : null}
+        {el ? (
+          <button
+            type="button"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => {
+              (document.activeElement as HTMLElement | null)?.blur();
+              setElement(mod.uid, el.id, false);
+            }}
+          >
+            <Icon name="eyeOff" size={14} /> Remove {el.label.toLowerCase()}
+          </button>
+        ) : null}
+      </div>
     </div>
   );
 }
@@ -392,6 +492,11 @@ export function Canvas() {
   const preview = useBuilder((s) => s.preview);
   const selected = useBuilder((s) => s.selectedUid);
   const select = useBuilder((s) => s.select);
+  const zoom = useBuilder((s) => s.zoom);
+  const focusMode = useBuilder((s) => s.focusMode);
+  const setFocusMode = useBuilder((s) => s.setFocusMode);
+  const setShownZoom = useBuilder((s) => s.setShownZoom);
+  const setPanel = useBuilder((s) => s.setPanel);
   const add = useBuilder((s) => s.addModule);
   const moveTo = useBuilder((s) => s.moveTo);
   const insertSaved = useBuilder((s) => s.insertSaved);
@@ -400,11 +505,54 @@ export function Canvas() {
   const canvas = useRef<HTMLDivElement>(null);
   const room = useRoom(canvas);
   // Full-screen preview: desktop fills the window, as a visitor's browser would
-  const fit = fitScreen(viewport, room, preview ? { desktopMax: Infinity } : undefined);
+  const fit = preview ? fitScreen(viewport, room, { desktopMax: Infinity }) : fitZoom(viewport, room, zoom);
   const [drop, setDrop] = useState<number | null>(null);
   const [dropMove, setDropMove] = useState(false);
+  const [menu, setMenu] = useState<MenuAt | null>(null);
+  /** Whether the right-click landed in text that was already being typed in. */
+  const typingAtRightClick = useRef(false);
 
-  if (!page) return <div ref={canvas} className="pb-canvas" />;
+  // The View menu button shows the zoom on screen
+  useEffect(() => {
+    if (room) setShownZoom(fit.zoom);
+  }, [fit.zoom, room, setShownZoom]);
+
+  // Zooming keeps the middle of the view on the same part of the page
+  const lastZoom = useRef(fit.zoom);
+  useLayoutEffect(() => {
+    const el = canvas.current;
+    const before = lastZoom.current;
+    lastZoom.current = fit.zoom;
+    if (!el || before === fit.zoom || !before) return;
+    const k = fit.zoom / before;
+    const mid = el.scrollTop + el.clientHeight / 2;
+    el.scrollTop = Math.max(0, mid * k - el.clientHeight / 2);
+    el.scrollLeft = Math.max(0, (el.scrollWidth - el.clientWidth) / 2);
+  }, [fit.zoom]);
+
+  // ⇧F10 or the context-menu key opens the selected block's actions, as a right-click does
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const s = useBuilder.getState();
+      const t = e.target as HTMLElement;
+      if (t.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(t.tagName) || s.preview || !s.selectedUid) return;
+      if (document.querySelector(".pb-modal")) return;
+      if ((e.shiftKey && e.key === "F10") || e.key === "ContextMenu") {
+        e.preventDefault();
+        const r = document.getElementById(`mod-${s.selectedUid}`)?.getBoundingClientRect();
+        if (r) setMenu({ uid: s.selectedUid, x: Math.max(8, r.left + 16), y: Math.max(64, r.top + 16) });
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  if (!page)
+    return (
+      <section className="pb-canvaswrap" aria-label="Page">
+        <div ref={canvas} className="pb-canvas" />
+      </section>
+    );
   const total = page.modules.length;
 
   const dropIndex = (y: number) => {
@@ -467,71 +615,97 @@ export function Canvas() {
           if (!moving && !t) return;
           e.preventDefault();
           if (moving) moveTo(moving, dropIndex(e.clientY));
-          else if (t.startsWith("saved:")) insertSaved(t.slice(6), dropIndex(e.clientY));
-          else add(t as ModuleType, dropIndex(e.clientY));
+          else {
+            if (t.startsWith("saved:")) insertSaved(t.slice(6), dropIndex(e.clientY));
+            else add(t as ModuleType, dropIndex(e.clientY));
+            // Dragged in from the Add panel: fold the panel away to give the page room
+            setPanel("left", false);
+          }
           setDrop(null);
         },
       };
 
   return (
-    <div
-      ref={canvas}
-      className="pb-canvas"
-      data-tour="canvas"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) select(null);
-      }}
-    >
-      {!preview && room ? (
-        <p className="pb-stagecap" style={{ width: Math.round(fit.width * fit.zoom) }}>
-          {SCREEN_LABEL[viewport]} · {fit.width} px
-          {fit.zoom < 0.995 ? <span> · shown at {Math.round(fit.zoom * 100)}%</span> : null}
-        </p>
-      ) : null}
-      <div ref={stage} className={`pb-stage pb-stage--${viewport}`} style={fitStyle(fit)} {...dragProps}>
-        <PageRenderer
-          page={page}
-          editing={!preview}
-          specs={showSpecs}
-          globalWrap={(kind, node) =>
-            preview ? (
-              node
-            ) : (
-              <div className={`pb-global pb-global--${kind}`} onClick={() => select(null)}>
-                <span className="pb-global__tag">Site {kind} · same on every page</span>
-                {node}
-              </div>
-            )
-          }
-          wrap={(mod, index, node) =>
-            preview ? (
-              <div key={mod.uid}>{node}</div>
-            ) : (
-              <div key={mod.uid}>
-                <InsertPoint index={index} active={drop === index} moving={dropMove} />
-                <div
-                  id={`mod-${mod.uid}`}
-                  className={`pb-frame ${selected === mod.uid ? "is-selected" : ""}`}
-                  onClickCapture={() => selected !== mod.uid && select(mod.uid)}
-                >
-                  <FrameBar mod={mod} index={index} total={total} />
+    <section className="pb-canvaswrap" aria-label="Page">
+      {!preview ? <ContextBar caption={`${SCREEN_LABEL[viewport]} · ${fit.width} px wide`} /> : null}
+      <div
+        ref={canvas}
+        className="pb-canvas"
+        data-tour="canvas"
+        onMouseDown={() => {
+          // On small laptops the left panel floats over the page: working on the page puts it away
+          if (useBuilder.getState().panels.left && window.matchMedia("(min-width: 961px) and (max-width: 1200px)").matches) setPanel("left", false);
+        }}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) select(null);
+        }}
+      >
+        <div ref={stage} className={`pb-stage pb-stage--${viewport}`} style={fitStyle(fit)} {...dragProps}>
+          <PageRenderer
+            page={page}
+            editing={!preview}
+            specs={showSpecs}
+            globalWrap={(kind, node) =>
+              preview ? (
+                node
+              ) : (
+                <div className={`pb-global pb-global--${kind}`} onClick={() => select(null)}>
+                  <span className="pb-global__tag">Site {kind} · same on every page</span>
                   {node}
-                  <NoteBadge mod={mod} />
                 </div>
-                {index === total - 1 ? <InsertPoint index={total} active={drop === total} moving={dropMove} /> : null}
-              </div>
-            )
-          }
-        />
-        {!preview && total === 0 ? (
-          <div className={`pb-empty ${drop !== null ? "is-drop" : ""}`}>
-            <h2>Start with a block</h2>
-            <p>Drag one in from the left, or pick one here. Most pages open with a Hero.</p>
-            <BlockPicker compact search={false} onPick={(t) => add(t, 0)} />
-          </div>
-        ) : null}
+              )
+            }
+            wrap={(mod, index, node) =>
+              preview ? (
+                <div key={mod.uid}>{node}</div>
+              ) : (
+                <div key={mod.uid}>
+                  <InsertPoint index={index} active={drop === index} moving={dropMove} />
+                  <div
+                    id={`mod-${mod.uid}`}
+                    className={`pb-frame ${selected === mod.uid ? "is-selected" : ""}`}
+                    onClickCapture={() => selected !== mod.uid && select(mod.uid)}
+                    onMouseDownCapture={(e) => {
+                      if (e.button === 2) {
+                        const t = e.target as HTMLElement;
+                        typingAtRightClick.current = t.isContentEditable && !!document.activeElement && t.contains(document.activeElement);
+                      }
+                    }}
+                    onContextMenu={(e) => {
+                      // While typing in a piece of text, keep the browser's own menu (spelling, paste)
+                      if (typingAtRightClick.current) return;
+                      e.preventDefault();
+                      // A right-click focuses text it lands on; this is not the start of typing
+                      const t = e.target as HTMLElement;
+                      if (t.isContentEditable) (document.activeElement as HTMLElement | null)?.blur();
+                      if (selected !== mod.uid) select(mod.uid);
+                      setMenu({ uid: mod.uid, x: e.clientX, y: e.clientY });
+                    }}
+                  >
+                    <FrameBar mod={mod} index={index} total={total} />
+                    {node}
+                    <NoteBadge mod={mod} />
+                  </div>
+                  {index === total - 1 ? <InsertPoint index={total} active={drop === total} moving={dropMove} /> : null}
+                </div>
+              )
+            }
+          />
+          {!preview && total === 0 ? (
+            <div className={`pb-empty ${drop !== null ? "is-drop" : ""}`}>
+              <h2>Start with a block</h2>
+              <p>Drag one in from the left, or pick one here. Most pages open with a Hero.</p>
+              <BlockPicker compact search={false} onPick={(t) => add(t, 0)} />
+            </div>
+          ) : null}
+        </div>
       </div>
-      {!preview ? <ElementBar /> : null}
-    </div>
+      {menu && !preview ? <BlockMenu at={menu} onClose={() => setMenu(null)} /> : null}
+      {focusMode && !preview ? (
+        <button type="button" className="pb-focusexit" onClick={() => setFocusMode(false)} title={"Show the side panels again (⌘\\)"}>
+          <Icon name="expand" size={16} /> Exit focus mode <kbd>{"⌘\\"}</kbd>
+        </button>
+      ) : null}
+    </section>
   );
 }

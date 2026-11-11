@@ -4,7 +4,7 @@ import { DndContext, PointerSensor, KeyboardSensor, closestCenter, useSensor, us
 import { SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { checkPage, effectiveBg } from "@/lib/checks";
+import { checkPage, effectiveBg, leftToDo } from "@/lib/checks";
 import { MODULES } from "@/lib/modules";
 import { listVersions, onVersionsChange, saveVersion, type Version } from "@/lib/history";
 import { EXAMPLES, RECIPES } from "@/lib/recipes";
@@ -61,11 +61,17 @@ function MyBlocks() {
 
 function AddTab() {
   const add = useBuilder((s) => s.addModule);
+  const setPanel = useBuilder((s) => s.setPanel);
   return (
     <div className="pb-panel">
-      <p className="pb-hint">Drag a block onto the page, or click to add it below the selected block.</p>
+      <p className="pb-hint">Drag a block onto the page, or click to add it below the selected block. The panel closes to give the page room.</p>
       <MyBlocks />
-      <BlockPicker onPick={(t) => add(t)} />
+      <BlockPicker
+        onPick={(t) => {
+          add(t);
+          setPanel("left", false);
+        }}
+      />
     </div>
   );
 }
@@ -325,7 +331,7 @@ function ReviewTab() {
         </div>
       ) : (
         <div className={`pb-score ${errors.length ? "pb-score--err" : ""}`}>
-          <b>{errors.length ? `${errors.length} to fix` : blocks.length ? `${blocks.length} block${blocks.length === 1 ? "" : "s"} to finish` : "Almost there"}</b>
+          <b>{errors.length ? `${errors.length} to fix` : `${leftToDo(issues).todo} to finish`}</b>
           <span>Click an item to jump to it</span>
         </div>
       )}
@@ -512,8 +518,11 @@ export function LeftPanel({
   touring?: boolean;
 }) {
   const page = useBuilder((s) => activePage(s));
+  const open = useBuilder((s) => s.panels.left && !s.focusMode);
+  const setPanel = useBuilder((s) => s.setPanel);
   const issues = useMemo(() => (page ? checkPage(page) : []), [page]);
-  const errors = issues.filter((i) => i.level === "error").length;
+  const { errors, todo } = leftToDo(issues);
+  const title = (t: Tab) => (t === "add" ? "Add a block" : t === "layers" ? "Page layers" : t === "pages" ? "Your pages" : t === "review" ? "Review" : "Version history");
   const tabs: { id: Tab; label: string; icon: string }[] = [
     { id: "add", label: "Add", icon: "add" },
     { id: "layers", label: "Layers", icon: "layers" },
@@ -525,12 +534,25 @@ export function LeftPanel({
     <>
       <nav className="pb-rail" aria-label="Builder">
         {tabs.map((t) => (
-          <button key={t.id} type="button" aria-pressed={tab === t.id} onClick={() => setTab(t.id)}>
+          <button
+            key={t.id}
+            type="button"
+            aria-pressed={open && tab === t.id}
+            aria-controls={open ? "pb-panel" : undefined}
+            title={open && tab === t.id ? `Close ${t.label}` : title(t.id)}
+            onClick={() => {
+              // The open tab's own button folds the panel away; any other opens it
+              if (open && tab === t.id) setPanel("left", false);
+              else {
+                setTab(t.id);
+                setPanel("left", true);
+              }
+            }}
+          >
             <Icon name={t.icon} size={20} />
             <span>{t.label}</span>
-            {t.id === "review" && issues.length ? (
-              <i className={`pb-rail__badge ${errors ? "is-err" : ""}`}>{errors || new Set(issues.map((i) => i.moduleUid ?? "page")).size}</i>
-            ) : null}
+            {/* The same number the top bar shows */}
+            {t.id === "review" && issues.length ? <i className={`pb-rail__badge ${errors ? "is-err" : ""}`}>{errors || todo}</i> : null}
           </button>
         ))}
         {/* Always here, for anyone who wants the walkthrough again */}
@@ -546,16 +568,21 @@ export function LeftPanel({
           <span>Tour</span>
         </button>
       </nav>
-      <aside className="pb-left" data-tour="panel" aria-label={tabs.find((t) => t.id === tab)?.label}>
-        <h2 className="pb-left__title">
-          {tab === "add" ? "Add a block" : tab === "layers" ? "Page layers" : tab === "pages" ? "Your pages" : tab === "review" ? "Review" : "Version history"}
-        </h2>
-        {tab === "add" ? <AddTab /> : null}
-        {tab === "layers" ? <LayersTab /> : null}
-        {tab === "pages" ? <PagesTab onNew={onNewPage} /> : null}
-        {tab === "review" ? <ReviewTab /> : null}
-        {tab === "history" ? <HistoryTab /> : null}
-      </aside>
+      {open ? (
+        <aside id="pb-panel" className="pb-left" data-tour="panel" aria-label={tabs.find((t) => t.id === tab)?.label}>
+          <div className="pb-left__title">
+            <h2>{title(tab)}</h2>
+            <button type="button" className="pb-panelx" aria-label="Hide panel" title="Hide panel" onClick={() => setPanel("left", false)}>
+              <Icon name="panelLeft" size={18} />
+            </button>
+          </div>
+          {tab === "add" ? <AddTab /> : null}
+          {tab === "layers" ? <LayersTab /> : null}
+          {tab === "pages" ? <PagesTab onNew={onNewPage} /> : null}
+          {tab === "review" ? <ReviewTab /> : null}
+          {tab === "history" ? <HistoryTab /> : null}
+        </aside>
+      ) : null}
     </>
   );
 }

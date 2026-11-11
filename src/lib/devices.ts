@@ -39,6 +39,26 @@ export function fitScreen(viewport: Viewport, room: number, { desktopMax = SCREE
 
 const round = (z: number) => Math.max(0.2, Math.floor(z * 1000) / 1000);
 
+/** "fit" scales the page to the space on screen; a number shows it at that share of actual size. */
+export type Zoom = "fit" | number;
+
+/** The fixed zoom levels, smallest first. ⌘+ and ⌘− step through them; 100% is the most. */
+export const ZOOM_STEPS = [0.25, 0.33, 0.5, 0.67, 0.75, 0.9, 1] as const;
+
+/** The page at a chosen zoom: laid out at its real width (desktop 1280 to 1440 px), scrolled if wider than the space. */
+export function fitZoom(viewport: Viewport, room: number, zoom: Zoom): Fit {
+  if (zoom === "fit") return fitScreen(viewport, room);
+  if (viewport !== "desktop") return { width: SCREEN[viewport], zoom };
+  const width = room ? Math.round(Math.min(SCREEN.desktopMax, Math.max(SCREEN.desktop, room / zoom))) : SCREEN.desktop;
+  return { width, zoom };
+}
+
+/** The next zoom level up or down from what is on screen now (which may be a fitted, in-between value). */
+export function stepZoom(current: number, dir: 1 | -1): number {
+  if (dir > 0) return ZOOM_STEPS.find((z) => z > current + 0.005) ?? 1;
+  return [...ZOOM_STEPS].reverse().find((z) => z < current - 0.005) ?? ZOOM_STEPS[0];
+}
+
 /** Style for the element the page is drawn in. `--pb-unzoom` lets editing tools inside it stay full size. */
 export function fitStyle(fit: Fit): CSSProperties {
   return { width: fit.width, zoom: fit.zoom, ["--pb-unzoom" as string]: String(round4(1 / fit.zoom)) };

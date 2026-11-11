@@ -75,6 +75,27 @@ const P: Record<string, ReactElement> = {
   note: <path d="M4 3.5h12v9l-4 4H4zM12 16.5v-4h4" />,
   link: <path d="M8.5 11.5a3.5 3.5 0 0 0 5 0l2.5-2.5a3.5 3.5 0 0 0-5-5l-.8.8M11.5 8.5a3.5 3.5 0 0 0-5 0L4 11a3.5 3.5 0 0 0 5 5l.8-.8" />,
   download: <path d="M10 3.5v9M6 9l4 4 4-4M4 16.5h12" />,
+  check: <path d="M4.5 10.5 8.5 14.5 15.5 6" />,
+  chevronDown: <path d="M6 8l4 4 4-4" />,
+  panelLeft: (
+    <>
+      <rect x="3" y="3.5" width="14" height="13" rx="2" />
+      <path d="M8 3.5v13M12.5 8 10.5 10l2 2" />
+    </>
+  ),
+  panelRight: (
+    <>
+      <rect x="3" y="3.5" width="14" height="13" rx="2" />
+      <path d="M12 3.5v13M7.5 8 9.5 10l-2 2" />
+    </>
+  ),
+  expand: <path d="M3.5 7.5v-4h4M16.5 7.5v-4h-4M3.5 12.5v4h4M16.5 12.5v4h-4" />,
+  settings: (
+    <>
+      <circle cx="10" cy="10" r="2.6" />
+      <path d="M10 2.5v2M10 15.5v2M2.5 10h2M15.5 10h2M4.7 4.7l1.4 1.4M13.9 13.9l1.4 1.4M4.7 15.3l1.4-1.4M13.9 6.1l1.4-1.4" />
+    </>
+  ),
   grid: (
     <>
       <rect x="3" y="3" width="6" height="6" rx="1" />

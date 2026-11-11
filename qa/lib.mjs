@@ -85,7 +85,10 @@ export async function activeDoc(page) {
 }
 
 export async function openPanel(page, label) {
-  await page.locator(".pb-rail button", { hasText: label }).first().click();
+  const btn = page.locator(".pb-rail button", { hasText: label }).first();
+  // The open tab's own button folds its panel away, so only click a tab that isn't open
+  if ((await btn.getAttribute("aria-pressed")) === "true") return;
+  await btn.click();
   await page.waitForTimeout(150);
 }
 

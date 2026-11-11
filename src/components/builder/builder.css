@@ -13,16 +13,34 @@
   --pb-amber-line: #e8c46a;
   --pb-amber-ink: #6b4200;
   --pb-red: #c62828;
+  /* Column widths; the panel classes below fold them away */
+  --pb-rail-w: 72px;
+  --pb-left-w: 280px;
+  --pb-right-w: 320px;
   height: 100vh;
   display: grid;
   grid-template-rows: 56px minmax(0, 1fr);
-  grid-template-columns: 72px 280px minmax(0, 1fr) 320px;
+  grid-template-columns: var(--pb-rail-w) var(--pb-left-w) minmax(0, 1fr) var(--pb-right-w);
   grid-template-areas:
     "top top top top"
     "rail left canvas right";
   background: var(--pb-canvas);
   font-size: 14px;
   color: var(--ag-charcoal);
+}
+/* Side panels folded away, and focus mode (no rail, no panels) */
+.pb.pb--noleft {
+  --pb-left-w: 0px;
+}
+.pb.pb--noright {
+  --pb-right-w: 64px;
+}
+.pb.pb--focus {
+  --pb-rail-w: 0px;
+  --pb-right-w: 0px;
+}
+.pb--focus .pb-rail {
+  display: none;
 }
 .pb--preview {
   grid-template-columns: minmax(0, 1fr);
@@ -72,13 +90,31 @@
 .pb-docname {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   min-width: 0;
-  flex: 0 1 360px;
+  flex: 0 1 auto;
+}
+/* The name input sits over a hidden copy of the name, which sets the width */
+.pb-namefit {
+  display: inline-grid;
+  min-width: 0;
+  max-width: 360px;
+}
+.pb-namefit::after {
+  content: attr(data-value);
+  grid-area: 1 / 1;
+  visibility: hidden;
+  white-space: pre;
+  overflow: hidden;
+  padding: 6px 9px;
+  border: 1px solid transparent;
+  font-weight: 700;
+  font-size: 15px;
 }
 .pb-pagename {
-  min-width: 80px;
-  flex: 1 1 auto;
+  grid-area: 1 / 1;
+  width: 100%;
+  min-width: 60px;
   padding: 6px 8px;
   border-radius: 6px;
   border: 1px solid transparent;
@@ -99,10 +135,46 @@
 .pb-saved {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   font-size: 12px;
+  font-weight: 600;
   color: #b9d6ea;
   white-space: nowrap;
+}
+.pb-zoombtn {
+  min-width: 66px;
+  gap: 2px;
+  font-variant-numeric: tabular-nums;
+}
+.pb-menu__list--view {
+  min-width: 260px;
+}
+.pb-menu__list.pb-menu__list--view button {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) auto;
+  column-gap: 6px;
+  align-items: center;
+}
+.pb-menu__list.pb-menu__list--view button::before {
+  content: "";
+  grid-row: span 2;
+}
+.pb-menu__list.pb-menu__list--view button[aria-checked="true"]::before {
+  content: "✓";
+  color: var(--ag-navy);
+  font-weight: 800;
+}
+.pb-menu__list.pb-menu__list--view button small {
+  grid-column: 2 / 4;
+}
+.pb-menu__list--view kbd {
+  font-size: 11px;
+  font-weight: 600;
+}
+.pb-menu__list--view button:disabled {
+  opacity: 0.4;
+  cursor: default;
+  background: transparent;
 }
 .pb-spacer {
   flex: 1;
@@ -423,13 +495,77 @@
   position: sticky;
   top: 0;
   z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   margin: 0;
-  padding: 16px 16px 10px;
+  padding: 12px 10px 8px 16px;
   background: var(--ag-white);
+}
+.pb-left__title h2 {
+  margin: 0;
   font-family: var(--font-head);
   font-weight: 800;
   font-size: 18px;
   color: var(--ag-navy);
+}
+/* Fold a side panel away */
+.pb-panelx {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ag-gray);
+  cursor: pointer;
+}
+.pb-panelx:hover {
+  background: var(--ag-silver-18);
+  color: var(--ag-navy);
+}
+.pb-panelx--right {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 3;
+}
+.pb-right {
+  position: relative;
+}
+.pb-right .pb-insp__head {
+  padding-right: 48px;
+}
+.pb-rstrip {
+  grid-area: right;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 10px;
+  background: var(--ag-white);
+  border-left: 1px solid var(--ag-silver-40);
+}
+.pb-rstrip button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 52px;
+  padding: 8px 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ag-navy);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.pb-rstrip button:hover {
+  background: var(--ag-cyan-12);
 }
 .pb-panel {
   padding: 0 16px 18px;
@@ -1038,10 +1174,31 @@ input.is-missing {
 .pb-element + .pb-element {
   border-top: 1px solid var(--ag-silver-40);
 }
-.pb-element.is-off span {
+.pb-element > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.pb-element > span svg {
+  flex: none;
+  color: var(--ag-navy);
+}
+.pb-element.is-off > span {
   color: var(--ag-gray);
   font-weight: 400;
-  text-decoration: line-through;
+}
+.pb-element.is-off > span svg {
+  color: var(--ag-gray);
+}
+.pb-element em {
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--ag-silver-18);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+  color: var(--ag-gray);
 }
 .pb-switch {
   flex: none;
@@ -1113,13 +1270,45 @@ input.is-missing {
 }
 
 /* Canvas ----------------------------------------------------------------- */
-.pb-canvas {
+.pb-canvaswrap {
   grid-area: canvas;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+.pb-canvas {
+  flex: 1;
   min-height: 0;
   overflow: auto;
   scrollbar-gutter: stable;
   padding: 28px 32px 80px;
   position: relative;
+}
+/* The bar above the page: what you are typing in, its count and formatting. Never on the page. */
+.pb-ctx {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* One fixed height whether it shows the caption or the text tools, so the page never moves */
+  height: 50px;
+  padding: 0 16px;
+  border-bottom: 1px solid rgba(0, 30, 60, 0.08);
+  background: var(--pb-canvas);
+}
+.pb-ctx__cap {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ag-charcoal);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pb-ctx__cap span {
+  font-weight: 500;
 }
 .pb--preview .pb-canvas {
   padding: 0;
@@ -1137,24 +1326,6 @@ input.is-missing {
 .pb--preview .pb-stage--tablet,
 .pb--preview .pb-stage--phone {
   margin-block: 24px;
-}
-.pb-stagecap {
-  position: absolute;
-  top: 6px;
-  left: 0;
-  right: 0;
-  max-width: 100%;
-  margin: 0 auto;
-  font: 600 11.5px/16px var(--font-ui);
-  color: var(--ag-gray);
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  pointer-events: none;
-}
-.pb-stagecap span {
-  font-weight: 500;
 }
 /* Editing tools drawn inside the scaled page keep their full size */
 .pb-stage :is(
@@ -1182,29 +1353,34 @@ input.is-missing {
   position: relative;
   outline: calc(2 * var(--pb-px)) solid transparent;
   outline-offset: calc(-2 * var(--pb-px));
-  scroll-margin-top: 20px;
+  scroll-margin-top: 48px;
 }
+/* Hover: a quiet navy line (white on navy blocks). Selected: cyan, which shows on every background. */
 .pb-frame:hover {
-  outline: calc(2 * var(--pb-px)) dashed rgba(0, 187, 242, 0.7);
+  outline: calc(2 * var(--pb-px)) solid rgba(0, 66, 120, 0.5);
+}
+.pb-frame:hover:has(> :is(.agx-bg--navy, .agx-sec--navy, .agx-hero, .agx-ctaband)) {
+  outline-color: rgba(255, 255, 255, 0.75);
 }
 .pb-frame.is-selected {
   outline: calc(3 * var(--pb-px)) solid var(--ag-cyan);
   outline-offset: calc(-3 * var(--pb-px));
 }
+/* The block's label tab sits on its top edge, outside the block, so it never covers the content */
 .pb-frame__bar {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 0;
+  left: 0;
   z-index: 20;
   display: none;
   align-items: center;
-  gap: 2px;
-  padding: 4px 4px 4px 10px;
-  border-radius: 10px;
+  gap: 1px;
+  padding: 2px 2px 2px 6px;
+  border-radius: 8px 8px 0 0;
   background: var(--ag-navy);
   color: var(--ag-white);
-  box-shadow: 0 6px 18px rgba(0, 30, 60, 0.3);
-  font-size: 13px;
+  font-size: 12px;
+  transform: translateY(-100%);
 }
 .pb-frame:hover > .pb-frame__bar,
 .pb-frame.is-selected > .pb-frame__bar {
@@ -1215,7 +1391,7 @@ input.is-missing {
   color: var(--ag-navy);
 }
 .pb-frame__bar strong {
-  padding-right: 8px;
+  padding: 0 6px 0 2px;
   white-space: nowrap;
 }
 .pb-frame__chip {
@@ -1234,8 +1410,8 @@ input.is-missing {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   border: 0;
   border-radius: 7px;
   background: transparent;
@@ -1422,21 +1598,21 @@ input.is-missing {
   text-align: left;
 }
 
-/* Floating bar over the text being edited ------------------------------- */
+/* Text tools, docked above the page while you type --------------------- */
 .pb-elbar {
-  position: fixed;
-  z-index: 70;
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 6px 6px 6px 12px;
+  min-height: 36px;
+  padding: 4px 4px 4px 12px;
   border-radius: 10px;
   background: var(--ag-navy);
   color: var(--ag-white);
   font-size: 12px;
-  box-shadow: 0 8px 24px rgba(0, 30, 60, 0.3);
-  transition: opacity 0.1s;
-  pointer-events: auto;
+}
+.pb-elbar__count {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 .pb-elbar b {
   color: var(--ag-cyan);
@@ -1623,13 +1799,43 @@ kbd {
   color: var(--ag-navy);
 }
 
+@media (max-width: 1365px) {
+  .pb-brand span {
+    display: none;
+  }
+}
 @media (max-width: 1280px) {
   .pb {
-    grid-template-columns: 68px 248px minmax(0, 1fr) 296px;
+    --pb-rail-w: 68px;
+    --pb-left-w: 248px;
+    --pb-right-w: 296px;
   }
-  .pb-brand span,
-  .pb-saved {
+  /* Preview and Share keep their icons; the words go to the tooltips */
+  .pb-mid {
     display: none;
+  }
+}
+@media (max-width: 1120px) {
+  .pb-wide {
+    display: none;
+  }
+  .pb-namefit {
+    max-width: 220px;
+  }
+}
+/* Small laptops: the left panel opens over the page instead of squeezing it */
+@media (min-width: 961px) and (max-width: 1200px) {
+  .pb {
+    --pb-left-w: 0px;
+  }
+  .pb-left {
+    position: fixed;
+    top: 56px;
+    bottom: 0;
+    left: var(--pb-rail-w);
+    width: 300px;
+    z-index: 55;
+    box-shadow: 10px 0 36px rgba(0, 30, 60, 0.22);
   }
 }
 @media (max-width: 960px) {
@@ -2363,4 +2569,95 @@ html[data-tour-step="insert"] .pb-insert[data-index="1"] .pb-insert__line {
   .pb-tour {
     display: none;
   }
+}
+
+/* Right-click menu on a block ------------------------------------------- */
+.pb-ctxmenu {
+  position: fixed;
+  z-index: 95;
+  min-width: 230px;
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  border-radius: 12px;
+  background: var(--ag-white);
+  border: 1px solid var(--ag-silver-40);
+  box-shadow: 0 14px 44px rgba(0, 30, 60, 0.24);
+}
+.pb-ctxmenu p {
+  margin: 0;
+  padding: 6px 10px 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ag-gray);
+}
+.pb-ctxmenu button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ag-charcoal);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+.pb-ctxmenu button svg {
+  color: var(--ag-gray);
+}
+.pb-ctxmenu button:hover:not(:disabled),
+.pb-ctxmenu button:focus-visible {
+  background: var(--ag-cyan-12);
+  outline: none;
+}
+.pb-ctxmenu button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.pb-ctxmenu kbd {
+  margin-left: auto;
+  font-size: 11px;
+}
+.pb-ctxmenu .is-danger,
+.pb-ctxmenu .is-danger svg {
+  color: var(--pb-red);
+}
+.pb-ctxmenu hr {
+  width: 100%;
+  border: 0;
+  border-top: 1px solid var(--ag-silver-40);
+  margin: 4px 0;
+}
+
+/* Focus mode: the way back */
+.pb-focusexit {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  z-index: 60;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ag-navy);
+  color: var(--ag-white);
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 8px 24px rgba(0, 30, 60, 0.28);
+  cursor: pointer;
+}
+.pb-focusexit kbd {
+  padding: 1px 6px;
+  border-radius: 5px;
+  border: 0;
+  background: rgba(255, 255, 255, 0.16);
+  color: var(--ag-white);
+  font-size: 11px;
 }

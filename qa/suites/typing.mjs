@@ -56,9 +56,10 @@ export default async function typing(browser) {
   await page.keyboard.press("Escape");
 
   // Adding a section from the Add panel
-  await openPanel(page, "Add");
   const times = [];
   for (let i = 0; i < 5; i++) {
+    // The Add panel folds away after each add, to give the page room
+    await openPanel(page, "Add");
     const ms = await page.evaluate(
       () =>
         new Promise((resolve) => {
