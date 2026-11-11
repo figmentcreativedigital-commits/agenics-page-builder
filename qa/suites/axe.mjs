@@ -4,7 +4,7 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { createRequire } from "node:module";
-import { BASE, QA_DIR, check, fixture, metric, openBuilder, openPageNamed, openPanel, selectBlock, settingsTab, startSuite } from "../lib.mjs";
+import { BASE, QA_DIR, check, fixture, metric, mod, openBuilder, openPageNamed, openPanel, selectBlock, settingsTab, startSuite } from "../lib.mjs";
 
 const require = createRequire(import.meta.url);
 const AXE = require.resolve("axe-core/axe.min.js");
@@ -53,7 +53,20 @@ export default async function axeSuite(browser) {
     ["Share dialog", async () => page.keyboard.press("Escape").then(() => page.locator("[data-tour=share]").click()), tool],
     ["Photo library", async () => page.keyboard.press("Escape").then(() => selectBlock(page, 0)).then(() => settingsTab(page, "Content")).then(() => page.locator(".pb-right").getByRole("button", { name: "Library" }).first().click()), tool],
     ["New page dialog", async () => page.keyboard.press("Escape").then(() => openPanel(page, "Pages")).then(() => page.getByRole("button", { name: /New page/ }).first().click()), tool],
-    ["Page being built (editing)", async () => page.keyboard.press("Escape"), { exclude: [".pb-top", ".pb-rail", ".pb-left", ".pb-right"] }],
+    ["View menu", async () => page.keyboard.press("Escape").then(() => page.locator("[data-tour=view] > button").click()), tool],
+    ["Block menu", async () => page.keyboard.press("Escape").then(() => page.locator(".pb-frame").nth(1).click({ button: "right", position: { x: 300, y: 120 } })), tool],
+    [
+      "Side panels folded",
+      async () => {
+        await page.keyboard.press("Escape");
+        await openPanel(page, "Pages");
+        await page.locator(".pb-left .pb-panelx").click();
+        await page.locator(".pb-panelx--right").click();
+      },
+      tool,
+    ],
+    ["Focus mode", async () => page.locator(".pb-rstrip button").click().then(() => page.keyboard.press(`${mod}+Backslash`)), tool],
+    ["Page being built (editing)", async () => page.keyboard.press(`${mod}+Backslash`).then(() => page.keyboard.press("Escape")), { exclude: [".pb-top", ".pb-rail", ".pb-left", ".pb-right"] }],
   ];
   for (const [name, open, opts] of views) {
     await open();

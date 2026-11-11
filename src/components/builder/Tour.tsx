@@ -125,7 +125,13 @@ export function Tour({ tab, setTab, onClose }: { tab: TourTab; setTab: (t: TourT
       if (step.needsBlock && !activePage(s)?.modules.length) return skip();
       if (s.preview) s.setPreview(false);
       if (setup.viewport && s.viewport !== setup.viewport) s.setViewport(setup.viewport);
-      if (setup.tab) setTab(setup.tab);
+      // The tour points at both side panels: bring back any that were folded away
+      if (s.focusMode) s.setFocusMode(false);
+      if (step.id === "settings" && !s.panels.right) s.setPanel("right", true);
+      if (setup.tab) {
+        setTab(setup.tab);
+        if (!s.panels.left) s.setPanel("left", true);
+      }
       if (setup.select === "first") {
         const uid = activePage(s)?.modules[0]?.uid ?? null;
         if (uid && s.selectedUid !== uid) s.select(uid);

@@ -1,5 +1,5 @@
 // The guided tour: opens the first time, every step has its target, keys work, Tour restarts it.
-import { TOUR_KEY, check, openBuilder, startSuite } from "../lib.mjs";
+import { TOUR_KEY, check, openBuilder, openPanel, startSuite } from "../lib.mjs";
 
 export default async function tour(browser) {
   startSuite("Guided tour");
@@ -53,7 +53,7 @@ export default async function tour(browser) {
   check("The Tour button starts it again, the chapter menu jumps, Escape closes", restarted && /Desktop|tablet|phone/i.test(jumped) && (await page.locator(".pb-tour").count()) === 0, `jumped to “${jumped}”`);
 
   // On an empty page the steps about blocks are skipped
-  await page.locator(".pb-rail button", { hasText: "Pages" }).click();
+  await openPanel(page, "Pages");
   await page.getByRole("button", { name: /New page/ }).first().click();
   await page.locator(".pb-dialog .pb-gcard", { hasText: "Blank" }).first().click();
   await page.waitForTimeout(400);

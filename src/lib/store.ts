@@ -6,6 +6,7 @@ import { effectiveBg } from "./checks";
 import { MODULES } from "./modules";
 import { setAt, getAt, uid } from "./path";
 import { EXAMPLES, exampleDentalWater, exampleST108, makeModule, pageFromRecipe } from "./recipes";
+import type { Zoom } from "./devices";
 import type { ModuleInstance, ModuleStyle, ModuleType, PageDoc, ShareInfo, Viewport } from "./types";
 import { upgradeModule, upgradePage } from "./upgrade";
 
@@ -30,6 +31,13 @@ interface BuilderState {
   viewport: Viewport;
   showSpecs: boolean;
   preview: boolean;
+  /** The zoom picked in the View menu. "fit" scales the page to the space on screen. */
+  zoom: Zoom;
+  /** The zoom on screen now, for the View menu button (fit works it out from the space). */
+  shownZoom: number;
+  /** Side panels folded away or open. Focus mode hides both, and the rail. */
+  panels: { left: boolean; right: boolean };
+  focusMode: boolean;
   focus: { uid: string; path: string } | null;
   /** The image slot the photo library is choosing for. */
   library: { uid: string; path: string } | null;
@@ -83,6 +91,10 @@ interface BuilderState {
   setViewport: (v: Viewport) => void;
   toggleSpecs: () => void;
   setPreview: (on: boolean) => void;
+  setZoom: (z: Zoom) => void;
+  setShownZoom: (z: number) => void;
+  setPanel: (side: "left" | "right", open: boolean) => void;
+  setFocusMode: (on: boolean) => void;
   setFocus: (f: { uid: string; path: string } | null) => void;
   setLibrary: (target: { uid: string; path: string } | null) => void;
   showToast: (msg: string, undo?: boolean) => void;
@@ -165,6 +177,10 @@ export const useBuilder = create<BuilderState>()(
         viewport: "desktop",
         showSpecs: false,
         preview: false,
+        zoom: "fit",
+        shownZoom: 1,
+        panels: { left: true, right: true },
+        focusMode: false,
         focus: null,
         library: null,
         past: [],
@@ -483,6 +499,11 @@ export const useBuilder = create<BuilderState>()(
         setViewport: (v) => set({ viewport: v }),
         toggleSpecs: () => set((s) => ({ showSpecs: !s.showSpecs })),
         setPreview: (on) => set({ preview: on, selectedUid: on ? null : get().selectedUid }),
+        setZoom: (z) => set({ zoom: z }),
+        setShownZoom: (z) => (get().shownZoom === z ? undefined : set({ shownZoom: z })),
+        // Opening a panel by hand ends focus mode
+        setPanel: (side, open) => set((s) => ({ panels: { ...s.panels, [side]: open }, focusMode: open ? false : s.focusMode })),
+        setFocusMode: (on) => set({ focusMode: on }),
         setFocus: (f) => set({ focus: f }),
         setLibrary: (target) => set({ library: target }),
         showToast: (msg, undo) => set({ toast: { msg, undo } }),
@@ -531,6 +552,9 @@ export const useBuilder = create<BuilderState>()(
         activeId: s.activeId,
         viewport: s.viewport,
         showSpecs: s.showSpecs,
+        zoom: s.zoom,
+        panels: s.panels,
+        focusMode: s.focusMode,
         seeded: s.seeded,
         saved: s.saved,
       }),
@@ -548,6 +572,10 @@ export const useBuilder = create<BuilderState>()(
           ...p,
           ...(Array.isArray(p.pages) ? { pages: p.pages.map(upgradePage) } : {}),
           ...(Array.isArray(p.saved) ? { saved: p.saved.map((b) => ({ ...b, module: upgradeModule(b.module) })) } : {}),
+          // View settings: anything unexpected falls back to the defaults
+          zoom: p.zoom === "fit" || (typeof p.zoom === "number" && p.zoom >= 0.2 && p.zoom <= 1) ? p.zoom : current.zoom,
+          panels: { left: p.panels?.left !== false, right: p.panels?.right !== false },
+          focusMode: p.focusMode === true,
         };
       },
     },

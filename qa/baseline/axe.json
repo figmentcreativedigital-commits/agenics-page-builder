@@ -1,51 +1,25 @@
 {
-  "Builder, Add panel": [
-    "color-contrast"
-  ],
-  "Layers panel": [
-    "color-contrast"
-  ],
-  "Pages panel": [
-    "color-contrast"
-  ],
-  "Review panel": [
-    "color-contrast"
-  ],
-  "History panel": [
-    "color-contrast"
-  ],
-  "Settings: Content": [
-    "color-contrast"
-  ],
-  "Settings: Style": [
-    "color-contrast"
-  ],
-  "Settings: Show / hide": [
-    "color-contrast"
-  ],
-  "Export menu": [
-    "color-contrast"
-  ],
+  "Builder, Add panel": [],
+  "Layers panel": [],
+  "Pages panel": [],
+  "Review panel": [],
+  "History panel": [],
+  "Settings: Content": [],
+  "Settings: Style": [],
+  "Settings: Show / hide": [],
+  "Export menu": [],
   "Help menu": [
-    "color-contrast",
     "target-size"
   ],
-  "Keyboard shortcuts": [
-    "color-contrast"
-  ],
-  "Share dialog": [
-    "color-contrast"
-  ],
-  "Photo library": [
-    "color-contrast"
-  ],
-  "New page dialog": [
-    "color-contrast"
-  ],
-  "Page being built (editing)": [
-    "color-contrast",
-    "target-size"
-  ],
+  "Keyboard shortcuts": [],
+  "Share dialog": [],
+  "Photo library": [],
+  "New page dialog": [],
+  "View menu": [],
+  "Block menu": [],
+  "Side panels folded": [],
+  "Focus mode": [],
+  "Page being built (editing)": [],
   "Share preview": [],
   "Spec sheet": []
 }

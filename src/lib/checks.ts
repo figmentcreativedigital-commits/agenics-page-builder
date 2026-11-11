@@ -16,6 +16,14 @@ export type Issue = {
   path?: string;
 };
 
+/**
+ * What is left, in one count shared by the top bar, the Review badge and the Review summary:
+ * the errors to fix, else the blocks (and the page itself) that still have something to finish.
+ */
+export function leftToDo(issues: Issue[]): { errors: number; todo: number } {
+  return { errors: issues.filter((i) => i.level === "error").length, todo: new Set(issues.map((i) => i.moduleUid ?? "page")).size };
+}
+
 const PLACEHOLDER = /\[[^\]]*\]/;
 
 export function measure(value: string, limit?: Limit): { used: number; max: number; unit: string; over: boolean } | null {

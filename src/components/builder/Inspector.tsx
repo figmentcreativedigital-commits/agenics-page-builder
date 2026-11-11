@@ -358,7 +358,11 @@ function ModuleInspector({ mod }: { mod: ModuleInstance }) {
                   const on = !mod.hidden?.includes(e.id);
                   return (
                     <div key={e.id} className={`pb-element ${on ? "" : "is-off"}`}>
-                      <span>{e.label}</span>
+                      <span>
+                        <Icon name={on ? "eye" : "eyeOff"} size={16} />
+                        {e.label}
+                        {on ? null : <em>Hidden</em>}
+                      </span>
                       <Switch on={on} label={`${on ? "Hide" : "Show"} ${e.label}`} onChange={(v) => setElement(mod.uid, e.id, v)} />
                     </div>
                   );
@@ -464,10 +468,34 @@ function PageInspector() {
 export function Inspector() {
   const page = useBuilder((s) => activePage(s));
   const selected = useBuilder((s) => s.selectedUid);
+  const setPanel = useBuilder((s) => s.setPanel);
   const mod = page?.modules.find((m) => m.uid === selected);
   return (
-    <aside className="pb-right" data-tour="settings" aria-label="Settings">
+    <aside id="pb-settings" className="pb-right" data-tour="settings" aria-label="Settings">
+      <button type="button" className="pb-panelx pb-panelx--right" aria-label="Hide settings" title="Hide settings" onClick={() => setPanel("right", false)}>
+        <Icon name="panelRight" size={18} />
+      </button>
       {mod ? <ModuleInspector key={mod.uid} mod={mod} /> : <PageInspector />}
     </aside>
+  );
+}
+
+/** The settings panel folded away: one button to bring it back. */
+export function SettingsStrip() {
+  const setPanel = useBuilder((s) => s.setPanel);
+  const selected = useBuilder((s) => s.selectedUid);
+  return (
+    <div className="pb-rstrip">
+      <button
+        type="button"
+        aria-label="Show settings"
+        aria-expanded={false}
+        title={selected ? "Show the settings for this block" : "Show page settings"}
+        onClick={() => setPanel("right", true)}
+      >
+        <Icon name="settings" size={20} />
+        <span>Settings</span>
+      </button>
+    </div>
   );
 }

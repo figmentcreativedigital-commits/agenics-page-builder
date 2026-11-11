@@ -7,26 +7,28 @@ Built by Figment Creative for Agenics Labs. Follows the **Agenics Corporate Grap
 ## How it works: three steps
 
 1. **Add blocks.** Drag a block from the left onto the page, or click a **+** between blocks. Sixteen blocks, grouped as Open, Explain, Lists and grids, Products and proof, Support, Close.
-2. **Edit in place.** Click any text to type. Drop an image on any image slot. Click an icon to swap it. A small bar above the text you're editing shows its limit while you type.
+2. **Edit in place.** Click any text to type. Drop an image on any image slot. Click an icon to swap it. The bar above the page shows the field you're editing and its limit while you type, so it never covers the text.
 3. **Review and export.** **Review** in the top bar lists what's left, grouped by block, in plain sentences. **Export** makes the handoff package.
 
 ## Things you can do
 
 - **Take the guided tour.** It opens by itself the first time someone uses the builder in a browser, and any time from the **Tour** button at the foot of the left rail (or **Help › Take the guided tour**). Clicking Tour while it runs starts it again from the top. Eighteen short steps spotlight the page, the side panels and the top bar, with Next / Back, the arrow keys, a chapter menu, and Escape to leave. The script is plain text in `src/lib/tour.ts`; a step whose target isn't on screen is skipped, so changing the tool never breaks it.
 
-- **Format paragraphs.** Bold, italic and links inside any paragraph slot, from the bar above the text or with ⌘B, ⌘I and ⌘K. Links can point at a page, a file, a full address or a section of the same page. Headings and buttons stay plain, as the brand guide sets them.
+- **Format paragraphs.** Bold, italic and links inside any paragraph slot, from the bar above the page or with ⌘B, ⌘I and ⌘K. Links can point at a page, a file, a full address or a section of the same page. Headings and buttons stay plain, as the brand guide sets them.
 - **Drag on the page.** Grab a block by the handle in its toolbar to move it. Grab any card, point, question, list item or paragraph by its handle to reorder it inside the block (or focus the handle and use the arrow keys).
 - **Copy, paste and reuse.** ⌘C / ⌘V copies a block, also between pages. **⋯ › Save to My blocks** keeps a finished block at the top of the Add panel for reuse.
+- **Right-click a block** (or select it and press ⇧F10) for its actions: move, duplicate, copy, paste below, save to My blocks, settings, delete. Arrow keys move through the menu, never between blocks.
+- **Make room to work.** The **View** menu in the top bar (it shows the zoom, such as 54%) zooms the page: Fit to screen, 50%, 75% or 100%, or ⌘+ ⌘− ⌘0, which work even while typing. The zoom you pick is kept. **Guides**, also in View, shows the size limit on every text and image slot. Click the open tab on the left rail to fold its panel away; the Add panel folds by itself after you add a block. The settings panel folds to a strip. **Focus mode** (⌘\\ or View › Focus mode) hides the rail and both panels so the page gets the whole screen. From 961 to 1,200 px wide, the left panel opens over the page instead of squeezing it, and goes away when you work on the page.
 - **Photos.** Every image slot has a **Library** with Agenics photography and everything uploaded in this browser. **Focus and zoom** in the settings panel sets the part of the photo that stays in view when the slot crops it; the brief passes the focal point on to Squarespace.
 - **Version history.** Versions save on their own when a page is opened and every few minutes while it changes, and whenever a preview link is created or updated. Save a named version any time, view any version, and restore it (restoring can be undone).
 
-- **Hide anything optional.** Hover a button and click ×, or use the bar above a text slot, or switch it off in **Show / hide**. Hidden elements keep their text, so they come back with one switch. The brief tells the developer to leave them out.
+- **Hide anything optional.** Hover a button and click ×, or use the bar above the page while you type, or switch it off in **Show / hide**. Hidden elements keep their text, so they come back with one switch. The brief tells the developer to leave them out.
 - **Pick a layout** from thumbnails (for example, an Icon grid can be 3 across, 4 across, 2 × 2, or a heading with a 2 × 2 grid beside it).
 - **Pick a background** from the brand-safe set each block allows: White, Silver 18%, Cyan 12% or Navy. **Tidy backgrounds** alternates them in one click so sections stand apart, and Review flags two same-colored sections in a row.
 - **Link to a section on the same page.** The link popover lists the page's sections; picking one gives it a short anchor such as `#what-is-st108`.
 - **Leave a note for the team** on any block. Notes show on the canvas while editing and are listed in the brief. They are never published.
 - **Change the number of items** (points, cards, questions, paragraphs) within each block's limits.
-- **Preview** at desktop, tablet and phone widths, or open the clean page in a new tab. Each view is laid out at a real screen width (desktop 1,280 px or wider, tablet 834, phone 390) and scaled to fit the window, so desktop always shows the desktop layout and the full agenics.com menu, and the views always read largest to smallest. The line above the page shows the width and the scale.
+- **Preview** at desktop, tablet and phone widths, or open the clean page in a new tab. Each view is laid out at a real screen width (desktop 1,280 px or wider, tablet 834, phone 390) and scaled to fit the window, so desktop always shows the desktop layout and the full agenics.com menu, and the views always read largest to smallest. The bar above the page shows the width; the View button shows the scale.
 - **Share a preview link.** **Share** in the top bar makes a link such as `/share/5dBw9qSUx9` that anyone can open on any device. Viewers see the page as visitors would, with a desktop / tablet / phone switch, and can't edit it. The link shows the version you published: after changes, **Update the link** refreshes it at the same address, and **Stop sharing** turns it off. Only the browser that created a link can update or stop it.
 - **Undo everything.** ⌘Z / ⌘⇧Z undo and redo every change: blocks, text, photos, links, image descriptions, notes and section links. A burst of typing in one field is one step, and a step that changed nothing in the end is skipped. While the cursor is in a text slot, ⌘Z undoes typing inside it. Press **?** for all shortcuts.
 
@@ -68,7 +70,7 @@ Both can be added again at any time from **Pages › New page › Start from a f
 | `src/lib/checks.ts` | Review checks |
 | `src/lib/exporters.ts` | Brief, zip and page-file export and import |
 | `src/lib/upgrade.ts` | Saved-page upgrades: pages from older versions of the builder open in today's form |
-| `qa/` | Quality checks: end-to-end, undo, old pages, export parity, speed, tour, accessibility and screenshot suites |
+| `qa/` | Quality checks: end-to-end, undo, old pages, export parity, view, speed, tour, accessibility and screenshot suites |
 | `src/lib/tour.ts`, `src/components/builder/Tour.tsx` | The guided tour: its script, and the spotlight that runs it |
 | `public/examples/` | Photography used by the worked examples |
 
@@ -98,6 +100,7 @@ npm run qa -- undo typing  # some suites
 | `undo` | A photo, a typed word, a link, an image description and a note each undo in one step and nothing else; redo; empty steps are skipped |
 | `upgrade` | Browser storage, page files and a share link made by the last release open with nothing lost; pages from before October 2026 are upgraded on purpose |
 | `export` | The brief, zip and page file match the recorded baseline (`qa/baseline`); record a new one with `QA_RECORD=1` when a change is intended |
+| `view` | Zoom and Fit (menu and keys, also while typing, kept after a reload), folding panels, focus mode, the floating left panel at 1,024 px, the text bar above the page, the block menu (right-click and ⇧F10, keys stay inside it), hover outlines, one shared Review count, old view settings |
 | `typing` | Typing p75 under 50 ms on a 19-section page, no layout shift while typing, adding a section in about 120 ms |
 | `tour` | The tour opens once, every step has its target, the keys and the Tour button work |
 | `axe` | No accessibility violations beyond the known list in `qa/baseline/axe.json`, on every panel, menu and dialog, the share preview and the spec sheet |

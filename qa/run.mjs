@@ -10,7 +10,7 @@ import { cpSync, existsSync, rmSync } from "node:fs";
 import path from "node:path";
 import { BASE, QA_DIR, launch, report } from "./lib.mjs";
 
-const ORDER = ["smoke", "undo", "upgrade", "export", "typing", "tour", "axe", "screens"];
+const ORDER = ["smoke", "undo", "upgrade", "export", "view", "typing", "tour", "axe", "screens"];
 
 const args = process.argv.slice(2);
 const appArg = args.indexOf("--app");

@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { checkPage } from "@/lib/checks";
+import { checkPage, leftToDo } from "@/lib/checks";
+import { ZOOM_STEPS, stepZoom } from "@/lib/devices";
 import { downloadBrief, downloadHandoffZip, downloadPageJson, importPageJson } from "@/lib/exporters";
 import { saveVersion } from "@/lib/history";
 import { activePage, useBuilder } from "@/lib/store";
@@ -10,7 +11,7 @@ import type { Viewport } from "@/lib/types";
 import "../page/page.css";
 import "./builder.css";
 import { Canvas } from "./Canvas";
-import { Inspector } from "./Inspector";
+import { Inspector, SettingsStrip } from "./Inspector";
 import { LeftPanel, NewPageDialog, type Tab } from "./LeftPanel";
 import { ImageLibrary } from "./ImageLibrary";
 import { ShareDialog } from "./ShareDialog";
@@ -18,6 +19,7 @@ import { Tour } from "./Tour";
 import { tourSeen } from "@/lib/tour";
 import { Icon } from "./ui";
 
+/** Closes a menu on a click elsewhere or on Escape. */
 function useOutside(open: boolean, close: () => void) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -25,8 +27,13 @@ function useOutside(open: boolean, close: () => void) {
     const onDoc = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) close();
     };
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && close();
     document.addEventListener("mousedown", onDoc);
-    return () => document.removeEventListener("mousedown", onDoc);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDoc);
+      document.removeEventListener("keydown", onKey);
+    };
   }, [open, close]);
   return ref;
 }
@@ -144,13 +151,73 @@ function HelpMenu({ onShortcuts, onTour }: { onShortcuts: () => void; onTour: ()
   );
 }
 
+/** Zoom, guides and focus mode. The button shows the zoom on screen now. */
+function ViewMenu() {
+  const zoom = useBuilder((s) => s.zoom);
+  const shown = useBuilder((s) => s.shownZoom);
+  const setZoom = useBuilder((s) => s.setZoom);
+  const showSpecs = useBuilder((s) => s.showSpecs);
+  const toggleSpecs = useBuilder((s) => s.toggleSpecs);
+  const focusMode = useBuilder((s) => s.focusMode);
+  const setFocusMode = useBuilder((s) => s.setFocusMode);
+  const [open, setOpen] = useState(false);
+  const ref = useOutside(open, () => setOpen(false));
+  const pct = `${Math.round(shown * 100)}%`;
+  const pick = (fn: () => void) => () => {
+    fn();
+    setOpen(false);
+  };
+  const fixed = [0.5, 0.75, 1] as const;
+  return (
+    <div className="pb-menu" ref={ref} data-tour="view">
+      <button
+        type="button"
+        className={`pb-topbtn pb-zoombtn ${showSpecs || focusMode ? "is-on" : ""}`}
+        aria-expanded={open}
+        aria-haspopup="menu"
+        aria-label={`View, zoom ${pct}`}
+        title="Zoom, guides and focus mode"
+        onClick={() => setOpen((o) => !o)}
+      >
+        {pct}
+        <Icon name="chevronDown" size={14} />
+      </button>
+      {open ? (
+        <div className="pb-menu__list pb-menu__list--view" role="menu">
+          <button type="button" role="menuitem" disabled={shown >= 1} onClick={() => setZoom(stepZoom(shown, 1))}>
+            Zoom in <kbd>⌘+</kbd>
+          </button>
+          <button type="button" role="menuitem" disabled={shown <= ZOOM_STEPS[0]} onClick={() => setZoom(stepZoom(shown, -1))}>
+            Zoom out <kbd>⌘−</kbd>
+          </button>
+          <button type="button" role="menuitemradio" aria-checked={zoom === "fit"} onClick={pick(() => setZoom("fit"))}>
+            Fit to screen <kbd>⌘0</kbd>
+          </button>
+          {fixed.map((z) => (
+            <button key={z} type="button" role="menuitemradio" aria-checked={zoom === z} onClick={pick(() => setZoom(z))}>
+              {Math.round(z * 100)}%{z === 1 ? <small>Actual size</small> : null}
+            </button>
+          ))}
+          <hr />
+          <button type="button" role="menuitemcheckbox" aria-checked={showSpecs} onClick={pick(toggleSpecs)}>
+            Guides
+            <small>The size limit on every text and image slot</small>
+          </button>
+          <button type="button" role="menuitemcheckbox" aria-checked={focusMode} onClick={pick(() => setFocusMode(!focusMode))}>
+            Focus mode <kbd>{"⌘\\"}</kbd>
+            <small>Hides the side panels so the page gets the whole screen</small>
+          </button>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function TopBar({ onReview, onShortcuts, onShare, onTour }: { onReview: () => void; onShortcuts: () => void; onShare: () => void; onTour: () => void }) {
   const page = useBuilder((s) => activePage(s));
   const updatePage = useBuilder((s) => s.updatePage);
   const viewport = useBuilder((s) => s.viewport);
   const setViewport = useBuilder((s) => s.setViewport);
-  const showSpecs = useBuilder((s) => s.showSpecs);
-  const toggleSpecs = useBuilder((s) => s.toggleSpecs);
   const preview = useBuilder((s) => s.preview);
   const setPreview = useBuilder((s) => s.setPreview);
   const savedAt = useBuilder((s) => s.savedAt);
@@ -159,8 +226,7 @@ function TopBar({ onReview, onShortcuts, onShare, onTour }: { onReview: () => vo
   const undo = useBuilder((s) => s.undo);
   const redo = useBuilder((s) => s.redo);
   const issues = useMemo(() => (page ? checkPage(page) : []), [page]);
-  const errors = issues.filter((i) => i.level === "error").length;
-  const todo = new Set(issues.map((i) => i.moduleUid ?? "page")).size;
+  const { errors, todo } = leftToDo(issues);
 
   const vps: { id: Viewport; label: string }[] = [
     { id: "desktop", label: "Desktop" },
@@ -170,6 +236,7 @@ function TopBar({ onReview, onShortcuts, onShare, onTour }: { onReview: () => vo
 
   return (
     <header className="pb-top">
+      <h1 className="sr-only">Agenics Page Builder{page ? `: ${page.name}` : ""}</h1>
       <Link href="/" className="pb-brand" aria-label="Agenics Page Builder home">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/brand/agenics-logo-reversed-cyan.svg" alt="Agenics Labs" />
@@ -177,9 +244,15 @@ function TopBar({ onReview, onShortcuts, onShare, onTour }: { onReview: () => vo
       </Link>
       {page ? (
         <span className="pb-docname">
-          <input className="pb-pagename" value={page.name} aria-label="Page name" onChange={(e) => updatePage({ name: e.target.value })} />
-          <span className="pb-saved" title={savedAt ? `Saved in this browser at ${new Date(savedAt).toLocaleTimeString("en-US")}` : "Saved in this browser"}>
-            <Icon name="review" size={14} /> Saved
+          {/* Grows with the name, so the whole name shows */}
+          <span className="pb-namefit" data-value={page.name || "Untitled"}>
+            <input className="pb-pagename" value={page.name} aria-label="Page name" size={1} onChange={(e) => updatePage({ name: e.target.value })} />
+          </span>
+          <span
+            className="pb-saved"
+            title={savedAt ? `Saved in this browser at ${new Date(savedAt).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}` : "Saved in this browser"}
+          >
+            <Icon name="check" size={14} /> Saved
           </span>
         </span>
       ) : null}
@@ -199,27 +272,47 @@ function TopBar({ onReview, onShortcuts, onShare, onTour }: { onReview: () => vo
           <button type="button" className="pb-topicon" aria-label="Redo" title="Redo (⌘⇧Z)" disabled={!canRedo} onClick={redo}>
             <Icon name="redo" />
           </button>
+          <ViewMenu />
           <button
             type="button"
-            className={`pb-topbtn ${showSpecs ? "is-on" : ""}`}
-            data-tour="guides"
-            aria-pressed={showSpecs}
-            onClick={toggleSpecs}
-            title="Show the size limit on every text slot and image"
+            data-tour="review"
+            className={`pb-topbtn pb-review ${errors ? "is-err" : issues.length ? "is-warn" : "is-ok"}`}
+            onClick={onReview}
+            title="Review: what is left to do"
+            aria-label={issues.length ? `Review: ${errors ? `${errors} to fix` : `${todo} to finish`}` : "Review: ready"}
           >
-            Guides
-          </button>
-          <button type="button" data-tour="review" className={`pb-topbtn pb-review ${errors ? "is-err" : issues.length ? "is-warn" : "is-ok"}`} onClick={onReview} title="What is left to do">
             <Icon name="review" size={16} />
-            {issues.length ? (errors ? `${errors} to fix` : `${todo} to finish`) : "Ready"}
+            {issues.length ? (
+              <>
+                {errors || todo}
+                <span className="pb-wide">{errors ? " to fix" : " to finish"}</span>
+              </>
+            ) : (
+              "Ready"
+            )}
           </button>
         </>
       ) : null}
-      <button type="button" data-tour="preview" className={`pb-topbtn ${preview ? "is-on" : ""}`} aria-pressed={preview} onClick={() => setPreview(!preview)}>
-        <Icon name="eye" size={16} /> {preview ? "Back to editing" : "Preview"}
+      <button
+        type="button"
+        data-tour="preview"
+        className={`pb-topbtn ${preview ? "is-on" : ""}`}
+        aria-pressed={preview}
+        aria-label={preview ? "Back to editing" : "Preview"}
+        title={preview ? "Back to editing (P)" : "Preview (P)"}
+        onClick={() => setPreview(!preview)}
+      >
+        <Icon name="eye" size={16} /> <span className={preview ? "" : "pb-mid"}>{preview ? "Back to editing" : "Preview"}</span>
       </button>
-      <button type="button" data-tour="share" className={`pb-topbtn ${page?.share ? "is-shared" : ""}`} onClick={onShare} title={page?.share ? "This page has a preview link" : "Make a link anyone can view"}>
-        <Icon name="link" size={16} /> Share
+      <button
+        type="button"
+        data-tour="share"
+        className={`pb-topbtn ${page?.share ? "is-shared" : ""}`}
+        aria-label="Share"
+        onClick={onShare}
+        title={page?.share ? "This page has a preview link" : "Make a link anyone can view"}
+      >
+        <Icon name="link" size={16} /> <span className="pb-mid">Share</span>
       </button>
       <ExportMenu />
       <HelpMenu onShortcuts={onShortcuts} onTour={onTour} />
@@ -260,6 +353,9 @@ const SHORTCUTS: [string, string][] = [
   ["Copy / paste a block (works across pages)", "⌘C · ⌘V"],
   ["Delete the selected block", "Delete"],
   ["Bold / italic / link, while typing a paragraph", "⌘B · ⌘I · ⌘K"],
+  ["Zoom in / out · fit to screen", "⌘+ · ⌘− · ⌘0"],
+  ["Focus mode: hide the side panels", "⌘\\"],
+  ["Actions for the selected block", "⇧F10"],
   ["Preview on / off", "P"],
   ["Deselect · close", "Esc"],
   ["This list", "?"],
@@ -307,6 +403,8 @@ export function Builder() {
   const [tour, setTour] = useState(false);
   const [tourRun, setTourRun] = useState(0);
   const preview = useBuilder((s) => s.preview);
+  const panels = useBuilder((s) => s.panels);
+  const focusMode = useBuilder((s) => s.focusMode);
 
   useEffect(() => {
     Promise.resolve(useBuilder.persist.rehydrate()).then(() => {
@@ -344,10 +442,23 @@ export function Builder() {
     const onKey = (e: KeyboardEvent) => {
       const t = e.target as HTMLElement;
       const typing = t.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(t.tagName);
-      if (typing) return;
-      if (document.querySelector(".pb-modal")) return;
       const s = useBuilder.getState();
       const mod = e.metaKey || e.ctrlKey;
+      // Zoom and focus mode work everywhere, even while typing, as in design tools
+      if (mod && !e.altKey && !s.preview && ["=", "+", "-", "_", "0"].includes(e.key)) {
+        e.preventDefault();
+        if (e.key === "0") s.setZoom("fit");
+        else s.setZoom(stepZoom(s.shownZoom, e.key === "-" || e.key === "_" ? -1 : 1));
+        return;
+      }
+      if (mod && e.key === "\\" && !s.preview) {
+        e.preventDefault();
+        s.setFocusMode(!s.focusMode);
+        return;
+      }
+      if (typing) return;
+      // While a dialog or a menu is open, keys belong to it: arrows and Delete never act on the page
+      if (document.querySelector(".pb-modal, .pb-ctxmenu, .pb-menu__list, .pb-more__menu")) return;
       const sel = s.selectedUid;
       if (mod && e.key.toLowerCase() === "z") {
         e.preventDefault();
@@ -389,13 +500,28 @@ export function Builder() {
     setSharing(false);
     setNewPage(false);
     setTourRun((n) => n + 1); // a click while it runs starts it again from the top
+    // The tour points at both panels: bring them back
+    const s = useBuilder.getState();
+    s.setFocusMode(false);
+    s.setPanel("left", true);
+    s.setPanel("right", true);
     setTour(true);
   };
 
   if (!ready) return <div className="pb-loading">Loading the page builder…</div>;
 
   return (
-    <div className={`pb ${preview ? "pb--preview" : ""}`}>
+    <div
+      className={[
+        "pb",
+        preview && "pb--preview",
+        focusMode && "pb--focus",
+        (focusMode || !panels.left) && "pb--noleft",
+        (focusMode || !panels.right) && "pb--noright",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
       <TopBar
         onReview={() => {
           useBuilder.getState().select(null);
@@ -407,7 +533,7 @@ export function Builder() {
       />
       {!preview ? <LeftPanel tab={tab} setTab={setTab} onNewPage={() => setNewPage(true)} onTour={startTour} touring={tour} /> : null}
       <Canvas />
-      {!preview ? <Inspector /> : null}
+      {preview || focusMode ? null : panels.right ? <Inspector /> : <SettingsStrip />}
       <Toast />
       {newPage ? <NewPageDialog onClose={() => setNewPage(false)} /> : null}
       {keys ? <ShortcutsDialog onClose={() => setKeys(false)} /> : null}
