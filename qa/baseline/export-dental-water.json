@@ -1,0 +1,343 @@
+{
+  "files": [
+    "brief.md",
+    "images/",
+    "page.json"
+  ],
+  "page": [
+    {
+      "type": "hero",
+      "variant": "photo",
+      "data": {
+        "eyebrow": "Dental unit water testing",
+        "h1": "Compliance without compromise",
+        "sub": "In-office and mail-in tests for dental waterlines, with lab results you can act on.",
+        "body": "[Optional second paragraph: what is included and how it works.]",
+        "cta1": {
+          "label": "Compare tests",
+          "href": "#compare"
+        },
+        "cta2": {
+          "label": "Talk to a water expert",
+          "href": "/agenics-contact"
+        },
+        "image": {
+          "id": null,
+          "alt": "Gloved hand holding a petri dish of bacterial colonies against a light background"
+        }
+      },
+      "hidden": [
+        "body"
+      ]
+    },
+    {
+      "type": "trust",
+      "variant": "default",
+      "data": {
+        "items": [
+          {
+            "title": "CDC ELITE validated",
+            "detail": "For Legionella testing"
+          },
+          {
+            "title": "Results in 24 hours",
+            "detail": "With RapidCheck"
+          },
+          {
+            "title": "Photo documentation",
+            "detail": "Included with StandardCheck"
+          },
+          {
+            "title": "At your distributor",
+            "detail": "Patterson, Henry Schein, Benco and more"
+          }
+        ]
+      }
+    },
+    {
+      "type": "intro",
+      "variant": "paths",
+      "data": {
+        "h2": "Why waterline testing matters",
+        "body": "Dental unit waterlines build up biofilm that can push bacteria past the CDC limit of 500 CFU/mL. Routine testing shows whether your treatment protocol is working and documents compliance when your state board or an auditor asks.",
+        "paths": [
+          {
+            "title": "In-office testing",
+            "line": "Monitor between lab tests with a paddle you read in your office.",
+            "link": {
+              "label": "See MyCheck",
+              "href": "/shop/p/mycheck"
+            }
+          },
+          {
+            "title": "Mail-in lab testing",
+            "line": "Send samples to our lab for counts you can document.",
+            "link": {
+              "label": "Compare lab tests",
+              "href": "#compare"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "compare",
+      "variant": "default",
+      "data": {
+        "h2": "Compare dental water tests",
+        "columns": [
+          "Test",
+          "Method",
+          "Results in",
+          "What it measures",
+          "Best for"
+        ],
+        "rows": [
+          {
+            "cells": [
+              "RapidCheck™",
+              "Flow cytometry",
+              "24 hours",
+              "Live and dead bacteria, pH, TDS",
+              "High-volume clinics avoiding long chair downtime"
+            ]
+          },
+          {
+            "cells": [
+              "StandardCheck™",
+              "R2A culture",
+              "5 days",
+              "CFU, TDS, pH, plate photo",
+              "[Best-for line — confirm]"
+            ]
+          },
+          {
+            "cells": [
+              "SimCheck™",
+              "Enzyme substrate (HPC)",
+              "[confirm]",
+              "[confirm]",
+              "[Best-for line — confirm]"
+            ]
+          },
+          {
+            "cells": [
+              "MyCheck™",
+              "In-office HPC paddle",
+              "As early as 2 days",
+              "CFU count, not a range",
+              "[Best-for line — confirm]"
+            ]
+          }
+        ]
+      },
+      "anchor": "compare"
+    },
+    {
+      "type": "products",
+      "variant": "default",
+      "data": {
+        "h2": "Our most-ordered dental tests",
+        "intro": "Save on mail-in bacteria testing with an annual kit, available on each product page.",
+        "cards": [
+          {
+            "type": "Mail-in · flow cytometry",
+            "name": "RapidCheck™",
+            "tagline": "Greatest accuracy, fastest turnaround",
+            "bullets": [
+              "Results in 24 hours",
+              "Live and dead bacteria counts",
+              "Counts hard-to-culture bacteria"
+            ],
+            "price": "From $34.99",
+            "cta": {
+              "label": "Shop RapidCheck",
+              "href": "/shop/p/rapidcheck"
+            },
+            "link": {
+              "label": "Flow cytometry guide",
+              "href": ""
+            },
+            "image": {
+              "id": null,
+              "alt": "RapidCheck mail-in test kit"
+            }
+          },
+          {
+            "type": "Mail-in · R2A culture",
+            "name": "StandardCheck™",
+            "tagline": "The gold standard in dental water testing",
+            "bullets": [
+              "Results in 5 days",
+              "Includes CFU, TDS and pH",
+              "Photo documentation included"
+            ],
+            "price": "From $[confirm]",
+            "cta": {
+              "label": "Shop StandardCheck",
+              "href": ""
+            },
+            "link": {
+              "label": "Sample report",
+              "href": ""
+            },
+            "image": {
+              "id": null,
+              "alt": "StandardCheck mail-in test kit"
+            }
+          },
+          {
+            "type": "In-office · HPC paddle",
+            "name": "MyCheck™",
+            "tagline": "The easiest quantified in-office test",
+            "bullets": [
+              "Results in as early as 2 days",
+              "A CFU count, not a range",
+              "Log sheet in every box"
+            ],
+            "price": "From $25.99",
+            "cta": {
+              "label": "Shop MyCheck",
+              "href": "/shop/p/mycheck"
+            },
+            "link": {
+              "label": "MyCheck IFU",
+              "href": ""
+            },
+            "image": {
+              "id": null,
+              "alt": "Box of MyCheck in-office test paddles"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "proof",
+      "variant": "stats",
+      "data": {
+        "quote": "Working with Agenics has been a true collaboration centered on prioritizing patient safety above all else.",
+        "name": "Dr. Huy Than, DDS",
+        "role": "Site Dental Director, AltaMed Community Health Center",
+        "stats": [
+          {
+            "value": "69%",
+            "label": "U.S. average waterline pass rate"
+          },
+          {
+            "value": "98%",
+            "label": "AltaMed pass rate with Agenics"
+          }
+        ],
+        "link": {
+          "label": "Read the AltaMed story",
+          "href": ""
+        },
+        "image": {
+          "id": null,
+          "alt": "Dr. Huy Than, DDS"
+        }
+      }
+    },
+    {
+      "type": "resources",
+      "variant": "default",
+      "data": {
+        "h2": "Submission forms and instructions",
+        "link": {
+          "label": "See the full library",
+          "href": "/library"
+        },
+        "cards": [
+          {
+            "tag": "Form",
+            "title": "RapidCheck submission form",
+            "meta": "PDF · [size]",
+            "href": "",
+            "image": {
+              "id": null,
+              "alt": ""
+            }
+          },
+          {
+            "tag": "Form",
+            "title": "StandardCheck submission form",
+            "meta": "PDF · [size]",
+            "href": "",
+            "image": {
+              "id": null,
+              "alt": ""
+            }
+          },
+          {
+            "tag": "Form",
+            "title": "SimCheck submission form",
+            "meta": "PDF · [size]",
+            "href": "",
+            "image": {
+              "id": null,
+              "alt": ""
+            }
+          },
+          {
+            "tag": "IFU",
+            "title": "MyCheck instructions and log",
+            "meta": "PDF · [size]",
+            "href": "",
+            "image": {
+              "id": null,
+              "alt": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "faq",
+      "variant": "default",
+      "data": {
+        "h2": "Shipping and sampling questions",
+        "help": "Still have a question?",
+        "helpLink": {
+          "label": "Contact support",
+          "href": "/agenics-contact"
+        },
+        "items": [
+          {
+            "q": "How are mail-in kits shipped?",
+            "a": "[Answer from the current FAQ page, trimmed to 80 words.]"
+          },
+          {
+            "q": "Do I need overnight shipping for samples?",
+            "a": "[Answer from the current FAQ page.]"
+          },
+          {
+            "q": "Are there state restrictions for shipping?",
+            "a": "[Answer from the current FAQ page.]"
+          },
+          {
+            "q": "When should I collect samples?",
+            "a": "[Answer from the current FAQ page.]"
+          }
+        ]
+      }
+    },
+    {
+      "type": "cta",
+      "variant": "phone",
+      "data": {
+        "h2": "Not sure which test fits?",
+        "line": "Schedule a consultation with an Agenics dental water expert.",
+        "assure": "[e.g. No contracts. All materials included.]",
+        "cta": {
+          "label": "Schedule a consultation",
+          "href": "/agenics-contact"
+        },
+        "phone": "719-466-5592"
+      },
+      "hidden": [
+        "assure"
+      ]
+    }
+  ]
+}

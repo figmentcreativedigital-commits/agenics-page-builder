@@ -43,3 +43,6 @@ next-env.d.ts
 # keep the example env file
 !.env.example
 .share-data
+
+# QA output (screenshots, results)
+/qa/out

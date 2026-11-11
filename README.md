@@ -28,7 +28,7 @@ Built by Figment Creative for Agenics Labs. Follows the **Agenics Corporate Grap
 - **Change the number of items** (points, cards, questions, paragraphs) within each block's limits.
 - **Preview** at desktop, tablet and phone widths, or open the clean page in a new tab. Each view is laid out at a real screen width (desktop 1,280 px or wider, tablet 834, phone 390) and scaled to fit the window, so desktop always shows the desktop layout and the full agenics.com menu, and the views always read largest to smallest. The line above the page shows the width and the scale.
 - **Share a preview link.** **Share** in the top bar makes a link such as `/share/5dBw9qSUx9` that anyone can open on any device. Viewers see the page as visitors would, with a desktop / tablet / phone switch, and can't edit it. The link shows the version you published: after changes, **Update the link** refreshes it at the same address, and **Stop sharing** turns it off. Only the browser that created a link can update or stop it.
-- **Undo everything.** ⌘Z / ⌘⇧Z. Press **?** for all shortcuts.
+- **Undo everything.** ⌘Z / ⌘⇧Z undo and redo every change: blocks, text, photos, links, image descriptions, notes and section links. A burst of typing in one field is one step, and a step that changed nothing in the end is skipped. While the cursor is in a text slot, ⌘Z undoes typing inside it. Press **?** for all shortcuts.
 
 ## How the color works in the tool
 
@@ -67,6 +67,8 @@ Both can be added again at any time from **Pages › New page › Start from a f
 | `src/components/builder/` | The builder: top bar, rail and panels, canvas, settings panel, block thumbnails |
 | `src/lib/checks.ts` | Review checks |
 | `src/lib/exporters.ts` | Brief, zip and page-file export and import |
+| `src/lib/upgrade.ts` | Saved-page upgrades: pages from older versions of the builder open in today's form |
+| `qa/` | Quality checks: end-to-end, undo, old pages, export parity, speed, tour, accessibility and screenshot suites |
 | `src/lib/tour.ts`, `src/components/builder/Tour.tsx` | The guided tour: its script, and the spotlight that runs it |
 | `public/examples/` | Photography used by the worked examples |
 
@@ -75,6 +77,31 @@ Both can be added again at any time from **Pages › New page › Start from a f
 Pages are stored in the browser (localStorage; uploaded images in IndexedDB). Nothing leaves the browser until you share a preview link: then a copy of that page and its images is stored in the project's Vercel Blob store. To move an editable page between people or computers, use **Export › Page file (.json)** and **Open a page file**.
 
 Preview links need a Vercel Blob store connected to the project (one-time setup, below). Running locally without one, links are stored in `./.share-data` so the feature can be tried.
+
+## Old pages keep working
+
+Pages come back from many places: this browser, page files, share links, version history, My blocks and the block clipboard. Whenever the shape of page data changes, add an upgrade to `src/lib/upgrade.ts` so all of them open in today's form. An upgrade leaves a page alone when it doesn't apply, is safe to run twice, and never deletes content (it hides it instead, so **Show** brings it back). Before the data change ships, record pages from the current release with `qa/capture-fixtures.mjs`; the old-pages suite then checks they still open.
+
+## Quality checks
+
+The suites in `qa/` drive a production build in Chromium with Playwright and print PASS or FAIL for each check in plain words.
+
+```bash
+npm run build
+npm run qa                 # every suite, against next start on port 3210
+npm run qa -- undo typing  # some suites
+```
+
+| Suite | What it checks |
+| --- | --- |
+| `smoke` | The builder and both examples open with no errors; adding, typing, reordering, preview, every export, opening a page file, a share link, /specs and /preview |
+| `undo` | A photo, a typed word, a link, an image description and a note each undo in one step and nothing else; redo; empty steps are skipped |
+| `upgrade` | Browser storage, page files and a share link made by the last release open with nothing lost; pages from before October 2026 are upgraded on purpose |
+| `export` | The brief, zip and page file match the recorded baseline (`qa/baseline`); record a new one with `QA_RECORD=1` when a change is intended |
+| `typing` | Typing p75 under 50 ms on a 19-section page, no layout shift while typing, adding a section in about 120 ms |
+| `tour` | The tour opens once, every step has its target, the keys and the Tour button work |
+| `axe` | No accessibility violations beyond the known list in `qa/baseline/axe.json`, on every panel, menu and dialog, the share preview and the spec sheet |
+| `screens` | Screenshots at 1,280, 834 and 390 px in `qa/out/screens`, with nothing spilling out |
 
 ## Run locally
 
