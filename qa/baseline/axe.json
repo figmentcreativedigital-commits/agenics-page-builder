@@ -1,0 +1,51 @@
+{
+  "Builder, Add panel": [
+    "color-contrast"
+  ],
+  "Layers panel": [
+    "color-contrast"
+  ],
+  "Pages panel": [
+    "color-contrast"
+  ],
+  "Review panel": [
+    "color-contrast"
+  ],
+  "History panel": [
+    "color-contrast"
+  ],
+  "Settings: Content": [
+    "color-contrast"
+  ],
+  "Settings: Style": [
+    "color-contrast"
+  ],
+  "Settings: Show / hide": [
+    "color-contrast"
+  ],
+  "Export menu": [
+    "color-contrast"
+  ],
+  "Help menu": [
+    "color-contrast",
+    "target-size"
+  ],
+  "Keyboard shortcuts": [
+    "color-contrast"
+  ],
+  "Share dialog": [
+    "color-contrast"
+  ],
+  "Photo library": [
+    "color-contrast"
+  ],
+  "New page dialog": [
+    "color-contrast"
+  ],
+  "Page being built (editing)": [
+    "color-contrast",
+    "target-size"
+  ],
+  "Share preview": [],
+  "Spec sheet": []
+}

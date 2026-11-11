@@ -1,0 +1,387 @@
+{
+  "format": "agenics-page-builder@1",
+  "page": {
+    "id": "2d744c8d-2635-4a84-aaae-6842ce602e51",
+    "name": "QA saved page",
+    "slug": "st108-water-testing",
+    "seoTitle": "ST108 Water Quality Testing Kits | Agenics Labs",
+    "metaDescription": "Agenics Affirm™ mail-in kits make ANSI/AAMI ST108 water quality testing simple: all materials included, no contracts, and results delivered online.",
+    "recipe": "explainer",
+    "createdAt": 1794417743339,
+    "updatedAt": 1794417747373,
+    "modules": [
+      {
+        "uid": "dbc326e2-cd9c-4505-b2c2-c1bff8966022",
+        "type": "hero",
+        "variant": "photo",
+        "data": {
+          "eyebrow": "Sterile processing water testing",
+          "h1": "Simplify ST108 Water Quality Testing",
+          "sub": "Agenics Affirm™ makes it easy to qualify and routinely monitor sterile processing water quality with convenient mail-in test kits.",
+          "cta1": {
+            "label": "Order a test kit",
+            "href": "#order"
+          },
+          "cta2": {
+            "label": "Learn about ST108",
+            "href": "#what-is-st108"
+          },
+          "image": {
+            "id": "107a061e-4f9f-4c02-81cf-6cc5dff2672e",
+            "alt": "Gloved hand loading instrument trays into a sterilizer",
+            "w": 1600,
+            "h": 900,
+            "name": "photo.jpg",
+            "type": "image/jpeg"
+          }
+        },
+        "hidden": [
+          "eyebrow"
+        ]
+      },
+      {
+        "uid": "86286017-3100-4140-b43f-e4e2b900def6",
+        "type": "explainer",
+        "variant": "numbered",
+        "data": {
+          "eyebrow": "[Topic]",
+          "h2": "What Is ST108?",
+          "paras": [
+            "ANSI/AAMI ST108 is the first comprehensive U.S. standard focused specifically on the quality of water used for processing medical devices. It establishes requirements for water quality management programs, Saved before the release.including testing, monitoring, documentation, review, and corrective actions.",
+            "The standard recognizes water quality itself as an important patient safety variable in medical device processing."
+          ],
+          "listTitle": "ST108 water quality management includes:",
+          "items": [
+            "Assessing current water systems and quality",
+            "Implementing a water management plan",
+            "Validating that systems meet water quality requirements",
+            "Routinely monitoring water quality"
+          ],
+          "cta": {
+            "label": "[Read the overview]",
+            "href": ""
+          }
+        },
+        "hidden": [
+          "eyebrow",
+          "cta"
+        ],
+        "anchor": "what-is-st108"
+      },
+      {
+        "uid": "889c5d68-69db-496f-b803-0c7942f73bde",
+        "type": "grid",
+        "variant": "split",
+        "data": {
+          "eyebrow": "[Why it matters]",
+          "h2": "ST108 Testing Without the Complexity",
+          "intro": "For many outpatient facilities, traditional water quality solutions may be more extensive than what is needed. Agenics Affirm™ provides a simpler option specifically designed around ST108 water quality testing.",
+          "items": [
+            {
+              "icon": "cart",
+              "title": "Easy to Order",
+              "body": "Order test kits online when you need them."
+            },
+            {
+              "icon": "kit",
+              "title": "Everything Included",
+              "body": "Each kit includes all needed testing materials."
+            },
+            {
+              "icon": "unlock",
+              "title": "No Contracts",
+              "body": "Straightforward pricing without long-term contracts."
+            },
+            {
+              "icon": "online",
+              "title": "Easy-to-Understand Results",
+              "body": "Results are delivered online in a user-friendly report."
+            }
+          ],
+          "cta": {
+            "label": "Order Agenics Affirm",
+            "href": "#order"
+          }
+        },
+        "hidden": [
+          "eyebrow",
+          "intro"
+        ],
+        "style": {
+          "bg": "white"
+        },
+        "note": "Saved before the release",
+        "anchor": "saved-before"
+      },
+      {
+        "uid": "fc8ec68a-e441-48e5-bdef-166fcb455351",
+        "type": "products",
+        "variant": "default",
+        "data": {
+          "h2": "Choose your Affirm kit",
+          "intro": "Pick the kit for the ST108 water category you are testing: AffirmCritical™ for critical water, AffirmUtility™ for utility water. Each kit includes all needed testing materials.",
+          "cards": [
+            {
+              "type": "Critical water · monthly",
+              "name": "AffirmCritical™",
+              "tagline": "For ST108 critical water sources",
+              "bullets": [
+                "Reports endotoxin and bacteria",
+                "Monthly testing for critical water",
+                "Critical+ adds pH, hardness and more"
+              ],
+              "price": "From $[price]",
+              "cta": {
+                "label": "Order AffirmCritical",
+                "href": "/shop/p/affirmcritical-9bepc"
+              },
+              "link": {
+                "label": "Sample submission form",
+                "href": "/s/GP40000-Affirm_Critical_Sample-Submission-Form.pdf"
+              },
+              "image": {
+                "id": null,
+                "src": "/examples/st108/st108-affirm-critical-kit-1x1.png",
+                "w": 1200,
+                "h": 1200,
+                "alt": "AffirmCritical test kit with sample vials, instructions and mailer",
+                "name": "st108-affirm-critical-kit-1x1.png",
+                "type": "image/png"
+              }
+            },
+            {
+              "type": "Utility water · quarterly",
+              "name": "AffirmUtility™",
+              "tagline": "For ST108 utility water sources",
+              "bullets": [
+                "Reports bacteria",
+                "Quarterly testing for utility water",
+                "Utility+ adds pH, hardness and more"
+              ],
+              "price": "From $[price]",
+              "cta": {
+                "label": "Order AffirmUtility",
+                "href": "/shop/p/affirmutility-5b8af"
+              },
+              "link": {
+                "label": "Sample submission form",
+                "href": "/s/GP40010-Affirm_Utility_Sample-Submission-Form.pdf"
+              },
+              "image": {
+                "id": null,
+                "src": "/examples/st108/st108-affirm-utility-kit-1x1.png",
+                "w": 1200,
+                "h": 1200,
+                "alt": "AffirmUtility test kit with sample vials, instructions and mailer",
+                "name": "st108-affirm-utility-kit-1x1.png",
+                "type": "image/png"
+              }
+            }
+          ]
+        },
+        "hidden": [
+          "cards.*.price"
+        ],
+        "anchor": "order",
+        "note": "Added by Figment, not in the 10.26 copy deck: every “Order a test kit” button lands here (#order) so visitors pick Critical or Utility. Copy adapted from agenics.com/medical and the Affirm sell sheet. Prices are switched off until confirmed. Delete this block if it is not wanted."
+      },
+      {
+        "uid": "d30c9bd4-1d66-438b-a1c7-c916a9444d4e",
+        "type": "grid",
+        "variant": "cols-3",
+        "data": {
+          "eyebrow": "[Why it matters]",
+          "h2": "Why Water Quality Matters",
+          "intro": "ST108 puts greater focus on the role water quality plays in medical device processing. Three primary areas of impact include:",
+          "items": [
+            {
+              "icon": "patient",
+              "title": "Patients",
+              "body": "Water quality management can help reduce risks associated with microbial or endotoxin contamination."
+            },
+            {
+              "icon": "instruments",
+              "title": "Devices",
+              "body": "Proper water quality can help reduce corrosion, pitting and scaling that affect equipment performance and longevity."
+            },
+            {
+              "icon": "facility",
+              "title": "Facilities",
+              "body": "Better water quality management can improve water system effectiveness while reducing maintenance associated with scaling and buildup."
+            }
+          ],
+          "cta": {
+            "label": "[Order a test kit]",
+            "href": ""
+          }
+        },
+        "hidden": [
+          "eyebrow",
+          "cta"
+        ],
+        "style": {
+          "bg": "navy"
+        }
+      },
+      {
+        "uid": "7fca9838-9545-4ce3-9cd7-0ddf164c7848",
+        "type": "audience",
+        "variant": "list",
+        "data": {
+          "eyebrow": "[Who it is for]",
+          "h2": "Built for Outpatient Healthcare",
+          "sub": "Designed for the Facilities That Need a Simpler Solution",
+          "body": "Agenics Affirm™ is particularly well suited for smaller healthcare environments that need to monitor sterile processing water quality without the complexity of a large-scale water management service.",
+          "items": [
+            {
+              "icon": "clinic",
+              "title": "Ambulatory Surgery Centers",
+              "body": "Including orthopedic, ophthalmology, gastroenterology, ENT and multispecialty surgery centers."
+            },
+            {
+              "icon": "stethoscope",
+              "title": "Office-Based Surgical Practices",
+              "body": "Including oral surgery, OMS, periodontics, plastic surgery and dermatology practices."
+            },
+            {
+              "icon": "community",
+              "title": "Community-Based Healthcare",
+              "body": "Including FQHCs, community health centers and rural health clinics."
+            }
+          ],
+          "cta": {
+            "label": "[Talk to our team]",
+            "href": ""
+          },
+          "image": {
+            "id": null,
+            "alt": ""
+          }
+        },
+        "hidden": [
+          "eyebrow",
+          "cta"
+        ]
+      },
+      {
+        "uid": "b6eeac6c-06ae-4066-9e33-a0b3ebe0fd6b",
+        "type": "statement",
+        "variant": "center",
+        "data": {
+          "eyebrow": "[The alternative]",
+          "h2": "A Simpler Alternative to Traditional Water Quality Testing",
+          "paras": [
+            "Facilities commonly rely on water treatment providers, environmental laboratories, or internal monitoring. Each approach can present limitations, particularly for smaller outpatient environments.",
+            "Agenics Affirm™ offers another option: an easy mail-in testing solution specifically designed around ST108 water quality requirements."
+          ],
+          "statement": "No contracts. No complicated service model. All needed testing materials included.",
+          "cta": {
+            "label": "Order a test kit",
+            "href": "#order"
+          }
+        },
+        "hidden": [
+          "eyebrow"
+        ],
+        "style": {
+          "bg": "cyan"
+        }
+      },
+      {
+        "uid": "7344c651-4d85-4168-ad2f-0a9be943d49e",
+        "type": "story",
+        "variant": "image-right",
+        "data": {
+          "eyebrow": "[Label]",
+          "h2": "Understand Your Water. Document Your Results.",
+          "paras": [
+            "ST108 calls for water quality management programs that include testing, monitoring, documentation, review and corrective actions.",
+            "Agenics Affirm™ provides a simple option for testing and reporting, with results delivered online in a user-friendly format.",
+            "That gives the facility the information it needs to incorporate testing results into its broader ST108 water quality management program."
+          ],
+          "cta": {
+            "label": "[Learn more]",
+            "href": ""
+          },
+          "image": {
+            "id": null,
+            "src": "/examples/st108/st108-sterilizer-chamber-3x2.jpg",
+            "w": 1254,
+            "h": 837,
+            "alt": "Open sterilizer with wrapped instrument packs loaded on its racks",
+            "name": "st108-sterilizer-chamber-3x2.jpg",
+            "type": "image/jpeg"
+          }
+        },
+        "hidden": [
+          "eyebrow",
+          "cta"
+        ]
+      },
+      {
+        "uid": "e26fc1c5-e53d-4972-94a3-f368bdbfd869",
+        "type": "faq",
+        "variant": "default",
+        "data": {
+          "h2": "Frequently asked questions",
+          "help": "[Still have a question?]",
+          "helpLink": {
+            "label": "[Contact support]",
+            "href": ""
+          },
+          "items": [
+            {
+              "q": "What is ST108?",
+              "a": "ANSI/AAMI ST108 is a U.S. standard focused on the quality of water used to process medical devices. It establishes requirements for water quality management programs that include testing, monitoring, documentation, review and corrective actions."
+            },
+            {
+              "q": "What is Agenics Affirm™?",
+              "a": "Agenics Affirm™ is a mail-in water testing kit designed specifically for ST108 water quality testing."
+            },
+            {
+              "q": "What’s included?",
+              "a": "Affirm test kits include all needed materials."
+            },
+            {
+              "q": "How do I receive my results?",
+              "a": "Results are delivered online in a user-friendly report."
+            },
+            {
+              "q": "Do I need a contract?",
+              "a": "No. Affirm offers straightforward pricing without contracts."
+            },
+            {
+              "q": "Is ST108 only relevant to hospitals?",
+              "a": "No. Agenics Affirm™ is designed with non-acute and outpatient healthcare in mind, including ambulatory surgery centers, office-based surgical practices and community-based healthcare facilities."
+            }
+          ]
+        },
+        "hidden": [
+          "support"
+        ],
+        "style": {
+          "bg": "silver"
+        },
+        "anchor": "faq"
+      },
+      {
+        "uid": "d3094af0-4ffd-4c61-a276-cbaa99c5f443",
+        "type": "cta",
+        "variant": "button",
+        "data": {
+          "h2": "Make ST108 Testing Easier",
+          "line": "Agenics Affirm™ gives outpatient healthcare facilities a simple way to test and monitor sterile processing water quality.",
+          "cta": {
+            "label": "Order a test kit",
+            "href": "#order"
+          },
+          "phone": "719-466-5592"
+        },
+        "hidden": []
+      }
+    ]
+  },
+  "images": {
+    "107a061e-4f9f-4c02-81cf-6cc5dff2672e": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA4KCw0LCQ4NDA0QDw4RFiQXFhQUFiwgIRokNC43NjMuMjI6QVNGOj1OPjIySGJJTlZYXV5dOEVmbWVabFNbXVn/2wBDAQ8QEBYTFioXFypZOzI7WVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVn/wAARCAOEBkADASIAAhEBAxEB/8QAGwABAQEAAwEBAAAAAAAAAAAAAAEGAwQFBwL/xABAEAEAAgECAgYHBQQKAgMAAAAAAQIDBBEFIQYSMUFRYRMicYGRsdEUIzKh8BVCweEWMzVTVHJzkqKyQ/FSYoL/xAAaAQEBAAMBAQAAAAAAAAAAAAAAAQQFBgMC/8QALREBAAIBAwIEBQQDAQAAAAAAAAECAwQREiExBTJBURMUImGxQnGBkRVS8MH/2gAMAwEAAhEDEQA/AMoA2jVgAKAqAAKAAAAqKIKigAAACKAAAAqKqAAAAigAoAAACoogAoKigACAAKACgCAACooAAgACgKAAgqKAqKAAAAIoAAAKAqAACoogqKAAAACgCAACooACoAAoAKAIAAKigACCooAACoogAoKigACCooAAAAKAIAAoCoKigAAACKAAACgCAAKAAACgKgACgAACCooAAKAIAAoAACoKigAAACKAAqKAAIKigAAKiqgAAACgCCooAACoogADHgMR0AACgKgACgAAAKiiCooAAAAigAAAKiqgAAAIoAKAAAAqKIAKCooAAgACgAoAgAAqKAAIAAoCgAIKigKigAAACKAAACgKgAAqKIKigAAAAoAgAAqKAAqAAKACgCAACooAAgqKAAAqKIAKCooAAgqKAAAACgCAAKAqCooAAAAigAAAoAgACgAAAoCoAAoAAAgqKAACgCAAKAAAqCooAAAAigAKigACCooAACoqoAAAAoAgqKAAAqKIAAx4DEdAAAoCoAAoAAACoogqKAAAAIoAAACoqoAAACKACgAAAKiiACgqKAAIAAoAKAIAAKigACAAKAoACCooCooAAAAigAAAoCoAAKiiCooAAAAKAIAAKigAKgACgAoAgAAqKAAIKigAAKiiACgqKAAIKigAAAAoAgACgKgqKAAAAIoAAAKAIAAoAAAKAqAAKAAAIKigAAoAgACgAAKgqKAAAAIoACooAAgqKAAAqKqAAAAKAIKigAAKiiAAMeAxHQAAKAqAAKAAAAqKIKigAAACKAAAAqKqAAAAigAoAAACoogAoKigACAAKACgCAACooAAgACgKAAgqKAqKAAAAIoAAAKAqAACoogqKAAAACgCAACooACoAAoAKAIAAKigACCooAACoogAoKigACCooAAAAKAIAAoCoKigAAACKAAACgCAAKAAACgKgACgAACCooAAKAIAAoAACoKigAAACKAAqKAAIKigAAKiqgAAACgCCooAACoogADHgMR0AACgKgACgAAAKiiCooAAAAigAAAKiqgAAAIoAKAAAAqKIAKCooAAgACgAoAgAAqKAAIAAoCgAIKigKigAAACKAAACgKgAAqKIKigAAAAoAgAAqKAAqAAKACgCAACooAAgqKAAAqKIAKCooAAgqKAAAACgCAAKAqCooAAAAigAAAoAgACgAAAoCoAAoAAAgqKAACgCAAKAAAqCooAAAAigAKigACCooAACoqoAAAAoAgqKAAAqKIAAx4DEdAAAoCoAAoAAACoogqKAAAAIoAAACoqoAAACKACgAAAKiiACgqKAAIAAoAKAIAAKigACAAKAoACCooCooAAAAigAAAoCoAAKiiCooAAAAKAIAAKigAKgACgAoAgAAqKAAIKigAAKiiACgqKAAIKigAAAAoAgACgKgqKAAAAIoAAAKAIAAoAAAKAqAAKAAAIKigAAoAgACgAAKgqKAAAAIoACooAAgqKAAAqKqAAAAKAIKigAAKiiAAMeAxHQAAKAqAAKAAAAqKIKigAAACKAAAAqKqAAAAigAoAAACoogAoKigACAAKACgCAACooAAgACgKAAgqKAqKAAAAIoAAAKAqAACoogqKAAAACgCAACooACoAAoAKAIAAKigACCooAACoogAoKigACCooAAAAKAIAAoCoKigAAACKAAACgCAAKAAACgKgACgAACCooAAKAIAAoAACoKigAAACKAAqKAAIKigAAKiqgAAACgCCooAACoogADHgMR0AACgKgACgAAAKiiCooAAAAigAAAKiqgAAAIoAKAAAAqKIAKCooAAgACgAoAgAAqKAAIAAoCgAIKigKigAAACKAAACgKgAAqKIKigAAAAoAgAAqKAAqAAKACgCAACooAAgqKAAAqKIAKCooAAgqKAAAACgCAAKAqCooAAAAigAAAoAgACgAAAoCoAAoAAAgqKAACgCAAKAAAqCooAAAAigAKigACCooAACoqoAAAAoAgqKAAAqKIAAx4DEdAAAoCoAAoAAACoogqKAAAAIoAAACoqoAAACKACgAAAKiiACgqKAAIAAoAKAIAAKigACAAKAoACCooCooAAAAigAAAoCoAAKiiCooAAAAKAIAAKigAKgACgAoAgAAqKAAIKigAAKiiACgqKAAIKigAAAAoAgACgKgqKAAAAIoAAAKAIAAoAAAKAqAAKAAAIKigAAoAgACgAAKgqKAAAAIoACooAAgqKAAAqKqAAAAKAIKigAAKiiAAMeAxHQAAKAqAAKAAAAqKIKigAAACKAAAAqKqAAAAigAoAAACoogAoKigACAAKACgCAACooAAgACgKAAgqKAqKAAAAIoAAAKAqAACoogqKAAAACgCAACooACoAAoAKAIAAKigACCooAACoogAoKigACCooAAAAKAIAAoCoKigAAACKAAACgCAAKAAACgKgACgAACCooAAKAIAAoAACoKigAAACKAAqKAAIKigAAKiqgAAACgCCooAACoogADHgMR0AACgKgACgAAAKiiCooAAAAigAAAKiqgAAAIoAKAAAAqKIAKCooAAgACgAoAgAAqKAAIAAoCgAIKigKigAAACKAAACgKgAAqKIKigAAAAoAgAAqKAAqAAKACgCAACooAAgqKAAAqKIAKCooAAgqKAAAACgCAAKAqCooAAAAigAAAoAgACgAAAoCoAAoAAAgqKAACgCAAKAAAqCooAAAAigAKigACCooAACoqoAAAAoAgqKAAAqKIAAx4DEdAAAoCoAAoAAACoogqKAAAAIoAAACoqoAAACKACgAAAKiiACgqKAAIAAoAKAIAAKigACAAKAoACCooCooAAAAigAAAoCoAAKiiCooAAAAKAIAAKigAKgACgAoAgAAqKAAIKigAAKiiACgqKAAIKigAAAAoAgACgKgqKAAAAIoAAAKAIAAoAAAKAqAAKAAAIKigAAoAgACgAAKgqKAAAAIoACooAAgqKAAAqKqAAAAKAIKigAAKiiAAMeAxHQAAKAqAAKAAAAqKIKigAAACKAAAAqKqAAAAigAoAAACoogAoKigACAAKACgCAACooAAgACgKAAgqKAqKAAAAIoAAAKAqAACoogqKAAAACgCAACooACoAAoAKAIAAKigACCooAACoogAoKigACCooAAAAKAIAAoCoKigAAACKAAACgCAAKAAACgKgACgAACCooAAKAIAAoAACoKigAAACKAAqKAAIKigAAKiqgAAACgCCooAACoogADHgMR0AACgKgACgAAAKiiCooAAAAigAAAKiqgAAAIoAKAAAAqKIAKCooAAgACgAoAgAAqKAAIAAoCgAIKigKigAAACKAAACgKgAAqKIKigAAAAoAgAAqKAAqAAKACgCAACooAAgqKAAAqKIAKCooAAgqKAAAACgCAAKAqCooAAAAigAAAoAgACgAAAoCoAAoAAAgqKAACgCAAKAAAqCooAAAAigAKigACCooAACoqoAAAAoAgqKAAAqKIAAx4DEdAAAoCoAAoAAACoogqKAAAAIoAAACoqoAAACKACgAAAKiiACgqKAAIAAoAKAIAAKigACAAKAoACCooCooAAAAigAAAoCoAAKiiCooAAAAKAIAAKigAKgACgAoAgAAqKAAIKigAAKiiACgqKAAIKigAAAAoAgACgKgqKAAAAIoAAAKAIAAoAAAKAqAAKAAAIKigAAoAgACgAAKgqKAAAAIoACooAAgqKAAAqKqAAAAKAIKigAAKiiAAMeAxHQAAKAqAAKAAAAqKIKigAAACKAAAAqKqAAAAigAoAAACoogAoKigACAAKACgCAACooAAgACgKAAgqKAqKAAAAIoAAAKAqAACoogqKAAAACgCAACooACoAAoAKAIAAKigACCooAACoogAoKigACCooAAAAKAIAAoCoKigAAACKAAACgCAAKOzpuH6vVdX0OnyWrbfa221Z988nfxdG9fkrM29Finfba9uf5bvi2Sle8vWuHJfy1l440deitprHW1kRbbnEY94ifi7f9GNF/e6j/dX6PKdTjj1e8aHNPoyQ2mPo/w6lIrbFbJMfvWvO8/DaH6/YXDf8N/zt9Xz83T2l9/47L7x/wB/DEjbfsLhv+G/52+qW4Dw61ZiME1mY23i9t4/M+bp7Sf47L7x/wB/DFjWf0Z0X97qP91fo4LdFq9aerq5iu/KJx7zEfF9xqcfu850OaPRmh7OTo3rqUm1Zw5Jj92tp3n4xEOjn4ZrdPv6XTZIiI60zWOtER5zHJ6RlpbtLwtgyV81ZdRUV6PEABQBAAFAAAVBUUAAAARQAFRQABBU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AqKIAAx4DEdAAAoCoAAoAAACoogqKAAAAIoAAACoqoAAACKACgAAAKiiACgqKAAIAAoAKAIAAKigACAAKAoACCooCooAAAAigAAAoCoAAKiiCooAAAAKAIAAKigAKgACgAoAgAAqKAAIKigAAKiiACgqKAAIKigAAAAoAgACgKgqKAAAAIoAAAKAI72k4trdJtGPPaaRt6l/WjaO7n2R7Hr6fpT+GNTpvHrWx2+UT9WaHlbDS3eGRj1OXH5ZbjT8d4fn6sem9Fa2/q5I229s9n5u/izYs9ZthyUyVidt6WiY39z5yPC2kr6Syq+I3jzRu+kj59XXaulYrXVZ61rG0RGSYiIdv9vcS/xP/Cv0ec6S3pL3jxGnrEtsMhj6Sa6lIraMOSY/etWd5+ExD9f0m1v91p/9tvq+Plcj0+fw/drRkv6Ta3+60/8Att9Ut0l1tqzEUwVmY23is7x+Z8rkPn8LXDFft3iX+J/4V+jr24jrbWm06vPvM78rzEfB9xo7+svOfEsfpEt3kyUxUm+S9aUjttadoh0s/GdBg3idRW9tt4jH62/lvHLdhx6Ro6+svC3iVp8tdmmz9J6RvGn09rcuVsk7bT7I33j3vK1PGtdqJ55pxV33iuL1dvf2/m85XvXBSvaGJk1WW/ewA9mMoAgACgAAKgqKAAAAIoACooAAgqKAAAqKqAAAAKAIKigAAKiiAAMeAxHQAAKAqAAKAAAAqKIKigAAACKAAAAqKqAAAAigAoAAACoogAoKigACAAKACgCAACooAAgACgKAAgqKAqKAAAAIoAAAKAqAACoogqKAAAACgCAACooACoAAoAKAIAAKigACCooAACoogAoKigACCooAAAAKAIAAoCoKigAAACKAAACgCAAKAAACgKgACgAACCooAAKAIAAoAACoKigAAACKAAqKAAIKigAAKiqgAAACgCCooAACoogADHgMR0AACgKgACgAAAKiiCooAAAAigAAAKiqgAAAIoAKAAAAqKIAKCooAAgACgAoAgAAqKAAIAAoCgAIKigKigAAACKAAACgKgAAqKIKigAAAAoAgAAqKAAqAAKACgCAACooAAgqKAAAqKIAKCooAAgqKAAAACgCAAKAqCooAAAAigAAAoAgACgAAAoCoAAoAAAgqKAACgCAAKAAAqCooAAAAigAKigACCooAACoqoAAAAoAgqKAAAqKIAAx4DEdAAAoCoAAoAAACoogqKAAAAIoAAACoqoAAACKACgAAAKiiACgqKAAIAAoAKAIAAKigACAAKAoACCooCooAAAAigAAAoCoAAKiiCooAAAAKAIAAKigAKgACgAoAgAAqKAAIKigAAKiiACgqKAAIKigAAAAoAgACgKgqKAAAAIoAAAKAIAAoAAAKAqAAKAAAIKigAAoAgACgAAKgqKAAAAIoACooAAgqKAAAqKqAAAAKAIKigAAKiiAAMeAxHQAAKAqAAKAAAAqKIKigAAACKAAAAqKqAAAAigAoAAACoogAoKigACAAKACgCAACooAAgACgKAAgqKAqKAAAAIoAAAKAqAACoogqKAAAACgCAACooACoAAoAKAIAAKigACCooAACoogAoKigACCooAAAAKAIAAoCoKigAAACKAAACgCAAKAAACgKgACgAACCooAAKAIAAoAACoKigAAACKAAqKAAIKigAAKiqgAAACgCCooAACoogADHgMR0AACgKgACgAAAKiiCooAAAAigAAAKiqgAAAIoAKAAAAqKIAKCooAAgACgAoAgAAqKAAIAAoCgAIKigKigAAACKAAACgKgAAqKIKigAAAAoAgAAqKAAqAAKACgCAACooAAgqKAAAqKIAKCooAAgqKAAAACgCAAKAqCooAAAAigAAAoAgACgAAAoCoAAoAAAgqKAACgCAAKAAAqCooAAAAigAKigACCooAACoqoAAAAoAgqKAAAqKIAAx4DEdAAAoCoAAoAAACoogqKAAAAIoAAACoqoAAACKACgAAAKiiACgqKAAIAAoAKAIAAKigACAAKAoACCooCooAAAAigAAAoCoAAKiiCooAAAAKAIAAKigAKgACgAoAgAAqKAAIKigAAKiiACgqKAAIKigAAAAoAgACgKgqKAAAAIoAAAKAIAAoAAAKAqAAKAAAIKigAAoAgACgAAKgqKAAAAIoACooAAgqKAAAqKqAAAAKAIKigAAKiiAAMeAxHQAAKAqAAKAAAAqKIKigAAACKAAAAqKqAAAAigAoAAACoogAoKigACAAKACgCAACooAAgACgKAAgqKAqKAAAAIoAAAKAqAACoogqKAAAACgCAACooACoAAoAKAIAAKigACCooAACoogAoKigACCooAAAAKAIAAoCoKigAAACKAAACgCAAKAAACgKgACgAACCooAAKAIAAoAACoKigAAACKAAqKAAIKigAAKiqgAAACgCCooAACoogADHgMR0AACgKgACgAAAKiiCooAAAAigAAAKiqgAAAIoAKAAAAqKIAKCooAAgACgAoAgAAqKAAIAAoCgAIKigKigAAACKAAACgKgAAqKIKigAAAAoAgAAqKAAqAAKACgCAACooAAgqKAAAqKIAKCooAAgqKAAAACgCAAKAqCooAAAAigAAAoAgACgAAAoCoAAoAAAgqKAACgCAAKAAAqCooAAAAigAKigACCooAACoqoAAAAoAgqKAAAqKIAAx4DEdAAAoCoAAoAAACoogqKAAAAIoAAACoqoAAACKACgAAAKiiACgqKAAIAAoAKAIAAKigACAAKAoACCooCooAAAAigAAAoCoAAKiiCooAAAAKAIAAKigAKgACgAoAgAAqKAAIKigAAKiiACgqKAAIKigAAAAoAgACgKgqKAAAAIoAAAKAIAAoAAAKAqAAKAAAIKigAAoAgACgAAKgqKAAAAIoACooAAgqKAAAqKqAAAAKAIKigAAKiiAAMeAxHQAAKAqAAKAAAAqKIKigAAACKAAAAqKqAAAAigAoAAACoogAoKigACAAKACgCAACooAAgACgKAAgqKAqKAAAAIoAAAKAqAACoogqKAAAACgCAACooACoAAoAKAIAAKigACCooAACoogAoKigACCooAAAAKAIAAoCoKigAAACKAAACgCAAKAAACgKgACgAACCooAAKAIAAoAACoKigAAACKAAqKAAIKigAAKiqgAAACgCCooAACoogADHgMR0AACgKgACgAAAKiiCooAAAAigAAAKiqgAAAIoAKAAAAqKIAKCooAAgACgAoAgAAqKAAIAAoCgAIKigKigAAACKAAACgKgAAqKIKigAAAAoAgAAqKAAqAAKACgCAACooAAgqKAAAqKIAKCooAAgqKAAAACgCAAKAqCooAAAAigAAAoAgACgAAAoCoAAoAAAgqKAACgCAAKAAAqCooAAAAigAKigACCooAACoqoAAAAoAgqKAAAqKIAAx4DEdAAAoCoAAoAAACoogqKAAAAIoAAACoqoAAACKACgAAAKiiACgqKAAIAAoAKAIAAKigACAAKAoACCooCooAAAAigAAAoCoAAKiiCooAAAAKAIAAKigAKgACgAoAgAAqKAAIKigAAKiiACgqKAAIKigAAAAoAgACgKgqKAAAAIoAAAKAIAAoAAAKAqAAKAAAIKigAAoAgACgAAKgqKAAAAIoACooAAgqKAAAqKqAAAAKAIKigAAKiiAAMeAxHQAAKAqAAKAAAAqKIKigAAACKAAAAqKqAAAAigAoAAACoogAoKigACAAKACgCAACooAAgACgKAAgqKAqKAAAAIoAAAKAqAACoogqKAAAACgCAACooACoAAoAKAIAAKigACCooAACoogAoKigACCooAAAAKAIAAoCoKigAAACKAAACgCAAKAAACgKgACgAACCooAAKAIAAoAACoKigAAACKAAqKAAIKigAAKiqgAAACgCCooAACoogADHgMR0AACgKgACgAAAKiiCooAAAAigAAAKiqgAAAIoAKAAAAqKIAKCooAAgACgAoAgAAqKAAIAAoCgAIKigKigAAACKAAACgKgAAqKIKigAAAAoAgAAqKAAqAAKACgCAACooAAgqKAAAqKIAKCooAAgqKAAAACgCAAKAqCooAAAAigAAAoAgACgAAAoCoAAoAAAgqKAACgCAAKAAAqCooAAAAigAKigACCooAACoqoAAAAoAgqKAAAqKIAAx4DEdAAAoCoAAoAAACoogqKAAAAIoAAACoqoAAACKACgAAAKiiACgqKAAIAAoAKAIAAKigACAAKAoACCooCooAAAAigAAAoCoAAKiiCooAAAAKAIAAKigAKgACgAoAgAAqKAAIKigAAKiiACgqKAAIKigAAAAoAgACgKgqKAAAAIoAAAKAIAAoAAAKAqAAKAAAIKigAAoAgACgAAKgqKAAAAIoACooAAgqKAAAqKqAAAAKAIKigAAKiiAAMeAxHQAAKAqAAKAAAAoCCgAAAAIoAAACgqAAAAigAoAAACgIAKCgAAIAAoAKAIAAKAAAgACgKAAgoAKAAAAAigAAAoCoAAKAgoAAAAAoAgAAoAAKgACgAoAgAAoAACCgAAAoCACgoAACCgAAAACgCAAKAqCgAAAAIoAAAKAIAAoAAAKAqAAKAAAIKAAAKAIAAoAACoKAAAAAigAKAAAgoAAAKCoAAAAoAgoAAAKAgAD/9k="
+  }
+}

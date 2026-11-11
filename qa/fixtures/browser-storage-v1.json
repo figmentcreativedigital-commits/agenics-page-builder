@@ -1,0 +1,1283 @@
+{
+  "version": 1,
+  "state": {
+    "pages": [
+      {
+        "id": "2a8e6e8b-ee34-4e54-835a-9ab866e4836a",
+        "name": "Master template",
+        "slug": "",
+        "seoTitle": "",
+        "metaDescription": "",
+        "recipe": "master",
+        "modules": [
+          {
+            "uid": "cf4249ed-d4e4-42e8-9278-b04994f690b8",
+            "type": "hero",
+            "variant": "photo",
+            "data": {
+              "eyebrow": "[For dental practices]",
+              "h1": "[Outcome headline in 45 characters or fewer]",
+              "sub": "[Who this page is for and what they get from it, in one plain sentence.]",
+              "cta1": {
+                "label": "[Shop dental tests]",
+                "href": ""
+              },
+              "cta2": {
+                "label": "[Talk to a water expert]",
+                "href": ""
+              },
+              "image": {
+                "id": null,
+                "alt": ""
+              }
+            },
+            "hidden": []
+          },
+          {
+            "uid": "4fb2dbe1-74a2-4011-b311-40aac64c9ccb",
+            "type": "trust",
+            "variant": "default",
+            "data": {
+              "items": [
+                {
+                  "title": "[Proof point one]",
+                  "detail": "[e.g. CDC ELITE Program participant]"
+                },
+                {
+                  "title": "[Proof point two]",
+                  "detail": "[e.g. CLIA-certified laboratory]"
+                },
+                {
+                  "title": "[Proof point three]",
+                  "detail": "[e.g. Results in as few as 24 hours]"
+                },
+                {
+                  "title": "[Proof point four]",
+                  "detail": "[e.g. Sold through major distributors]"
+                }
+              ]
+            }
+          },
+          {
+            "uid": "793514ce-c684-41a5-a5bc-af2485bb30a6",
+            "type": "intro",
+            "variant": "paths",
+            "data": {
+              "h2": "[The problem this page solves, stated in one line]",
+              "body": "[Why it matters to a practice or department right now. Name the guideline or risk in plain words. Two or three sentences.]",
+              "paths": [
+                {
+                  "title": "[e.g. Dental unit water]",
+                  "line": "[Who should click this card, in one line.]",
+                  "link": {
+                    "label": "[Explore dental tests]",
+                    "href": ""
+                  }
+                },
+                {
+                  "title": "[e.g. Sterile processing]",
+                  "line": "[Who should click this card, in one line.]",
+                  "link": {
+                    "label": "[Explore ST108 tests]",
+                    "href": ""
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "uid": "d8919915-2458-4bf4-850b-8f3c08ccb168",
+            "type": "feature",
+            "variant": "image-left",
+            "data": {
+              "eyebrow": "[Why Agenics]",
+              "h2": "[The main reason to choose this, in one line]",
+              "benefits": [
+                {
+                  "title": "[Benefit one]",
+                  "body": "[What the customer gets and why it matters, in two sentences at most.]"
+                },
+                {
+                  "title": "[Benefit two]",
+                  "body": "[What the customer gets and why it matters, in two sentences at most.]"
+                },
+                {
+                  "title": "[Benefit three]",
+                  "body": "[What the customer gets and why it matters, in two sentences at most.]"
+                }
+              ],
+              "cta": {
+                "label": "[About our lab]",
+                "href": ""
+              },
+              "image": {
+                "id": null,
+                "alt": ""
+              }
+            }
+          },
+          {
+            "uid": "8fc63373-e01a-4b54-bb29-6bbf05331d4f",
+            "type": "explainer",
+            "variant": "checklist",
+            "data": {
+              "eyebrow": "[Topic]",
+              "h2": "[What the reader needs to understand]",
+              "paras": [
+                "[Define the standard or topic in plain words. Say who it applies to and what it asks of them. Two or three sentences.]"
+              ],
+              "listTitle": "[It includes:]",
+              "items": [
+                "[First item]",
+                "[Second item]",
+                "[Third item]",
+                "[Fourth item]"
+              ],
+              "cta": {
+                "label": "[Read the overview]",
+                "href": ""
+              }
+            },
+            "hidden": [
+              "cta"
+            ]
+          },
+          {
+            "uid": "66ed2bb6-5589-45f1-aad8-0ac882c99f40",
+            "type": "statement",
+            "variant": "center",
+            "data": {
+              "eyebrow": "[The alternative]",
+              "h2": "[The claim, in one line]",
+              "paras": [
+                "[What customers do today and where it falls short.]",
+                "[What Agenics offers instead.]"
+              ],
+              "statement": "[No contracts. No complicated setup. Everything included.]",
+              "cta": {
+                "label": "[Order a test kit]",
+                "href": ""
+              }
+            },
+            "hidden": [
+              "eyebrow"
+            ]
+          },
+          {
+            "uid": "8105ad32-9892-44f0-9d9d-eb8602681af1",
+            "type": "story",
+            "variant": "image-right",
+            "data": {
+              "eyebrow": "[Label]",
+              "h2": "[The point of this section]",
+              "paras": [
+                "[First paragraph: the situation.]",
+                "[Second paragraph: what changes with Agenics.]"
+              ],
+              "cta": {
+                "label": "[Learn more]",
+                "href": ""
+              },
+              "image": {
+                "id": null,
+                "alt": ""
+              }
+            },
+            "hidden": [
+              "eyebrow"
+            ]
+          },
+          {
+            "uid": "3e5775a4-d121-47e7-bd72-ed655dd3244e",
+            "type": "steps",
+            "variant": "default",
+            "data": {
+              "h2": "[How it works]",
+              "steps": [
+                {
+                  "title": "[Step one]",
+                  "body": "[What happens in this step and who does it.]"
+                },
+                {
+                  "title": "[Step two]",
+                  "body": "[What happens in this step and who does it.]"
+                },
+                {
+                  "title": "[Step three]",
+                  "body": "[What happens in this step and who does it.]"
+                },
+                {
+                  "title": "[Step four]",
+                  "body": "[What happens in this step and who does it.]"
+                }
+              ]
+            }
+          },
+          {
+            "uid": "5027f177-6ca9-4979-af34-b433a98d99f7",
+            "type": "grid",
+            "variant": "cols-3",
+            "data": {
+              "eyebrow": "[Why it matters]",
+              "h2": "[The idea these points add up to]",
+              "intro": "[One or two sentences that set up the points below.]",
+              "items": [
+                {
+                  "icon": "droplet",
+                  "title": "[Benefit or impact]",
+                  "body": "[One sentence on what it means for the customer.]"
+                },
+                {
+                  "icon": "shield",
+                  "title": "[Benefit or impact]",
+                  "body": "[One sentence on what it means for the customer.]"
+                },
+                {
+                  "icon": "report",
+                  "title": "[Benefit or impact]",
+                  "body": "[One sentence on what it means for the customer.]"
+                }
+              ],
+              "cta": {
+                "label": "[Order a test kit]",
+                "href": ""
+              }
+            },
+            "hidden": [
+              "eyebrow"
+            ]
+          },
+          {
+            "uid": "2aa23218-8a13-4dab-8a93-752e40524f81",
+            "type": "audience",
+            "variant": "list",
+            "data": {
+              "eyebrow": "[Who it is for]",
+              "h2": "[Built for the people who use it]",
+              "sub": "[A line that sharpens the heading]",
+              "body": "[What these customers have in common and why the product fits them.]",
+              "items": [
+                {
+                  "icon": "clinic",
+                  "title": "[Segment]",
+                  "body": "[Including the specialties or facility types in this group.]"
+                },
+                {
+                  "icon": "instruments",
+                  "title": "[Segment]",
+                  "body": "[Including the specialties or facility types in this group.]"
+                },
+                {
+                  "icon": "community",
+                  "title": "[Segment]",
+                  "body": "[Including the specialties or facility types in this group.]"
+                }
+              ],
+              "cta": {
+                "label": "[Talk to our team]",
+                "href": ""
+              },
+              "image": {
+                "id": null,
+                "alt": ""
+              }
+            },
+            "hidden": [
+              "eyebrow",
+              "cta"
+            ]
+          },
+          {
+            "uid": "82ca2209-fab0-4b88-b2df-732378155aa7",
+            "type": "products",
+            "variant": "default",
+            "data": {
+              "h2": "[Choose the right test]",
+              "intro": "[One or two sentences that help the reader pick between these options.]",
+              "cards": [
+                {
+                  "type": "[Test type · e.g. Mail-in R2A]",
+                  "name": "[Product name]",
+                  "tagline": "[What it does best, 50 characters max]",
+                  "bullets": [
+                    "[Benefit, 40 characters max]",
+                    "[Benefit, 40 characters max]",
+                    "[Benefit, 40 characters max]"
+                  ],
+                  "price": "From $[price]",
+                  "cta": {
+                    "label": "[Shop product name]",
+                    "href": ""
+                  },
+                  "link": {
+                    "label": "[Sample report]",
+                    "href": ""
+                  },
+                  "image": {
+                    "id": null,
+                    "alt": ""
+                  }
+                },
+                {
+                  "type": "[Test type · e.g. Mail-in R2A]",
+                  "name": "[Product name]",
+                  "tagline": "[What it does best, 50 characters max]",
+                  "bullets": [
+                    "[Benefit, 40 characters max]",
+                    "[Benefit, 40 characters max]",
+                    "[Benefit, 40 characters max]"
+                  ],
+                  "price": "From $[price]",
+                  "cta": {
+                    "label": "[Shop product name]",
+                    "href": ""
+                  },
+                  "link": {
+                    "label": "[Sample report]",
+                    "href": ""
+                  },
+                  "image": {
+                    "id": null,
+                    "alt": ""
+                  }
+                },
+                {
+                  "type": "[Test type · e.g. Mail-in R2A]",
+                  "name": "[Product name]",
+                  "tagline": "[What it does best, 50 characters max]",
+                  "bullets": [
+                    "[Benefit, 40 characters max]",
+                    "[Benefit, 40 characters max]",
+                    "[Benefit, 40 characters max]"
+                  ],
+                  "price": "From $[price]",
+                  "cta": {
+                    "label": "[Shop product name]",
+                    "href": ""
+                  },
+                  "link": {
+                    "label": "[Sample report]",
+                    "href": ""
+                  },
+                  "image": {
+                    "id": null,
+                    "alt": ""
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "uid": "ee13e38d-964a-41b2-a724-dac6c8db870c",
+            "type": "proof",
+            "variant": "stats",
+            "data": {
+              "quote": "[Customer quote in their own words. One idea, 40 words max.]",
+              "name": "[Full name, credentials]",
+              "role": "[Title, Organization]",
+              "stats": [
+                {
+                  "value": "[XX%]",
+                  "label": "[Before · e.g. U.S. average pass rate]"
+                },
+                {
+                  "value": "[XX%]",
+                  "label": "[After · e.g. with an Agenics program]"
+                }
+              ],
+              "link": {
+                "label": "[Read the case study]",
+                "href": ""
+              },
+              "image": {
+                "id": null,
+                "alt": ""
+              }
+            }
+          },
+          {
+            "uid": "6f956688-cc1c-4345-9dfe-2b001ce2ae51",
+            "type": "compare",
+            "variant": "default",
+            "data": {
+              "h2": "[Compare tests at a glance]",
+              "columns": [
+                "Test",
+                "[Method]",
+                "[Results in]",
+                "[What it measures]",
+                "[Best for]"
+              ],
+              "rows": [
+                {
+                  "cells": [
+                    "[Product A]",
+                    "[e.g. Flow cytometry]",
+                    "[e.g. 24 hours]",
+                    "[e.g. Live and dead bacteria, pH, TDS]",
+                    "[One-line use case]"
+                  ]
+                },
+                {
+                  "cells": [
+                    "[Product B]",
+                    "[Method]",
+                    "[Turnaround]",
+                    "[Metrics]",
+                    "[One-line use case]"
+                  ]
+                },
+                {
+                  "cells": [
+                    "[Product C]",
+                    "[Method]",
+                    "[Turnaround]",
+                    "[Metrics]",
+                    "[One-line use case]"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "uid": "65fe65ef-d423-429a-b394-1464160c732b",
+            "type": "resources",
+            "variant": "default",
+            "data": {
+              "h2": "[Instructions, forms and guides]",
+              "link": {
+                "label": "[See the full library]",
+                "href": ""
+              },
+              "cards": [
+                {
+                  "tag": "[IFU]",
+                  "title": "[Document title]",
+                  "meta": "[PDF · size]",
+                  "href": "",
+                  "image": {
+                    "id": null,
+                    "alt": ""
+                  }
+                },
+                {
+                  "tag": "[Form]",
+                  "title": "[Document title]",
+                  "meta": "[PDF · size]",
+                  "href": "",
+                  "image": {
+                    "id": null,
+                    "alt": ""
+                  }
+                },
+                {
+                  "tag": "[Guide]",
+                  "title": "[Document title]",
+                  "meta": "[PDF · size]",
+                  "href": "",
+                  "image": {
+                    "id": null,
+                    "alt": ""
+                  }
+                },
+                {
+                  "tag": "[Sample report]",
+                  "title": "[Document title]",
+                  "meta": "[PDF · size]",
+                  "href": "",
+                  "image": {
+                    "id": null,
+                    "alt": ""
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "uid": "c4815fa3-c9ca-43a2-8abb-ff22f9b5620b",
+            "type": "faq",
+            "variant": "default",
+            "data": {
+              "h2": "[Common questions]",
+              "help": "[Still have a question?]",
+              "helpLink": {
+                "label": "[Contact support]",
+                "href": ""
+              },
+              "items": [
+                {
+                  "q": "[Question one, phrased the way a customer asks it?]",
+                  "a": "[Direct answer first. Then one or two sentences of detail or a link to the source.]"
+                },
+                {
+                  "q": "[Question two?]",
+                  "a": "[Answer.]"
+                },
+                {
+                  "q": "[Question three?]",
+                  "a": "[Answer.]"
+                },
+                {
+                  "q": "[Question four?]",
+                  "a": "[Answer.]"
+                }
+              ]
+            }
+          },
+          {
+            "uid": "931c8db9-eac4-4cee-9a56-f2b575703f94",
+            "type": "cta",
+            "variant": "phone",
+            "data": {
+              "h2": "[One clear next step]",
+              "line": "[What happens after they click, in one sentence.]",
+              "cta": {
+                "label": "[Schedule a consultation]",
+                "href": ""
+              },
+              "phone": "719-466-5592"
+            },
+            "hidden": []
+          }
+        ],
+        "createdAt": 1794417743338,
+        "updatedAt": 1794417743338
+      },
+      {
+        "id": "d76597ec-528d-4583-b4da-5839e20c6333",
+        "name": "Example — Dental Water",
+        "slug": "dental-water",
+        "seoTitle": "Dental Waterline Testing | Agenics Labs",
+        "metaDescription": "In-office and mail-in dental waterline tests with lab results you can act on. Compare RapidCheck, StandardCheck, SimCheck and MyCheck by method and turnaround.",
+        "recipe": "product-line",
+        "createdAt": 1794417743339,
+        "updatedAt": 1794417743339,
+        "modules": [
+          {
+            "uid": "35a7c0a4-d66f-4565-87ab-2253eec70fb2",
+            "type": "hero",
+            "variant": "photo",
+            "data": {
+              "eyebrow": "Dental unit water testing",
+              "h1": "Compliance without compromise",
+              "sub": "In-office and mail-in tests for dental waterlines, with lab results you can act on.",
+              "cta1": {
+                "label": "Compare tests",
+                "href": "#compare"
+              },
+              "cta2": {
+                "label": "Talk to a water expert",
+                "href": "/agenics-contact"
+              },
+              "image": {
+                "id": null,
+                "alt": "Gloved hand holding a petri dish of bacterial colonies against a light background"
+              }
+            },
+            "hidden": []
+          },
+          {
+            "uid": "15e818b5-276c-4d8a-b44f-95635df3e512",
+            "type": "trust",
+            "variant": "default",
+            "data": {
+              "items": [
+                {
+                  "title": "CDC ELITE validated",
+                  "detail": "For Legionella testing"
+                },
+                {
+                  "title": "Results in 24 hours",
+                  "detail": "With RapidCheck"
+                },
+                {
+                  "title": "Photo documentation",
+                  "detail": "Included with StandardCheck"
+                },
+                {
+                  "title": "At your distributor",
+                  "detail": "Patterson, Henry Schein, Benco and more"
+                }
+              ]
+            }
+          },
+          {
+            "uid": "5866959d-920b-4473-bc8e-b783483fcaba",
+            "type": "intro",
+            "variant": "paths",
+            "data": {
+              "h2": "Why waterline testing matters",
+              "body": "Dental unit waterlines build up biofilm that can push bacteria past the CDC limit of 500 CFU/mL. Routine testing shows whether your treatment protocol is working and documents compliance when your state board or an auditor asks.",
+              "paths": [
+                {
+                  "title": "In-office testing",
+                  "line": "Monitor between lab tests with a paddle you read in your office.",
+                  "link": {
+                    "label": "See MyCheck",
+                    "href": "/shop/p/mycheck"
+                  }
+                },
+                {
+                  "title": "Mail-in lab testing",
+                  "line": "Send samples to our lab for counts you can document.",
+                  "link": {
+                    "label": "Compare lab tests",
+                    "href": "#compare"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "uid": "54798322-6fb3-4e88-b6b6-7a243091691d",
+            "type": "compare",
+            "variant": "default",
+            "data": {
+              "h2": "Compare dental water tests",
+              "columns": [
+                "Test",
+                "Method",
+                "Results in",
+                "What it measures",
+                "Best for"
+              ],
+              "rows": [
+                {
+                  "cells": [
+                    "RapidCheck™",
+                    "Flow cytometry",
+                    "24 hours",
+                    "Live and dead bacteria, pH, TDS",
+                    "High-volume clinics avoiding long chair downtime"
+                  ]
+                },
+                {
+                  "cells": [
+                    "StandardCheck™",
+                    "R2A culture",
+                    "5 days",
+                    "CFU, TDS, pH, plate photo",
+                    "[Best-for line — confirm]"
+                  ]
+                },
+                {
+                  "cells": [
+                    "SimCheck™",
+                    "Enzyme substrate (HPC)",
+                    "[confirm]",
+                    "[confirm]",
+                    "[Best-for line — confirm]"
+                  ]
+                },
+                {
+                  "cells": [
+                    "MyCheck™",
+                    "In-office HPC paddle",
+                    "As early as 2 days",
+                    "CFU count, not a range",
+                    "[Best-for line — confirm]"
+                  ]
+                }
+              ]
+            },
+            "anchor": "compare"
+          },
+          {
+            "uid": "d8a84dab-51fb-486d-a4d9-4727199c380a",
+            "type": "products",
+            "variant": "default",
+            "data": {
+              "h2": "Our most-ordered dental tests",
+              "intro": "Save on mail-in bacteria testing with an annual kit, available on each product page.",
+              "cards": [
+                {
+                  "type": "Mail-in · flow cytometry",
+                  "name": "RapidCheck™",
+                  "tagline": "Greatest accuracy, fastest turnaround",
+                  "bullets": [
+                    "Results in 24 hours",
+                    "Live and dead bacteria counts",
+                    "Counts hard-to-culture bacteria"
+                  ],
+                  "price": "From $34.99",
+                  "cta": {
+                    "label": "Shop RapidCheck",
+                    "href": "/shop/p/rapidcheck"
+                  },
+                  "link": {
+                    "label": "Flow cytometry guide",
+                    "href": ""
+                  },
+                  "image": {
+                    "id": null,
+                    "alt": "RapidCheck mail-in test kit"
+                  }
+                },
+                {
+                  "type": "Mail-in · R2A culture",
+                  "name": "StandardCheck™",
+                  "tagline": "The gold standard in dental water testing",
+                  "bullets": [
+                    "Results in 5 days",
+                    "Includes CFU, TDS and pH",
+                    "Photo documentation included"
+                  ],
+                  "price": "From $[confirm]",
+                  "cta": {
+                    "label": "Shop StandardCheck",
+                    "href": ""
+                  },
+                  "link": {
+                    "label": "Sample report",
+                    "href": ""
+                  },
+                  "image": {
+                    "id": null,
+                    "alt": "StandardCheck mail-in test kit"
+                  }
+                },
+                {
+                  "type": "In-office · HPC paddle",
+                  "name": "MyCheck™",
+                  "tagline": "The easiest quantified in-office test",
+                  "bullets": [
+                    "Results in as early as 2 days",
+                    "A CFU count, not a range",
+                    "Log sheet in every box"
+                  ],
+                  "price": "From $25.99",
+                  "cta": {
+                    "label": "Shop MyCheck",
+                    "href": "/shop/p/mycheck"
+                  },
+                  "link": {
+                    "label": "MyCheck IFU",
+                    "href": ""
+                  },
+                  "image": {
+                    "id": null,
+                    "alt": "Box of MyCheck in-office test paddles"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "uid": "6758aaf0-816a-4cf7-bb00-4005f984ca82",
+            "type": "proof",
+            "variant": "stats",
+            "data": {
+              "quote": "Working with Agenics has been a true collaboration centered on prioritizing patient safety above all else.",
+              "name": "Dr. Huy Than, DDS",
+              "role": "Site Dental Director, AltaMed Community Health Center",
+              "stats": [
+                {
+                  "value": "69%",
+                  "label": "U.S. average waterline pass rate"
+                },
+                {
+                  "value": "98%",
+                  "label": "AltaMed pass rate with Agenics"
+                }
+              ],
+              "link": {
+                "label": "Read the AltaMed story",
+                "href": ""
+              },
+              "image": {
+                "id": null,
+                "alt": "Dr. Huy Than, DDS"
+              }
+            }
+          },
+          {
+            "uid": "4f3174f7-9088-4445-90d0-24262ef73c9f",
+            "type": "resources",
+            "variant": "default",
+            "data": {
+              "h2": "Submission forms and instructions",
+              "link": {
+                "label": "See the full library",
+                "href": "/library"
+              },
+              "cards": [
+                {
+                  "tag": "Form",
+                  "title": "RapidCheck submission form",
+                  "meta": "PDF · [size]",
+                  "href": "",
+                  "image": {
+                    "id": null,
+                    "alt": ""
+                  }
+                },
+                {
+                  "tag": "Form",
+                  "title": "StandardCheck submission form",
+                  "meta": "PDF · [size]",
+                  "href": "",
+                  "image": {
+                    "id": null,
+                    "alt": ""
+                  }
+                },
+                {
+                  "tag": "Form",
+                  "title": "SimCheck submission form",
+                  "meta": "PDF · [size]",
+                  "href": "",
+                  "image": {
+                    "id": null,
+                    "alt": ""
+                  }
+                },
+                {
+                  "tag": "IFU",
+                  "title": "MyCheck instructions and log",
+                  "meta": "PDF · [size]",
+                  "href": "",
+                  "image": {
+                    "id": null,
+                    "alt": ""
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "uid": "db1f5e2c-bc99-481b-82e5-cd1cc5701c93",
+            "type": "faq",
+            "variant": "default",
+            "data": {
+              "h2": "Shipping and sampling questions",
+              "help": "Still have a question?",
+              "helpLink": {
+                "label": "Contact support",
+                "href": "/agenics-contact"
+              },
+              "items": [
+                {
+                  "q": "How are mail-in kits shipped?",
+                  "a": "[Answer from the current FAQ page, trimmed to 80 words.]"
+                },
+                {
+                  "q": "Do I need overnight shipping for samples?",
+                  "a": "[Answer from the current FAQ page.]"
+                },
+                {
+                  "q": "Are there state restrictions for shipping?",
+                  "a": "[Answer from the current FAQ page.]"
+                },
+                {
+                  "q": "When should I collect samples?",
+                  "a": "[Answer from the current FAQ page.]"
+                }
+              ]
+            }
+          },
+          {
+            "uid": "0e15073d-b1c7-45ee-b00b-d2ba4b36b5dd",
+            "type": "cta",
+            "variant": "phone",
+            "data": {
+              "h2": "Not sure which test fits?",
+              "line": "Schedule a consultation with an Agenics dental water expert.",
+              "cta": {
+                "label": "Schedule a consultation",
+                "href": "/agenics-contact"
+              },
+              "phone": "719-466-5592"
+            },
+            "hidden": []
+          }
+        ]
+      },
+      {
+        "id": "2d744c8d-2635-4a84-aaae-6842ce602e51",
+        "name": "QA saved page",
+        "slug": "st108-water-testing",
+        "seoTitle": "ST108 Water Quality Testing Kits | Agenics Labs",
+        "metaDescription": "Agenics Affirm™ mail-in kits make ANSI/AAMI ST108 water quality testing simple: all materials included, no contracts, and results delivered online.",
+        "recipe": "explainer",
+        "createdAt": 1794417743339,
+        "updatedAt": 1794417746162,
+        "modules": [
+          {
+            "uid": "dbc326e2-cd9c-4505-b2c2-c1bff8966022",
+            "type": "hero",
+            "variant": "photo",
+            "data": {
+              "eyebrow": "Sterile processing water testing",
+              "h1": "Simplify ST108 Water Quality Testing",
+              "sub": "Agenics Affirm™ makes it easy to qualify and routinely monitor sterile processing water quality with convenient mail-in test kits.",
+              "cta1": {
+                "label": "Order a test kit",
+                "href": "#order"
+              },
+              "cta2": {
+                "label": "Learn about ST108",
+                "href": "#what-is-st108"
+              },
+              "image": {
+                "id": null,
+                "src": "/examples/st108/st108-hero-sterilizer-16x9.jpg",
+                "w": 2119,
+                "h": 1192,
+                "alt": "Gloved hand loading instrument trays into a sterilizer",
+                "name": "st108-hero-sterilizer-16x9.jpg",
+                "type": "image/jpeg"
+              }
+            },
+            "hidden": [
+              "eyebrow"
+            ]
+          },
+          {
+            "uid": "86286017-3100-4140-b43f-e4e2b900def6",
+            "type": "explainer",
+            "variant": "numbered",
+            "data": {
+              "eyebrow": "[Topic]",
+              "h2": "What Is ST108?",
+              "paras": [
+                "ANSI/AAMI ST108 is the first comprehensive U.S. standard focused specifically on the quality of water used for processing medical devices. It establishes requirements for water quality management programs, Saved before the release.including testing, monitoring, documentation, review, and corrective actions.",
+                "The standard recognizes water quality itself as an important patient safety variable in medical device processing."
+              ],
+              "listTitle": "ST108 water quality management includes:",
+              "items": [
+                "Assessing current water systems and quality",
+                "Implementing a water management plan",
+                "Validating that systems meet water quality requirements",
+                "Routinely monitoring water quality"
+              ],
+              "cta": {
+                "label": "[Read the overview]",
+                "href": ""
+              }
+            },
+            "hidden": [
+              "eyebrow",
+              "cta"
+            ],
+            "anchor": "what-is-st108"
+          },
+          {
+            "uid": "889c5d68-69db-496f-b803-0c7942f73bde",
+            "type": "grid",
+            "variant": "split",
+            "data": {
+              "eyebrow": "[Why it matters]",
+              "h2": "ST108 Testing Without the Complexity",
+              "intro": "For many outpatient facilities, traditional water quality solutions may be more extensive than what is needed. Agenics Affirm™ provides a simpler option specifically designed around ST108 water quality testing.",
+              "items": [
+                {
+                  "icon": "cart",
+                  "title": "Easy to Order",
+                  "body": "Order test kits online when you need them."
+                },
+                {
+                  "icon": "kit",
+                  "title": "Everything Included",
+                  "body": "Each kit includes all needed testing materials."
+                },
+                {
+                  "icon": "unlock",
+                  "title": "No Contracts",
+                  "body": "Straightforward pricing without long-term contracts."
+                },
+                {
+                  "icon": "online",
+                  "title": "Easy-to-Understand Results",
+                  "body": "Results are delivered online in a user-friendly report."
+                }
+              ],
+              "cta": {
+                "label": "Order Agenics Affirm",
+                "href": "#order"
+              }
+            },
+            "hidden": [
+              "eyebrow",
+              "intro"
+            ],
+            "style": {
+              "bg": "white"
+            },
+            "note": "Saved before the release",
+            "anchor": "saved-before"
+          },
+          {
+            "uid": "fc8ec68a-e441-48e5-bdef-166fcb455351",
+            "type": "products",
+            "variant": "default",
+            "data": {
+              "h2": "Choose your Affirm kit",
+              "intro": "Pick the kit for the ST108 water category you are testing: AffirmCritical™ for critical water, AffirmUtility™ for utility water. Each kit includes all needed testing materials.",
+              "cards": [
+                {
+                  "type": "Critical water · monthly",
+                  "name": "AffirmCritical™",
+                  "tagline": "For ST108 critical water sources",
+                  "bullets": [
+                    "Reports endotoxin and bacteria",
+                    "Monthly testing for critical water",
+                    "Critical+ adds pH, hardness and more"
+                  ],
+                  "price": "From $[price]",
+                  "cta": {
+                    "label": "Order AffirmCritical",
+                    "href": "/shop/p/affirmcritical-9bepc"
+                  },
+                  "link": {
+                    "label": "Sample submission form",
+                    "href": "/s/GP40000-Affirm_Critical_Sample-Submission-Form.pdf"
+                  },
+                  "image": {
+                    "id": null,
+                    "src": "/examples/st108/st108-affirm-critical-kit-1x1.png",
+                    "w": 1200,
+                    "h": 1200,
+                    "alt": "AffirmCritical test kit with sample vials, instructions and mailer",
+                    "name": "st108-affirm-critical-kit-1x1.png",
+                    "type": "image/png"
+                  }
+                },
+                {
+                  "type": "Utility water · quarterly",
+                  "name": "AffirmUtility™",
+                  "tagline": "For ST108 utility water sources",
+                  "bullets": [
+                    "Reports bacteria",
+                    "Quarterly testing for utility water",
+                    "Utility+ adds pH, hardness and more"
+                  ],
+                  "price": "From $[price]",
+                  "cta": {
+                    "label": "Order AffirmUtility",
+                    "href": "/shop/p/affirmutility-5b8af"
+                  },
+                  "link": {
+                    "label": "Sample submission form",
+                    "href": "/s/GP40010-Affirm_Utility_Sample-Submission-Form.pdf"
+                  },
+                  "image": {
+                    "id": null,
+                    "src": "/examples/st108/st108-affirm-utility-kit-1x1.png",
+                    "w": 1200,
+                    "h": 1200,
+                    "alt": "AffirmUtility test kit with sample vials, instructions and mailer",
+                    "name": "st108-affirm-utility-kit-1x1.png",
+                    "type": "image/png"
+                  }
+                }
+              ]
+            },
+            "hidden": [
+              "cards.*.price"
+            ],
+            "anchor": "order",
+            "note": "Added by Figment, not in the 10.26 copy deck: every “Order a test kit” button lands here (#order) so visitors pick Critical or Utility. Copy adapted from agenics.com/medical and the Affirm sell sheet. Prices are switched off until confirmed. Delete this block if it is not wanted."
+          },
+          {
+            "uid": "d30c9bd4-1d66-438b-a1c7-c916a9444d4e",
+            "type": "grid",
+            "variant": "cols-3",
+            "data": {
+              "eyebrow": "[Why it matters]",
+              "h2": "Why Water Quality Matters",
+              "intro": "ST108 puts greater focus on the role water quality plays in medical device processing. Three primary areas of impact include:",
+              "items": [
+                {
+                  "icon": "patient",
+                  "title": "Patients",
+                  "body": "Water quality management can help reduce risks associated with microbial or endotoxin contamination."
+                },
+                {
+                  "icon": "instruments",
+                  "title": "Devices",
+                  "body": "Proper water quality can help reduce corrosion, pitting and scaling that affect equipment performance and longevity."
+                },
+                {
+                  "icon": "facility",
+                  "title": "Facilities",
+                  "body": "Better water quality management can improve water system effectiveness while reducing maintenance associated with scaling and buildup."
+                }
+              ],
+              "cta": {
+                "label": "[Order a test kit]",
+                "href": ""
+              }
+            },
+            "hidden": [
+              "eyebrow",
+              "cta"
+            ],
+            "style": {
+              "bg": "navy"
+            }
+          },
+          {
+            "uid": "7fca9838-9545-4ce3-9cd7-0ddf164c7848",
+            "type": "audience",
+            "variant": "list",
+            "data": {
+              "eyebrow": "[Who it is for]",
+              "h2": "Built for Outpatient Healthcare",
+              "sub": "Designed for the Facilities That Need a Simpler Solution",
+              "body": "Agenics Affirm™ is particularly well suited for smaller healthcare environments that need to monitor sterile processing water quality without the complexity of a large-scale water management service.",
+              "items": [
+                {
+                  "icon": "clinic",
+                  "title": "Ambulatory Surgery Centers",
+                  "body": "Including orthopedic, ophthalmology, gastroenterology, ENT and multispecialty surgery centers."
+                },
+                {
+                  "icon": "stethoscope",
+                  "title": "Office-Based Surgical Practices",
+                  "body": "Including oral surgery, OMS, periodontics, plastic surgery and dermatology practices."
+                },
+                {
+                  "icon": "community",
+                  "title": "Community-Based Healthcare",
+                  "body": "Including FQHCs, community health centers and rural health clinics."
+                }
+              ],
+              "cta": {
+                "label": "[Talk to our team]",
+                "href": ""
+              },
+              "image": {
+                "id": null,
+                "alt": ""
+              }
+            },
+            "hidden": [
+              "eyebrow",
+              "cta"
+            ]
+          },
+          {
+            "uid": "b6eeac6c-06ae-4066-9e33-a0b3ebe0fd6b",
+            "type": "statement",
+            "variant": "center",
+            "data": {
+              "eyebrow": "[The alternative]",
+              "h2": "A Simpler Alternative to Traditional Water Quality Testing",
+              "paras": [
+                "Facilities commonly rely on water treatment providers, environmental laboratories, or internal monitoring. Each approach can present limitations, particularly for smaller outpatient environments.",
+                "Agenics Affirm™ offers another option: an easy mail-in testing solution specifically designed around ST108 water quality requirements."
+              ],
+              "statement": "No contracts. No complicated service model. All needed testing materials included.",
+              "cta": {
+                "label": "Order a test kit",
+                "href": "#order"
+              }
+            },
+            "hidden": [
+              "eyebrow"
+            ],
+            "style": {
+              "bg": "cyan"
+            }
+          },
+          {
+            "uid": "7344c651-4d85-4168-ad2f-0a9be943d49e",
+            "type": "story",
+            "variant": "image-right",
+            "data": {
+              "eyebrow": "[Label]",
+              "h2": "Understand Your Water. Document Your Results.",
+              "paras": [
+                "ST108 calls for water quality management programs that include testing, monitoring, documentation, review and corrective actions.",
+                "Agenics Affirm™ provides a simple option for testing and reporting, with results delivered online in a user-friendly format.",
+                "That gives the facility the information it needs to incorporate testing results into its broader ST108 water quality management program."
+              ],
+              "cta": {
+                "label": "[Learn more]",
+                "href": ""
+              },
+              "image": {
+                "id": null,
+                "src": "/examples/st108/st108-sterilizer-chamber-3x2.jpg",
+                "w": 1254,
+                "h": 837,
+                "alt": "Open sterilizer with wrapped instrument packs loaded on its racks",
+                "name": "st108-sterilizer-chamber-3x2.jpg",
+                "type": "image/jpeg"
+              }
+            },
+            "hidden": [
+              "eyebrow",
+              "cta"
+            ]
+          },
+          {
+            "uid": "e26fc1c5-e53d-4972-94a3-f368bdbfd869",
+            "type": "faq",
+            "variant": "default",
+            "data": {
+              "h2": "Frequently asked questions",
+              "help": "[Still have a question?]",
+              "helpLink": {
+                "label": "[Contact support]",
+                "href": ""
+              },
+              "items": [
+                {
+                  "q": "What is ST108?",
+                  "a": "ANSI/AAMI ST108 is a U.S. standard focused on the quality of water used to process medical devices. It establishes requirements for water quality management programs that include testing, monitoring, documentation, review and corrective actions."
+                },
+                {
+                  "q": "What is Agenics Affirm™?",
+                  "a": "Agenics Affirm™ is a mail-in water testing kit designed specifically for ST108 water quality testing."
+                },
+                {
+                  "q": "What’s included?",
+                  "a": "Affirm test kits include all needed materials."
+                },
+                {
+                  "q": "How do I receive my results?",
+                  "a": "Results are delivered online in a user-friendly report."
+                },
+                {
+                  "q": "Do I need a contract?",
+                  "a": "No. Affirm offers straightforward pricing without contracts."
+                },
+                {
+                  "q": "Is ST108 only relevant to hospitals?",
+                  "a": "No. Agenics Affirm™ is designed with non-acute and outpatient healthcare in mind, including ambulatory surgery centers, office-based surgical practices and community-based healthcare facilities."
+                }
+              ]
+            },
+            "hidden": [
+              "support"
+            ],
+            "style": {
+              "bg": "silver"
+            },
+            "anchor": "faq"
+          },
+          {
+            "uid": "d3094af0-4ffd-4c61-a276-cbaa99c5f443",
+            "type": "cta",
+            "variant": "button",
+            "data": {
+              "h2": "Make ST108 Testing Easier",
+              "line": "Agenics Affirm™ gives outpatient healthcare facilities a simple way to test and monitor sterile processing water quality.",
+              "cta": {
+                "label": "Order a test kit",
+                "href": "#order"
+              },
+              "phone": "719-466-5592"
+            },
+            "hidden": []
+          }
+        ]
+      }
+    ],
+    "activeId": "2d744c8d-2635-4a84-aaae-6842ce602e51",
+    "viewport": "desktop",
+    "showSpecs": false,
+    "saved": []
+  }
+}

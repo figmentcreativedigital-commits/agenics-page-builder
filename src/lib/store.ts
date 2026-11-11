@@ -7,6 +7,7 @@ import { MODULES } from "./modules";
 import { setAt, getAt, uid } from "./path";
 import { EXAMPLES, exampleDentalWater, exampleST108, makeModule, pageFromRecipe } from "./recipes";
 import type { ModuleInstance, ModuleStyle, ModuleType, PageDoc, ShareInfo, Viewport } from "./types";
+import { upgradeModule, upgradePage } from "./upgrade";
 
 export interface SavedBlock {
   id: string;
@@ -99,6 +100,12 @@ export const activePage = (s: Pick<BuilderState, "pages" | "activeId">) =>
 export const useBuilder = create<BuilderState>()(
   persist(
     (set, get) => {
+      /**
+       * The field last changed and when, so a burst of typing in one field is one undo step.
+       * Any other change starts a new step.
+       */
+      let lastEdit = { key: "", t: 0 };
+
       /** Apply a change to the active page's modules, recording undo history. */
       const commit = (fn: (mods: ModuleInstance[]) => ModuleInstance[], record = true) => {
         const s = get();
@@ -106,6 +113,7 @@ export const useBuilder = create<BuilderState>()(
         if (!page) return;
         const next = fn(page.modules);
         if (next === page.modules) return;
+        if (record) lastEdit = { key: "", t: 0 };
         set({
           pages: s.pages.map((p) => (p.id === page.id ? { ...p, modules: next, updatedAt: Date.now() } : p)),
           savedAt: Date.now(),
@@ -113,6 +121,18 @@ export const useBuilder = create<BuilderState>()(
             ? { past: [...s.past, { pageId: page.id, modules: page.modules }].slice(-HISTORY), future: [] }
             : {}),
         });
+      };
+
+      /**
+       * A change to one field (text, photo, link, description, note, anchor). Every one can be
+       * undone; changes to the same field without a pause of 1.5 s join one step, so undo takes
+       * back a word, not a letter.
+       */
+      const edit = (key: string, fn: (mods: ModuleInstance[]) => ModuleInstance[]) => {
+        const now = Date.now();
+        const join = lastEdit.key === key && now - lastEdit.t < 1500;
+        commit(fn, !join);
+        lastEdit = { key, t: now };
       };
 
       /** Put a block on the active page: at index, else after the selected block, else above the closing CTA. */
@@ -182,7 +202,9 @@ export const useBuilder = create<BuilderState>()(
           return page.id;
         },
 
-        addPage: (page) => {
+        addPage: (incoming) => {
+          // Page files can come from an older version of the builder
+          const page = upgradePage(incoming);
           set((s) => ({ pages: [...s.pages, page], activeId: page.id, selectedUid: null, past: [], future: [] }));
           return page.id;
         },
@@ -238,7 +260,8 @@ export const useBuilder = create<BuilderState>()(
 
         addModule: (type, index) => insert(makeModule(type), index),
 
-        insertModule: (mod, index) => insert({ ...structuredClone(mod), uid: uid() }, index),
+        // Pasted and saved blocks can come from an older version of the builder
+        insertModule: (mod, index) => insert({ ...upgradeModule(structuredClone(mod)), uid: uid() }, index),
 
         copyBlock: (u) => {
           const mod = activePage(get())?.modules.find((m) => m.uid === u);
@@ -352,10 +375,7 @@ export const useBuilder = create<BuilderState>()(
           commit((mods) => mods.map((m) => (m.uid === u ? { ...m, variant } : m))),
 
         updateField: (u, path, value) =>
-          commit(
-            (mods) => mods.map((m) => (m.uid === u ? { ...m, data: setAt(m.data, path, value) } : m)),
-            false,
-          ),
+          edit(`${u}:${path}`, (mods) => mods.map((m) => (m.uid === u ? { ...m, data: setAt(m.data, path, value) } : m))),
 
         addItem: (u, groupKey) =>
           commit((mods) =>
@@ -401,20 +421,15 @@ export const useBuilder = create<BuilderState>()(
           commit((mods) => mods.map((m) => (m.uid === u ? { ...m, style: { ...m.style, ...patch } } : m))),
 
         setAnchor: (u, anchor) =>
-          commit(
-            (mods) => mods.map((m) => (m.uid === u ? { ...m, anchor: anchor || undefined } : m)),
-            false,
-          ),
+          edit(`${u}:#anchor`, (mods) => mods.map((m) => (m.uid === u ? { ...m, anchor: anchor || undefined } : m))),
 
         setNote: (u, note) =>
-          commit(
-            (mods) => mods.map((m) => (m.uid === u ? { ...m, note: note || undefined } : m)),
-            false,
-          ),
+          edit(`${u}:#note`, (mods) => mods.map((m) => (m.uid === u ? { ...m, note: note || undefined } : m))),
 
-        restoreVersion: (doc, when) => {
+        restoreVersion: (saved, when) => {
           const page = activePage(get());
-          if (!page || page.id !== doc.id) return;
+          if (!page || page.id !== saved.id) return;
+          const doc = upgradePage(saved);
           commit(() => structuredClone(doc.modules));
           set((s) => ({
             pages: s.pages.map((p) =>
@@ -475,12 +490,18 @@ export const useBuilder = create<BuilderState>()(
 
         undo: () => {
           const s = get();
-          const snap = s.past[s.past.length - 1];
           const page = activePage(s);
-          if (!snap || !page || snap.pageId !== page.id) return;
+          if (!page) return;
+          // Skip steps that changed nothing in the end (text typed, then taken back inside the field)
+          const same = JSON.stringify(page.modules);
+          let i = s.past.length - 1;
+          while (i >= 0 && s.past[i].pageId === page.id && JSON.stringify(s.past[i].modules) === same) i--;
+          const snap = s.past[i];
+          if (!snap || snap.pageId !== page.id) return;
+          lastEdit = { key: "", t: 0 };
           set({
             pages: s.pages.map((p) => (p.id === page.id ? { ...p, modules: snap.modules, updatedAt: Date.now() } : p)),
-            past: s.past.slice(0, -1),
+            past: s.past.slice(0, i),
             future: [...s.future, { pageId: page.id, modules: page.modules }],
             toast: null,
           });
@@ -491,6 +512,7 @@ export const useBuilder = create<BuilderState>()(
           const snap = s.future[s.future.length - 1];
           const page = activePage(s);
           if (!snap || !page || snap.pageId !== page.id) return;
+          lastEdit = { key: "", t: 0 };
           set({
             pages: s.pages.map((p) => (p.id === page.id ? { ...p, modules: snap.modules, updatedAt: Date.now() } : p)),
             future: s.future.slice(0, -1),
@@ -514,23 +536,19 @@ export const useBuilder = create<BuilderState>()(
       }),
       migrate: (persisted, version) => {
         const state = persisted as { pages?: PageDoc[]; seeded?: number };
-        if (version < 2) {
-          // New optional slots (hero supporting paragraph, CTA reassurance line) start switched off on old pages
-          state.pages = (state.pages ?? []).map((p) => ({
-            ...p,
-            modules: p.modules.map((mod) => {
-              const meta = MODULES[mod.type];
-              const missing = (meta.hiddenByDefault ?? []).filter((k) => !(k in mod.data));
-              if (!missing.length) return mod;
-              const defaults = meta.defaults();
-              const data = { ...mod.data };
-              missing.forEach((k) => (data[k] = defaults[k]));
-              return { ...mod, data, hidden: [...new Set([...(mod.hidden ?? []), ...missing])] };
-            }),
-          }));
-          state.seeded = state.seeded ?? 1;
-        }
+        // Page data upgrades live in lib/upgrade and run in merge below, for every saved page
+        if (version < 2) state.seeded = state.seeded ?? 1;
         return state as unknown as BuilderState;
+      },
+      // Pages and My blocks saved by an older version open in today's form (see lib/upgrade)
+      merge: (persisted, current) => {
+        const p = (persisted ?? {}) as Partial<BuilderState>;
+        return {
+          ...current,
+          ...p,
+          ...(Array.isArray(p.pages) ? { pages: p.pages.map(upgradePage) } : {}),
+          ...(Array.isArray(p.saved) ? { saved: p.saved.map((b) => ({ ...b, module: upgradeModule(b.module) })) } : {}),
+        };
       },
     },
   ),

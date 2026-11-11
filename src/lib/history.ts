@@ -2,6 +2,7 @@
 
 import { createStore, get, set } from "idb-keyval";
 import type { PageDoc } from "./types";
+import { upgradePage } from "./upgrade";
 
 /*
   Version history, kept in this browser (IndexedDB) per page.
@@ -32,7 +33,12 @@ export const onVersionsChange = (fn: () => void) => {
 
 export async function listVersions(pageId: string): Promise<Version[]> {
   if (!store) return [];
-  return (await get<Version[]>(pageId, store)) ?? [];
+  const list = (await get<Version[]>(pageId, store)) ?? [];
+  // Versions saved by an older builder show and restore in today's form
+  return list.map((v) => {
+    const page = upgradePage(v.page);
+    return page === v.page ? v : { ...v, page };
+  });
 }
 
 /** Save a version unless it is identical to the newest one. Returns false when nothing changed. */

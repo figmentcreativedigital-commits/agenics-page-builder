@@ -4,6 +4,7 @@ import { SharedPreview } from "@/components/share/SharedPreview";
 import "@/components/share/share.css";
 import { loadJson } from "@/lib/share-store";
 import { shareKey, validId, type ShareDoc } from "@/lib/share-server";
+import { upgradePage } from "@/lib/upgrade";
 
 export const metadata: Metadata = {
   title: "Page preview · Agenics Labs",
@@ -33,7 +34,8 @@ async function Shared({ id }: { id: string }) {
     year: "numeric",
     timeZone: "America/New_York",
   });
-  return <SharedPreview page={doc.page} updated={updated} />;
+  // Links shared from an older version of the builder open in today's form
+  return <SharedPreview page={upgradePage(doc.page)} updated={updated} />;
 }
 
 export default function SharePage({ params }: PageProps<"/share/[id]">) {
