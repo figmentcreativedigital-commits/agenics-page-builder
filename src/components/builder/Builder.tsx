@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { checkPage, leftToDo } from "@/lib/checks";
+import { startCloud } from "@/lib/cloud";
 import { ZOOM_STEPS, stepZoom } from "@/lib/devices";
 import { downloadBrief, downloadHandoffZip, downloadPageJson, importPageJson } from "@/lib/exporters";
 import { saveVersion } from "@/lib/history";
@@ -12,6 +13,7 @@ import "../page/page.css";
 import "./builder.css";
 import { usePageAdvice } from "./Advice";
 import { Canvas } from "./Canvas";
+import { SaveStatus } from "./CloudSave";
 import { Inspector, SettingsStrip } from "./Inspector";
 import { LeftPanel, NewPageDialog, type Tab } from "./LeftPanel";
 import { ImageLibrary } from "./ImageLibrary";
@@ -221,7 +223,6 @@ function TopBar({ onReview, onShortcuts, onShare, onTour }: { onReview: () => vo
   const setViewport = useBuilder((s) => s.setViewport);
   const preview = useBuilder((s) => s.preview);
   const setPreview = useBuilder((s) => s.setPreview);
-  const savedAt = useBuilder((s) => s.savedAt);
   const canUndo = useBuilder((s) => s.past.length > 0 && s.past[s.past.length - 1].pageId === s.activeId);
   const canRedo = useBuilder((s) => s.future.length > 0 && s.future[s.future.length - 1].pageId === s.activeId);
   const undo = useBuilder((s) => s.undo);
@@ -252,12 +253,7 @@ function TopBar({ onReview, onShortcuts, onShare, onTour }: { onReview: () => vo
           <span className="pb-namefit" data-value={page.name || "Untitled"}>
             <input className="pb-pagename" value={page.name} aria-label="Page name" size={1} onChange={(e) => updatePage({ name: e.target.value })} />
           </span>
-          <span
-            className="pb-saved"
-            title={savedAt ? `Saved in this browser at ${new Date(savedAt).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}` : "Saved in this browser"}
-          >
-            <Icon name="check" size={14} /> Saved
-          </span>
+          <SaveStatus />
         </span>
       ) : null}
       <span className="pb-spacer" />
@@ -414,6 +410,8 @@ export function Builder() {
     Promise.resolve(useBuilder.persist.rehydrate()).then(() => {
       useBuilder.getState().seedIfEmpty();
       setReady(true);
+      // With cloud save on, bring in the team's pages and keep this browser's changes going up
+      void startCloud();
       // First visit in this browser: offer the tour
       if (!tourSeen()) setTour(true);
     });

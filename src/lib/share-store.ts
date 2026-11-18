@@ -8,8 +8,8 @@
  *   be tried end to end.
  * - On Vercel without a store: sharing is off and the API says how to switch it on.
  */
-import { del, get, put } from "@vercel/blob";
-import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { del, get, list, put } from "@vercel/blob";
+import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 export type Mode = "blob" | "local" | "off";
@@ -97,10 +97,32 @@ export async function loadFile(key: string): Promise<{ body: BodyInit; contentTy
   }
 }
 
-export async function remove(key: string): Promise<void> {
+export async function remove(key: string | string[]): Promise<void> {
+  const keys = Array.isArray(key) ? key : [key];
+  if (!keys.length) return;
   if (storageMode() === "blob") {
-    await del(key).catch(() => undefined);
+    await del(keys).catch(() => undefined);
     return;
   }
-  await rm(localPath(key), { force: true });
+  await Promise.all(keys.map((k) => rm(localPath(k), { force: true })));
+}
+
+/** Every stored key that starts with the prefix (for example "pages/"). */
+export async function listKeys(prefix: string): Promise<string[]> {
+  if (storageMode() === "blob") {
+    const out: string[] = [];
+    let cursor: string | undefined;
+    do {
+      const res = await list({ prefix, cursor, limit: 1000 });
+      out.push(...res.blobs.map((b) => b.pathname));
+      cursor = res.hasMore ? res.cursor : undefined;
+    } while (cursor);
+    return out;
+  }
+  const base = path.join(LOCAL_DIR, prefix.split("/").filter(Boolean).join(path.sep));
+  if (!base.startsWith(LOCAL_DIR)) return [];
+  const entries = await readdir(base, { recursive: true, withFileTypes: true }).catch(() => []);
+  return entries
+    .filter((e) => e.isFile() && !e.name.endsWith(".type"))
+    .map((e) => path.relative(LOCAL_DIR, path.join(e.parentPath, e.name)).split(path.sep).join("/"));
 }

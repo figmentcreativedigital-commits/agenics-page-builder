@@ -11,6 +11,7 @@ import { EXAMPLES, RECIPES } from "@/lib/recipes";
 import { activePage, useBuilder } from "@/lib/store";
 import type { ModuleInstance, ModuleType } from "@/lib/types";
 import { PageRenderer } from "../page/PageRenderer";
+import { useCloud } from "@/lib/cloud";
 import { AdviceList, usePageAdvice } from "./Advice";
 import { BlockPicker, DRAG_TYPE } from "./Blocks";
 import { ModuleThumb } from "./thumbs";
@@ -270,6 +271,7 @@ function PagesTab({ onNew }: { onNew: () => void }) {
             {p.name}
             <small>
               {p.modules.length} blocks · edited {new Date(p.updatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+              {p.editedBy ? ` by ${p.editedBy}` : ""}
             </small>
           </button>
           <div className="pb-actions">
@@ -293,8 +295,22 @@ function PagesTab({ onNew }: { onNew: () => void }) {
           </div>
         </div>
       ))}
-      <p className="pb-hint">Pages save in this browser as you work. To share one, use Export › Page file.</p>
+      <PagesSaveHint />
     </div>
+  );
+}
+
+function PagesSaveHint() {
+  const status = useCloud((s) => s.status);
+  const on = status === "saved" || status === "syncing" || status === "offline" || status === "error";
+  return (
+    <p className="pb-hint">
+      {on
+        ? "Pages you make or change save to the cloud as you work. Everyone with the team passcode sees them here."
+        : status === "locked"
+          ? "Pages save in this browser as you work. Turn on cloud save, at the top, so the whole team sees the same pages."
+          : "Pages save in this browser as you work. To share one, use Export › Page file."}
+    </p>
   );
 }
 

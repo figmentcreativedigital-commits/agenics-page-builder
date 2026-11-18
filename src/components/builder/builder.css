@@ -2984,3 +2984,29 @@ html[data-tour-step="insert"] .pb-insert[data-index="1"] .pb-insert__line {
   color: var(--ag-charcoal);
   font: 600 12px/1.3 var(--font-ui);
 }
+
+/* Cloud save, in the top bar -------------------------------------------- */
+.pb-saved--btn {
+  border: 0;
+  background: transparent;
+  padding: 4px 6px;
+  border-radius: 6px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: #b9d6ea;
+  cursor: pointer;
+}
+.pb-saved--btn:hover,
+.pb-saved--btn:focus-visible {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+.pb-saved--cloud {
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #fff;
+}
+.pb-saved.is-warn {
+  color: #ffd38a;
+}
+

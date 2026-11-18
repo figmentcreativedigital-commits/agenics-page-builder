@@ -10,7 +10,7 @@ import { cpSync, existsSync, rmSync } from "node:fs";
 import path from "node:path";
 import { BASE, QA_DIR, launch, report } from "./lib.mjs";
 
-const ORDER = ["smoke", "undo", "upgrade", "export", "view", "tips", "typing", "tour", "axe", "screens"];
+const ORDER = ["smoke", "undo", "upgrade", "export", "view", "tips", "cloud", "typing", "tour", "axe", "screens"];
 
 const args = process.argv.slice(2);
 const appArg = args.indexOf("--app");
@@ -46,7 +46,8 @@ const server = spawn(path.join(appDir, "node_modules/.bin/next"), ["start", "-p"
   cwd: appDir,
   stdio: ["ignore", "ignore", "inherit"],
   detached: true,
-  env: { ...process.env, BLOB_READ_WRITE_TOKEN: "" },
+  // Cloud save is tested against local storage with a passcode that exists only for these checks
+  env: { ...process.env, BLOB_READ_WRITE_TOKEN: "", TEAM_PASSCODE: "qa-only-passcode" },
 });
 let code = 1;
 try {
