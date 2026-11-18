@@ -57,6 +57,12 @@ interface BuilderState {
   addPage: (page: PageDoc) => string;
   duplicatePage: (id: string) => void;
   deletePage: (id: string) => void;
+  /** A page arriving from cloud save: replaces or adds it without counting as an edit. */
+  upsertPage: (page: PageDoc) => void;
+  /** A page deleted on another computer. */
+  dropPage: (id: string) => void;
+  /** Cloud save notes who saved a page last, without counting as an edit. */
+  stampEditor: (id: string, name: string) => void;
   setActive: (id: string) => void;
   updatePage: (patch: Partial<Omit<PageDoc, "id" | "modules">>) => void;
   setShare: (pageId: string, share: ShareInfo | undefined) => void;
@@ -254,17 +260,48 @@ export const useBuilder = create<BuilderState>()(
           return page.id;
         },
 
+        upsertPage: (incoming) =>
+          set((s) => {
+            const page = upgradePage(incoming);
+            const exists = s.pages.some((p) => p.id === page.id);
+            return {
+              pages: exists ? s.pages.map((p) => (p.id === page.id ? page : p)) : [...s.pages, page],
+              activeId: s.activeId ?? page.id,
+              // Undo steps for a page that changed elsewhere would restore stale content
+              past: s.past.filter((x) => x.pageId !== page.id),
+              future: s.future.filter((x) => x.pageId !== page.id),
+            };
+          }),
+
+        dropPage: (id) =>
+          set((s) => {
+            const pages = s.pages.filter((p) => p.id !== id);
+            return {
+              pages,
+              activeId: s.activeId === id ? pages[0]?.id ?? null : s.activeId,
+              selectedUid: s.activeId === id ? null : s.selectedUid,
+              past: s.past.filter((x) => x.pageId !== id),
+              future: s.future.filter((x) => x.pageId !== id),
+            };
+          }),
+
+        stampEditor: (id, name) =>
+          set((s) => (s.pages.some((p) => p.id === id && p.editedBy !== name) ? { pages: s.pages.map((p) => (p.id === id ? { ...p, editedBy: name } : p)) } : s)),
+
         duplicatePage: (id) => {
           const src = get().pages.find((p) => p.id === id);
           if (!src) return;
+          const now = Date.now();
           const copy: PageDoc = {
             ...structuredClone(src),
             id: uid(),
             name: `${src.name} (copy)`,
-            createdAt: Date.now(),
-            updatedAt: Date.now(),
+            createdAt: now,
+            // One tick later than it was made: a copy is someone's work, so cloud save keeps it
+            updatedAt: now + 1,
           };
           delete copy.share; // a copy gets its own link when shared
+          delete copy.editedBy;
           copy.modules = copy.modules.map((m) => ({ ...m, uid: uid() }));
           set((s) => ({ pages: [...s.pages, copy], activeId: copy.id, selectedUid: null, past: [], future: [] }));
         },

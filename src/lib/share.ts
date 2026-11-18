@@ -83,7 +83,7 @@ async function call<T>(url: string, init: RequestInit): Promise<T> {
   return body as T;
 }
 
-async function uploadImage(id: string): Promise<string> {
+export async function uploadImage(id: string): Promise<string> {
   const cached = uploads()[id];
   if (cached) return cached;
   const blob = await getImageBlob(id);

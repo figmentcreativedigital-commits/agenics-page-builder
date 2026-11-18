@@ -53,6 +53,12 @@ Built by Figment Creative for Agenics Labs. Follows the **Agenics Corporate Grap
 - **Example — ST108 (Affirm), rev 2**: every line of the 10.26 copy deck, built with the newer blocks (Explainer + list, Icon grid, Who it's for, Statement, Text + image), hidden elements, navy and cyan sections, in-page anchors and the client's photography. The kit-chooser block is an addition, with a note saying so. Rev 2 follows the client's feedback of Nov 10, 2026: tables for the three water categories, the routine monitoring standards and the testing frequencies (typed out as real tables), a qualification and steam testing callout, the sample report with turnaround and in range or out of range, and a route to a person from the FAQ.
 
 Both can be added again at any time from **Pages › New page › Start from a finished example**. Browsers that used an earlier version receive the current ST108 example once, alongside their own pages (an earlier copy of it stays).
+- **Cloud save.** Click **Turn on cloud save** in the top bar, type your name and the team passcode once per computer. From then on:
+  - Every page you make or change saves to the team's private storage as you work, and shows up under **Pages** for everyone else with the passcode, with a notice ("New from the team") the first time it arrives.
+  - Each page's card says who saved it last and when.
+  - The newer copy of a page wins. Deleting a page deletes it for everyone.
+  - The examples and a template you have only just opened stay in your own browser until you change them, so the team never collects one copy per person.
+  - Uploaded photos travel with the page. Offline, changes wait in the browser and go up when the connection is back.
 - **Tables.** The Table block holds up to ten rows and eight columns, with an optional intro, notes under the table and a button. It is a real HTML table, so search engines can read it, and it scrolls sideways on phones.
 
 ## Brand implementation
@@ -81,6 +87,7 @@ Both can be added again at any time from **Pages › New page › Start from a f
 | `src/lib/upgrade.ts` | Saved-page upgrades: pages from older versions of the builder open in today's form |
 | `qa/` | Quality checks: end-to-end, undo, old pages, export parity, view, design tips, speed, tour, accessibility and screenshot suites |
 | `src/lib/tour.ts`, `src/components/builder/Tour.tsx` | The guided tour: its script, and the spotlight that runs it |
+| `src/lib/cloud.ts`, `src/lib/team-server.ts`, `src/app/api/pages/`, `src/app/api/team/`, `src/components/builder/CloudSave.tsx` | Cloud save: the sync between a browser and the team's storage, the passcode check, and the top bar status and dialog |
 | `src/lib/narration.ts`, `src/lib/speech.ts`, `src/app/api/voice/` | Read aloud: what may be voiced, the player with its browser-voice fallback, and the server route that voices a card once and caches it |
 | `public/examples/` | Photography used by the worked examples |
 
@@ -111,6 +118,7 @@ npm run qa -- undo typing  # some suites
 | `upgrade` | Browser storage, page files and a share link made by the last release open with nothing lost; pages from before October 2026 are upgraded on purpose |
 | `export` | The brief, zip and page file match the recorded baseline (`qa/baseline`); record a new one with `QA_RECORD=1` when a change is intended |
 | `view` | Zoom and Fit (menu and keys, also while typing, kept after a reload), folding panels, focus mode, the floating left panel at 1,024 px, the text bar above the page, the block menu (right-click and ⇧F10, keys stay inside it), hover outlines, one shared Review count, old view settings |
+| `cloud` | Cloud save between two browsers: the passcode gate, a page made in one showing up in the other with its pictures and the saver's name, changes and deletes crossing over, untouched examples staying local |
 | `tips` | Every template and example starts with no design tips; the three tips, their cards, fixes, undo and Keep as is; text colors by background (never cyan on light); cut-outs; the brief and page file carry colors and image fit |
 | `typing` | Typing p75 under 50 ms on a 19-section page, no layout shift while typing, adding a section in about 120 ms |
 | `tour` | The tour opens once, every step has its target, the keys and the Tour button work; 18 steps or fewer; Read aloud turns on and is remembered; the narrator voices tour cards only |
@@ -131,6 +139,7 @@ npm run build    # production build check
 2. For preview links: **Storage › Create › Blob**, connect it to this project (Vercel adds the access token), then redeploy. If you choose a private store, also add `BLOB_ACCESS=private`.
 3. Add environment variables (Settings › Environment Variables), then redeploy:
    - `NEXT_PUBLIC_ADOBE_FONTS_KIT_ID`: the Adobe Fonts web project ID with Neue Kabel
+   - `TEAM_PASSCODE` (optional, cloud save): any passcode you choose. With it set, the top bar offers **Turn on cloud save**; everyone who enters it, at Figment and at Agenics, sees the same pages. Changing it signs everyone out. It needs the Blob store that share links already use. Without it, pages stay in each browser.
    - `GOOGLE_TTS_API_KEY` (optional, the tour narrator): a Google Cloud key with the Text-to-Speech API on; the key the Figment Page Builder uses works. The tour's **Read aloud** then uses Google's Chirp 3 HD voices (Charon by default), voiced on the server once per card and voice and cached across deploys. The whole tour is about 3,500 characters per voice. Only tour cards can be voiced, and the key never reaches the browser. Without the key, Read aloud uses the browser's own voice.
 4. In Adobe Fonts, add the Vercel domain (and any custom domain) to the web project.
 5. Every push to `main` deploys to production; every pull request gets its own preview URL.

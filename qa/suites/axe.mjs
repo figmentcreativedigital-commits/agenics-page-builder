@@ -53,6 +53,7 @@ export default async function axeSuite(browser) {
     ["Share dialog", async () => page.keyboard.press("Escape").then(() => page.locator("[data-tour=share]").click()), tool],
     ["Photo library", async () => page.keyboard.press("Escape").then(() => selectBlock(page, 0)).then(() => settingsTab(page, "Content")).then(() => page.locator(".pb-right").getByRole("button", { name: "Library" }).first().click()), tool],
     ["New page dialog", async () => page.keyboard.press("Escape").then(() => openPanel(page, "Pages")).then(() => page.getByRole("button", { name: /New page/ }).first().click()), tool],
+    ["Cloud save dialog", async () => page.keyboard.press("Escape").then(() => page.locator("[data-cloud=off]").click()), tool],
     ["View menu", async () => page.keyboard.press("Escape").then(() => page.locator("[data-tour=view] > button").click()), tool],
     ["Block menu", async () => page.keyboard.press("Escape").then(() => page.locator(".pb-frame").nth(1).click({ button: "right", position: { x: 300, y: 120 } })), tool],
     [

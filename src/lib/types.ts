@@ -86,6 +86,8 @@ export interface PageDoc {
   createdAt: number;
   updatedAt: number;
   share?: ShareInfo;
+  /** With cloud save: the name of whoever saved the page last. */
+  editedBy?: string;
   /** Design tips someone chose to keep as is (ids from lib/advice). */
   keep?: string[];
 }
